@@ -22,8 +22,6 @@
 *   Authors:  Carlos Henrique Barriquelo
 *   Revision: 1.0
 *   Date:     12/01/2013
-*   Revision: 1.02 (Support for task handle)
-*   Date:     22/11/2014
 *********************************************************************************************************/
 
 
@@ -33,6 +31,8 @@
 #ifndef TIMERS_H
 #define TIMERS_H
 
+#include "OS_types.h"
+#include "BRTOSConfig.h"
 #include "BRTOS.h"
 
 #ifdef BRTOS_TMR_EN 
@@ -55,16 +55,19 @@ typedef TIMER_CNT (*FCN_CALLBACK) (void);
 
 /* soft timer possible states:
 */
-typedef enum{
+typedef enum
+{
   TIMER_NOT_ALLOCATED = 0,
   TIMER_NOT_USED = 1,
   TIMER_STOPPED = 2,
-  TIMER_RUNNING = 3,  
+  TIMER_RUNNING = 3,
+  TIMER_SEARCH = 4,
 } TIMER_STATE;
 
 /* soft timer data struct
 */
-typedef struct BRTOS_TIMER_S {
+typedef struct BRTOS_TIMER_S 
+{
       FCN_CALLBACK       func_cb;
       TIMER_CNT          timeout;
       TIMER_STATE        state;
@@ -77,18 +80,15 @@ typedef  BRTOS_TIMER_T*  BRTOS_TIMER;
 /* soft timers list data struct 
 */
 
-typedef struct{    
+typedef struct
+{    
     BRTOS_TIMER timers [BRTOS_MAX_TIMER];
     INT8S       count;
 }BRTOS_TMR_T;
 
 
 /* TIMER TASK prototype */  
-#if (TASK_WITH_PARAMETERS == 1)
-void BRTOS_TimerTask(void *param);
-#else
 void BRTOS_TimerTask(void);
-#endif
  
 /************* public API *********************/ 
 void OSTimerInit(INT16U timertask_stacksize, INT8U prio);
