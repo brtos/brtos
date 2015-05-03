@@ -110,3 +110,6 @@
 
 == BRTOS 1.77 Changelog ==
 - Added soft timers service. Beta version.
+
+== BRTOS 1.78 Changelog ==
+- Fix in TimerStop function for soft timers service.
