@@ -113,3 +113,6 @@
 
 == BRTOS 1.78 Changelog ==
 - Fix in TimerStop function for soft timers service.
+
+== BRTOS 1.79 Changelog ==
+- Added support for binary semaphores.

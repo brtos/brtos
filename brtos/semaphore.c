@@ -123,7 +123,9 @@ INT8U OSSemCreate (INT8U cnt, BRTOS_Sem **event)
     // Exit Critical
   pont_event->OSEventCount = cnt;                      // Set semaphore count value
   pont_event->OSEventWait  = 0;
+#if (BRTOS_BINARY_SEM_EN == 1)
   pont_event->Binary = FALSE;
+#endif
   pont_event->OSEventWaitList=0;
 
   *event = pont_event;
@@ -144,6 +146,7 @@ INT8U OSSemCreate (INT8U cnt, BRTOS_Sem **event)
 
 
 
+#if (BRTOS_BINARY_SEM_EN == 1)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 /////      Create Binary Semaphore Function            /////
@@ -214,6 +217,8 @@ INT8U OSSemBinaryCreate (INT8U bit, BRTOS_Sem **event)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
+#endif
+
 
 
 
@@ -515,6 +520,7 @@ INT8U OSSemPost(BRTOS_Sem *pont_event)
   if (pont_event->OSEventCount < 255)
   {
     // Increment semaphore count
+#if (BRTOS_BINARY_SEM_EN == 1)
 	if (pont_event->Binary == FALSE)
 	{
 		pont_event->OSEventCount++;
@@ -522,6 +528,9 @@ INT8U OSSemPost(BRTOS_Sem *pont_event)
 	{
 		pont_event->OSEventCount = TRUE;
 	}
+#else
+	pont_event->OSEventCount++;
+#endif
                          
     // Exit Critical Section
     #if (NESTING_INT == 0)

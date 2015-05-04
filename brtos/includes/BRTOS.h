@@ -252,7 +252,9 @@ typedef struct {
   INT8U        OSEventAllocated;              ///< Indicate if the event is allocated or not
   INT8U        OSEventCount;                  ///< Semaphore Count - This value is increased with a post and decremented with a pend
   INT8U        OSEventWait;                   ///< Counter of waiting Tasks
+#if (BRTOS_BINARY_SEM_EN == 1)
   INT8U		   Binary;						  ///< Defines if semaphore is binary or counting
+#endif
   PriorityType OSEventWaitList;               ///< Task wait list for event to occur
 } BRTOS_Sem;
 
@@ -736,6 +738,7 @@ void initEvents(void);
   *********************************************************************************************/
   INT8U OSSemCreate (INT8U cnt, BRTOS_Sem **event);
 
+#if (BRTOS_BINARY_SEM_EN == 1)
   /*****************************************************************************************//**
   * \fn INT8U OSSemBinaryCreate (INT8U cnt, BRTOS_Sem **event)
   * \brief Allocates a semaphore control block
@@ -746,6 +749,7 @@ void initEvents(void);
   * \return ALLOC_EVENT_OK Semaphore control block successfully allocated
   *********************************************************************************************/
   INT8U OSSemBinaryCreate(INT8U bit, BRTOS_Sem **event);
+#endif
   
   /*****************************************************************************************//**
   * \fn INT8U OSSemDelete (BRTOS_Sem **event)
