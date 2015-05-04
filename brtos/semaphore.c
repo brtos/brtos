@@ -62,6 +62,10 @@
 *   Revision: 1.76
 *   Date:     11/10/2012
 *
+*   Authors:  Gustavo Weber Denardin
+*   Revision: 1.79
+*   Date:     03/05/2015
+*
 *********************************************************************************************************/
 
 #include "BRTOS.h"
@@ -119,7 +123,82 @@ INT8U OSSemCreate (INT8U cnt, BRTOS_Sem **event)
     // Exit Critical
   pont_event->OSEventCount = cnt;                      // Set semaphore count value
   pont_event->OSEventWait  = 0;
+  pont_event->Binary = FALSE;
+  pont_event->OSEventWaitList=0;
+
+  *event = pont_event;
+
+  // Exit critical Section
+  if (currentTask)
+     OSExitCritical();
+
+  return(ALLOC_EVENT_OK);
+}
+
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+
+
+
+
+
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+/////      Create Binary Semaphore Function            /////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+
+INT8U OSSemBinaryCreate (INT8U bit, BRTOS_Sem **event)
+{
+  OS_SR_SAVE_VAR
+  int i=0;
+
+  BRTOS_Sem *pont_event;
+
+  if (iNesting > 0) {                                // See if caller is an interrupt
+     return(IRQ_PEND_ERR);                           // Can't be create by interrupt
+  }
+
+  // Enter critical Section
+  if (currentTask)
+     OSEnterCritical();
+
+  // Verifica se ainda há blocos de controle de eventos disponíveis
+  for(i=0;i<=BRTOS_MAX_SEM;i++)
+  {
+
+    if(i >= BRTOS_MAX_SEM)
+    {
+      // Caso não haja mais blocos disponíveis, retorna exceção
+
+      // Exit critical Section
+      if (currentTask)
+         OSExitCritical();
+
+      return(NO_AVAILABLE_EVENT);
+    }
+
+
+    if(BRTOS_Sem_Table[i].OSEventAllocated != TRUE)
+    {
+      BRTOS_Sem_Table[i].OSEventAllocated = TRUE;
+      pont_event = &BRTOS_Sem_Table[i];
+      break;
+    }
+  }
   
+  // Exit Critical
+  if (bit > 1)
+  {
+	  pont_event->OSEventCount = TRUE;                      // Set semaphore bit value
+  }else
+  {
+	  pont_event->OSEventCount = FALSE;                      // Set semaphore bit value
+  }
+  pont_event->OSEventWait  = 0;
+  pont_event->Binary = TRUE;
   pont_event->OSEventWaitList=0;
   
   *event = pont_event;
@@ -135,7 +214,6 @@ INT8U OSSemCreate (INT8U cnt, BRTOS_Sem **event)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
-
 
 
 
@@ -437,7 +515,13 @@ INT8U OSSemPost(BRTOS_Sem *pont_event)
   if (pont_event->OSEventCount < 255)
   {
     // Increment semaphore count
-    pont_event->OSEventCount++;
+	if (pont_event->Binary == FALSE)
+	{
+		pont_event->OSEventCount++;
+	}else
+	{
+		pont_event->OSEventCount = TRUE;
+	}
                          
     // Exit Critical Section
     #if (NESTING_INT == 0)

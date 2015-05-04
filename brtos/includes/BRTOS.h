@@ -54,7 +54,7 @@
 
 
 // Brtos version
-#define BRTOS_VERSION   "BRTOS Ver. 1.78"
+#define BRTOS_VERSION   "BRTOS Ver. 1.79"
 
 /// False and True defines
 #ifndef FALSE
@@ -252,6 +252,7 @@ typedef struct {
   INT8U        OSEventAllocated;              ///< Indicate if the event is allocated or not
   INT8U        OSEventCount;                  ///< Semaphore Count - This value is increased with a post and decremented with a pend
   INT8U        OSEventWait;                   ///< Counter of waiting Tasks
+  INT8U		   Binary;						  ///< Defines if semaphore is binary or counting
   PriorityType OSEventWaitList;               ///< Task wait list for event to occur
 } BRTOS_Sem;
 
@@ -734,6 +735,17 @@ void initEvents(void);
   * \return ALLOC_EVENT_OK Semaphore control block successfully allocated
   *********************************************************************************************/
   INT8U OSSemCreate (INT8U cnt, BRTOS_Sem **event);
+
+  /*****************************************************************************************//**
+  * \fn INT8U OSSemBinaryCreate (INT8U cnt, BRTOS_Sem **event)
+  * \brief Allocates a semaphore control block
+  * \param bit Initial Semaphore bit value - default = 0
+  * \param **event Address of the semaphore control block pointer
+  * \return IRQ_PEND_ERR Can not use semaphore create function from interrupt handler code
+  * \return NO_AVAILABLE_EVENT No semaphore control blocks available
+  * \return ALLOC_EVENT_OK Semaphore control block successfully allocated
+  *********************************************************************************************/
+  INT8U OSSemBinaryCreate(INT8U bit, BRTOS_Sem **event);
   
   /*****************************************************************************************//**
   * \fn INT8U OSSemDelete (BRTOS_Sem **event)
