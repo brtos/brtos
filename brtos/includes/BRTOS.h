@@ -1192,7 +1192,12 @@ extern INT32U TaskAlloc;
 extern INT16U iQueueAddress;
 
 #if (PROCESSOR == ATMEGA)
-extern PGM_P BRTOSStringTable[] PROGMEM;
+#if (!defined __GNUC__)
+#define CONST
+#else
+#define CONST const
+#endif
+extern PGM_P CONST BRTOSStringTable[] PROGMEM;
 #else
 #if (PROCESSOR == PIC18)
 extern const rom CHAR8 *version;

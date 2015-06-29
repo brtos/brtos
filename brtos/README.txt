@@ -116,3 +116,6 @@
 
 == BRTOS 1.79 Changelog ==
 - Added support for binary semaphores.
+
+== BRTOS 1.80 Changelog ==
+- Added port for Atmel Studio with ATMEGA2560/1, ATMEGA328P

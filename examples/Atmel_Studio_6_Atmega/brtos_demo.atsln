@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Atmel Studio Solution File, Format Version 11.00
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "brtos_atmega2560", "brtos_atmega2560\brtos_atmega2560.cproj", "{6D287CFD-13EA-4057-8B28-0B4D2F4053E0}"
+EndProject
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "brtos_atmega328p", "brtos_atmega328p\brtos_atmega328p.cproj", "{8264E795-D31C-4C19-B652-3C094D6CB4D4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6D287CFD-13EA-4057-8B28-0B4D2F4053E0}.Debug|AVR.ActiveCfg = Debug|AVR
+		{6D287CFD-13EA-4057-8B28-0B4D2F4053E0}.Debug|AVR.Build.0 = Debug|AVR
+		{6D287CFD-13EA-4057-8B28-0B4D2F4053E0}.Release|AVR.ActiveCfg = Release|AVR
+		{6D287CFD-13EA-4057-8B28-0B4D2F4053E0}.Release|AVR.Build.0 = Release|AVR
+		{8264E795-D31C-4C19-B652-3C094D6CB4D4}.Debug|AVR.ActiveCfg = Debug|AVR
+		{8264E795-D31C-4C19-B652-3C094D6CB4D4}.Debug|AVR.Build.0 = Debug|AVR
+		{8264E795-D31C-4C19-B652-3C094D6CB4D4}.Release|AVR.ActiveCfg = Release|AVR
+		{8264E795-D31C-4C19-B652-3C094D6CB4D4}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

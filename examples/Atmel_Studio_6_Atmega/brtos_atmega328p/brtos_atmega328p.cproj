@@ -1,0 +1,219 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>6.2</ProjectVersion>
+    <ToolchainName>com.Atmel.AVRGCC8.C</ToolchainName>
+    <ProjectGuid>{8264e795-d31c-4c19-b652-3c094d6cb4d4}</ProjectGuid>
+    <avrdevice>ATmega328P</avrdevice>
+    <avrdeviceseries>none</avrdeviceseries>
+    <OutputType>Executable</OutputType>
+    <Language>C</Language>
+    <OutputFileName>$(MSBuildProjectName)</OutputFileName>
+    <OutputFileExtension>.elf</OutputFileExtension>
+    <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
+    <AssemblyName>brtos_atmega328p</AssemblyName>
+    <Name>brtos_atmega328p</Name>
+    <RootNamespace>brtos_atmega328p</RootNamespace>
+    <ToolchainFlavour>Native</ToolchainFlavour>
+    <KeepTimersRunning>true</KeepTimersRunning>
+    <OverrideVtor>false</OverrideVtor>
+    <CacheFlash>true</CacheFlash>
+    <ProgFlashFromRam>true</ProgFlashFromRam>
+    <RamSnippetAddress />
+    <UncachedRange />
+    <preserveEEPROM>true</preserveEEPROM>
+    <OverrideVtorValue />
+    <BootSegment>2</BootSegment>
+    <eraseonlaunchrule>1</eraseonlaunchrule>
+    <AsfFrameworkConfig>
+      <framework-data xmlns="">
+        <options />
+        <configurations />
+        <files />
+        <documentation help="" />
+        <offline-documentation help="" />
+        <dependencies>
+          <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.20.1" />
+        </dependencies>
+      </framework-data>
+    </AsfFrameworkConfig>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <ToolchainSettings>
+      <AvrGcc>
+        <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+        <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+        <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+        <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+        <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>NDEBUG</Value>
+          </ListValues>
+        </avrgcc.compiler.symbols.DefSymbols>
+        <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
+        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+        <avrgcc.linker.libraries.Libraries>
+          <ListValues>
+            <Value>libm</Value>
+          </ListValues>
+        </avrgcc.linker.libraries.Libraries>
+      </AvrGcc>
+    </ToolchainSettings>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <ToolchainSettings>
+      <AvrGcc>
+  <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+  <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+  <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+  <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+  <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+  <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+  <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+  <avrgcc.compiler.symbols.DefSymbols>
+    <ListValues>
+      <Value>DEBUG</Value>
+    </ListValues>
+  </avrgcc.compiler.symbols.DefSymbols>
+  <avrgcc.compiler.directories.IncludePaths>
+    <ListValues>
+      <Value>../../../../brtos/includes</Value>
+      <Value>../../../../hal/Atmel_Studio_6_ATMEGA</Value>
+      <Value>../../drivers</Value>
+      <Value>../../includes</Value>
+      <Value>../includes</Value>
+    </ListValues>
+  </avrgcc.compiler.directories.IncludePaths>
+  <avrgcc.compiler.optimization.level>Optimize (-O1)</avrgcc.compiler.optimization.level>
+  <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+  <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+  <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
+  <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+  <avrgcc.linker.libraries.Libraries>
+    <ListValues>
+      <Value>libm</Value>
+    </ListValues>
+  </avrgcc.linker.libraries.Libraries>
+  <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
+</AvrGcc>
+    </ToolchainSettings>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\..\brtos\BRTOS.c">
+      <SubType>compile</SubType>
+      <Link>brtos\BRTOS.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\brtos\includes\BRTOS.h">
+      <SubType>compile</SubType>
+      <Link>brtos\includes\BRTOS.h</Link>
+    </Compile>
+    <Compile Include="..\..\..\brtos\includes\OSInfo.h">
+      <SubType>compile</SubType>
+      <Link>brtos\includes\OSInfo.h</Link>
+    </Compile>
+    <Compile Include="..\..\..\brtos\includes\OS_RTC.h">
+      <SubType>compile</SubType>
+      <Link>brtos\includes\OS_RTC.h</Link>
+    </Compile>
+    <Compile Include="..\..\..\brtos\includes\OS_types.h">
+      <SubType>compile</SubType>
+      <Link>brtos\includes\OS_types.h</Link>
+    </Compile>
+    <Compile Include="..\..\..\brtos\includes\timers.h">
+      <SubType>compile</SubType>
+      <Link>brtos\includes\timers.h</Link>
+    </Compile>
+    <Compile Include="..\..\..\brtos\mbox.c">
+      <SubType>compile</SubType>
+      <Link>brtos\mbox.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\brtos\mutex.c">
+      <SubType>compile</SubType>
+      <Link>brtos\mutex.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\brtos\OSInfo.c">
+      <SubType>compile</SubType>
+      <Link>brtos\OSInfo.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\brtos\OS_RTC.c">
+      <SubType>compile</SubType>
+      <Link>brtos\OS_RTC.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\brtos\queue.c">
+      <SubType>compile</SubType>
+      <Link>brtos\queue.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\brtos\semaphore.c">
+      <SubType>compile</SubType>
+      <Link>brtos\semaphore.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\brtos\timers.c">
+      <SubType>compile</SubType>
+      <Link>brtos\timers.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\hal\Atmel_Studio_6_ATMEGA\HAL.c">
+      <SubType>compile</SubType>
+      <Link>brtos\hal\HAL.c</Link>
+    </Compile>
+    <Compile Include="..\..\..\hal\Atmel_Studio_6_ATMEGA\HAL.h">
+      <SubType>compile</SubType>
+      <Link>brtos\hal\HAL.h</Link>
+    </Compile>
+    <Compile Include="..\debug_info.c">
+      <SubType>compile</SubType>
+      <Link>debug_info.c</Link>
+    </Compile>
+    <Compile Include="..\drivers\serial.c">
+      <SubType>compile</SubType>
+      <Link>drivers\serial.c</Link>
+    </Compile>
+    <Compile Include="..\drivers\serial.h">
+      <SubType>compile</SubType>
+      <Link>drivers\serial.h</Link>
+    </Compile>
+    <Compile Include="..\includes\debug_info.h">
+      <SubType>compile</SubType>
+      <Link>includes\debug_info.h</Link>
+    </Compile>
+    <Compile Include="..\includes\drivers.h">
+      <SubType>compile</SubType>
+      <Link>includes\drivers.h</Link>
+    </Compile>
+    <Compile Include="..\includes\hardware.h">
+      <SubType>compile</SubType>
+      <Link>includes\hardware.h</Link>
+    </Compile>
+    <Compile Include="..\includes\tasks.h">
+      <SubType>compile</SubType>
+      <Link>includes\tasks.h</Link>
+    </Compile>
+    <Compile Include="..\main_demo.c">
+      <SubType>compile</SubType>
+      <Link>main_demo.c</Link>
+    </Compile>
+    <Compile Include="..\tasks.c">
+      <SubType>compile</SubType>
+      <Link>tasks.c</Link>
+    </Compile>
+    <Compile Include="brtos_atmega328p.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="includes\BRTOSConfig.h">
+      <SubType>compile</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="brtos\" />
+    <Folder Include="brtos\hal\" />
+    <Folder Include="brtos\includes\" />
+    <Folder Include="drivers\" />
+    <Folder Include="includes\" />
+  </ItemGroup>
+  <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
+</Project>

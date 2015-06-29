@@ -71,7 +71,7 @@
 
 #if (PROCESSOR == ATMEGA)
 const CHAR8 version[] PROGMEM = BRTOS_VERSION;	///< Informs BRTOS version
-PGM_P BRTOSStringTable[] PROGMEM = 
+PGM_P CONST BRTOSStringTable[] PROGMEM = 
 {
     version
 };
