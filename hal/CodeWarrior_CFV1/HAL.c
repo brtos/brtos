@@ -81,6 +81,7 @@ void TickTimerSetup(void)
 
 void OSRTCSetup(void)
 {  
+#if OSRTCEN == 1
   /* ### Init_RTC init code */
   /* RTCMOD: RTCMOD=0x63 */
   // Cristal de Referência = 1Khz
@@ -88,8 +89,8 @@ void OSRTCSetup(void)
   /* RTCSC: RTIF=1,RTCLKS=0,RTIE=1,RTCPS=0x0B */
   RTCSC = 0x1B;                                      
   /* ### */
-
   //OSResetTime(&Hora);
+#endif
 }
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
