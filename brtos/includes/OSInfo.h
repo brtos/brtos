@@ -16,6 +16,7 @@ void OSTaskList(char *string);
 void OSAvailableMemory(char *string);
 void OSUptimeInfo(char *string);
 void OSCPULoad(char *string);
+char *PrintDecimal(signed short val, char *buff);
 
 
 #endif /* DEBUG_H_ */
