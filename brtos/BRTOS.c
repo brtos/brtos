@@ -58,6 +58,10 @@
 *   Revision: 1.77       ,  Revision: 1.78, 		Revision: 1.79
 *   Date:     12/01/2013 ,  Date:     06/03/2014, 	Date:     02/09/2014
 *
+*   Authors:  Gustavo Weber Denardin
+*   Revision: 1.80
+*   Date:     11/11/2015
+*
 *
 *********************************************************************************************************/
 
@@ -205,7 +209,8 @@ volatile INT8U flag_load = TRUE;
 ////////////////////////////////////////////////////////////
 #if (BRTOS_QUEUE_EN == 1)
   /// Queue Control Block
-  BRTOS_Queue      BRTOS_Queue_Table[BRTOS_MAX_QUEUE];    // Table of EVENT control blocks
+  BRTOS_Queue      BRTOS_Queue_Table[BRTOS_MAX_QUEUE];    	// Table of EVENT control blocks
+  OS_QUEUE	       BRTOS_OS_QUEUE_Table[BRTOS_MAX_QUEUE];	// Table of QUEUE control blocks
 #endif
 
 

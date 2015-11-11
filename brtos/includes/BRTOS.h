@@ -719,6 +719,7 @@ INT8U SAScheduler(PriorityType ReadyList);
 #if (BRTOS_QUEUE_EN == 1)
   /// Queue Control Block
   extern BRTOS_Queue BRTOS_Queue_Table[BRTOS_MAX_QUEUE];
+  extern OS_QUEUE	 BRTOS_OS_QUEUE_Table[BRTOS_MAX_QUEUE];
 #endif
 
 
@@ -906,14 +907,13 @@ void initEvents(void);
   /*****************************************************************************************//**
   * \fn INT8U OSQueueCreate(OS_QUEUE *cqueue, INT16U size, BRTOS_Queue **event)
   * \brief Allocates a queue control block  
-  * \param *cqueue Queue pointer
   * \param size Queue size
   * \param **event Queue event pointer
   * \return IRQ_PEND_ERR Can not use queue create function from interrupt handler code
   * \return NO_AVAILABLE_EVENT No queue control blocks available
   * \return ALLOC_EVENT_OK Queue control block successfully allocated
   *********************************************************************************************/
-  INT8U OSQueueCreate(OS_QUEUE *cqueue, INT16U size, BRTOS_Queue **event);
+  INT8U OSQueueCreate(INT16U size, BRTOS_Queue **event);
  
   /*****************************************************************************************//**
   * \fn OSWQueue(OS_QUEUE *cqueue,INT8U data)

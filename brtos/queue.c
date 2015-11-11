@@ -86,11 +86,12 @@
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSQueueCreate(OS_QUEUE *cqueue, INT16U size, BRTOS_Queue **event)
+INT8U OSQueueCreate(INT16U size, BRTOS_Queue **event)
 {
   OS_SR_SAVE_VAR
   INT16S i=0;
   BRTOS_Queue *pont_event;
+  OS_QUEUE *cqueue; 
 
   if (iNesting > 0) {                                // See if caller is an interrupt
      return(IRQ_PEND_ERR);                           // Can't be create by interrupt
@@ -135,6 +136,7 @@ INT8U OSQueueCreate(OS_QUEUE *cqueue, INT16U size, BRTOS_Queue **event)
     {
       BRTOS_Queue_Table[i].OSEventAllocated = TRUE;
       pont_event = &BRTOS_Queue_Table[i];
+      cqueue = &BRTOS_OS_QUEUE_Table[i];
       break;      
     }
   } 
