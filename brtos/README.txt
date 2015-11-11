@@ -119,3 +119,6 @@
 
 == BRTOS 1.80 Changelog ==
 - Added port for Atmel Studio with ATMEGA2560/1, ATMEGA328P
+- Now semaphores, queues and mailboxes can use the NO_TIMEOUT option in order to avoid timeout in Pend functions
+- Now it is no longer necessary to pass the structure OS_QUEUE to create a queue
+- Arquivos timers.c e timers.h alterados para stimer.c e stimer.h
