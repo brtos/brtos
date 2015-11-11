@@ -145,7 +145,11 @@ static void BRTOS_TimerTaskSleep(TIMER_CNT next_time_to_wake)
 }
 
 /* Timer Task */
+#if (TASK_WITH_PARAMETERS == 1)
+void BRTOS_TimerTask(void *param)
+#else
 void BRTOS_TimerTask(void)
+#endif
 {
      
      OS_SR_SAVE_VAR
@@ -155,6 +159,10 @@ void BRTOS_TimerTask(void)
      INT32U      timeout;
      TIMER_CNT   next_time_to_wake;      /* tick count of next timer */
      BRTOS_TMR_T *list, *list_tmp;          
+     
+     #if (TASK_WITH_PARAMETERS == 1)
+	 (void)param;
+	 #endif
      
      BRTOS_TIMER_VECTOR.handling_task = currentTask;
      

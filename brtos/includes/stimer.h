@@ -88,7 +88,11 @@ typedef struct
 
 
 /* TIMER TASK prototype */  
+#if (TASK_WITH_PARAMETERS == 1)
+void BRTOS_TimerTask(void *param);
+#else
 void BRTOS_TimerTask(void);
+#endif
  
 /************* public API *********************/ 
 void OSTimerInit(INT16U timertask_stacksize, INT8U prio);
