@@ -66,6 +66,10 @@
 *   Revision: 1.79
 *   Date:     03/05/2015
 *
+*   Authors:  Gustavo Weber Denardin
+*   Revision: 1.80
+*   Date:     11/11/2015
+*
 *********************************************************************************************************/
 
 #include "BRTOS.h"
@@ -324,6 +328,13 @@ INT8U OSSemPend (BRTOS_Sem *pont_event, INT16U time_wait)
     OSExitCritical();
     return OK;
   } 
+  
+  // If no timeout is used and the semaphore count is zero, exit the semaphore with an error
+  if (time_wait == NO_TIMEOUT){
+  	// Exit Critical Section
+    OSExitCritical();
+    return EXIT_BY_NO_ENTRY_AVAILABLE;
+  }
  
   Task = (ContextType*)&ContextTask[currentTask];
     

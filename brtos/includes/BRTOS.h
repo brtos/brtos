@@ -31,6 +31,10 @@
 *   Revision: 1.75					,   Revision: 1.76        ,   Revision: 1.78
 *   Date:     24/08/2012	  ,	  Date:     11/10/2012	,	  Date:     06/03/2014
 *
+*   Authors:  Gustavo Weber Denardin
+*   Revision: 1.80
+*   Date:     11/11/2015
+*
 *********************************************************************************************************/
 
 #ifndef OS_BRTOS_H
@@ -54,7 +58,7 @@
 
 
 // Brtos version
-#define BRTOS_VERSION   "BRTOS Ver. 1.79"
+#define BRTOS_VERSION   "BRTOS Ver. 1.80"
 
 /// False and True defines
 #ifndef FALSE
@@ -107,6 +111,7 @@
 #define NOT_VALID_TASK               (INT8U)8     ///< There current task number is not valid for this function
 #define NO_TASK_DELAY                (INT8U)9     ///< Error - No valid time to wait
 #define END_OF_AVAILABLE_TCB         (INT8U)10    ///< Error - There are no more task control blocks (Context task)
+#define EXIT_BY_NO_ENTRY_AVAILABLE	 (INT8U)11	  ///< Error - There are no data into queues and mailboxes or semaphore value is zero with no timeout option
 
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////

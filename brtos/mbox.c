@@ -62,6 +62,10 @@
 *   Revision: 1.76
 *   Date:     11/10/2012
 *
+*   Authors:  Gustavo Weber Denardin
+*   Revision: 1.80
+*   Date:     11/11/2015
+*
 *********************************************************************************************************/
 
 #include "BRTOS.h"
@@ -248,6 +252,13 @@ INT8U OSMboxPend (BRTOS_Mbox *pont_event, void **Mail, INT16U time_wait)
   }
   else
   {
+  	// If no timeout is used and the mailbox is empty, exit the mailbox with an error
+	if (time_wait == NO_TIMEOUT){
+		// Exit Critical Section
+	    OSExitCritical();
+	    return EXIT_BY_NO_ENTRY_AVAILABLE;
+	}
+  	
     Task = (ContextType*)&ContextTask[currentTask];
       
     // Copy task priority to local scope

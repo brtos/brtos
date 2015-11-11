@@ -66,6 +66,10 @@
 *   Revision: 1.76
 *   Date:     11/10/2012
 *
+*   Authors:  Gustavo Weber Denardin
+*   Revision: 1.80
+*   Date:     11/11/2015
+*
 *********************************************************************************************************/
 
 #include "BRTOS.h"
@@ -393,6 +397,13 @@ INT8U OSQueuePend (BRTOS_Queue *pont_event, INT8U* pdata, INT16U time_wait)
   }
   else
   {
+  	// If no timeout is used and the queue is empty, exit the queue with an error
+	if (time_wait == NO_TIMEOUT){
+		// Exit Critical Section
+	    OSExitCritical();
+	    return EXIT_BY_NO_ENTRY_AVAILABLE;
+	}  	
+  	
     Task = (ContextType*)&ContextTask[currentTask];
     
     // Copy task priority to local scope
@@ -1425,6 +1436,13 @@ INT8U OSDQueuePend (BRTOS_Queue *pont_event, void *pdata, INT16U time_wait)
   }
   else
   {
+  	// If no timeout is used and the queue is empty, exit the queue with an error
+	if (time_wait == NO_TIMEOUT){
+		// Exit Critical Section
+	    OSExitCritical();
+	    return EXIT_BY_NO_ENTRY_AVAILABLE;
+	}    	
+  	
     Task = (ContextType*)&ContextTask[currentTask];
     
     // Copy task priority to local scope
