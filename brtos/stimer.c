@@ -34,7 +34,7 @@
 /**
 \brief BRTOS soft timer service
 */
-#include "timers.h"
+#include "stimer.h"
 
 
 #ifdef BRTOS_TMR_EN 
