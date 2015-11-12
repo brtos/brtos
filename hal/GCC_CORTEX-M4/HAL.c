@@ -231,6 +231,46 @@ void          OS_TaskReturn             (void);
 }
 
 
+#if (TASK_WITH_PARAMETERS == 1)
+  unsigned int CreateDVirtualStack(void(*FctPtr)(void*), unsigned int stk, void *parameters)
+#else
+  unsigned int CreateDVirtualStack(void(*FctPtr)(void), unsigned int stk)
+#endif
+{
+	OS_CPU_TYPE *stk_pt = (OS_CPU_TYPE *)stk;
+
+	*--stk_pt = (INT32U)INITIAL_XPSR;                   	/* xPSR                                                   */
+
+    *--stk_pt = (INT32U)FctPtr;                             /* Entry Point                                            */
+    /// ??????????????????????
+    *--stk_pt = 0;                      					/* R14 (LR)                                               */
+    /// ??????????????????????
+    *--stk_pt = (INT32U)0x12121212u;                        /* R12                                                    */
+    *--stk_pt = (INT32U)0x03030303u;                        /* R3                                                     */
+    *--stk_pt = (INT32U)0x02020202u;                        /* R2                                                     */
+	*--stk_pt = (INT32U)0x01010101u;						/* R1                                                     */
+   #if (TASK_WITH_PARAMETERS == 1)
+	*--stk_pt = (INT32U)parameters;                         /* R0 : argument                                          */
+   #else
+	*--stk_pt = (INT32U)0;                              	/* R0 : argument                                          */
+   #endif
+#if (FPU_SUPPORT == 1)
+    *--stk_pt = (INT32U)0xFFFFFFFDu;                        /* R14                                                    */
+#endif
+                                                            /* Remaining registers saved on process stack             */
+    *--stk_pt = (INT32U)0x11111111u;                        /* R11                                                    */
+    *--stk_pt = (INT32U)0x10101010u;                        /* R10                                                    */
+    *--stk_pt = (INT32U)0x09090909u;                        /* R9                                                     */
+    *--stk_pt = (INT32U)0x08080808u;                        /* R8                                                     */
+    *--stk_pt = (INT32U)0x07070707u;                        /* R7                                                     */
+    *--stk_pt = (INT32U)0x06060606u;                        /* R6                                                     */
+    *--stk_pt = (INT32U)0x05050505u;                        /* R5                                                     */
+    *--stk_pt = (INT32U)0x04040404u;                        /* R4                                                     */
+
+    return (unsigned int)stk_pt;
+}
+
+
 inline void CriticalDecNesting(void)
 {
 	UserEnterCritical();
