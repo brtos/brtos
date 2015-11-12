@@ -102,7 +102,7 @@
 
 == BRTOS 1.75 Changelog ==
 - Added a function to get the current tick count
-- Added support for dinamic queue (now it is possible to allocate and deallocate queues with different sizes of data)
+- Added support for dynamic queue (now it is possible to allocate and deallocate queues with different sizes of data)
 - Added support for parameters in the install task function
 
 == BRTOS 1.76 Changelog ==
@@ -121,4 +121,7 @@
 - Added port for Atmel Studio with ATMEGA2560/1, ATMEGA328P
 - Now semaphores, queues and mailboxes can use the NO_TIMEOUT option in order to avoid timeout in Pend functions
 - Now it is no longer necessary to pass the structure OS_QUEUE to create a queue
-- Arquivos timers.c e timers.h alterados para stimer.c e stimer.h
+- timers.c and timers.h changed to stimer.c and stimer.h
+
+== BRTOS 1.90 Changelog ==
+- Added support for dynamic task install and uninstall

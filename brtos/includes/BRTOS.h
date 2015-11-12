@@ -29,11 +29,11 @@
 *
 *   Author:   Gustavo W. Denardin	,	Authors:  Gustavo W. Denardin
 *   Revision: 1.75					,   Revision: 1.76        ,   Revision: 1.78
-*   Date:     24/08/2012	  ,	  Date:     11/10/2012	,	  Date:     06/03/2014
+*   Date:     24/08/2012	  		,	Date:     11/10/2012  ,	  Date:     06/03/2014
 *
 *   Authors:  Gustavo Weber Denardin
-*   Revision: 1.80
-*   Date:     11/11/2015
+*   Revision: 1.80					,	Revision: 1.90
+*   Date:     11/11/2015			, 	Date: 12/11/2015
 *
 *********************************************************************************************************/
 
@@ -58,7 +58,7 @@
 
 
 // Brtos version
-#define BRTOS_VERSION   "BRTOS Ver. 1.80"
+#define BRTOS_VERSION   "BRTOS Ver. 1.90"
 
 /// False and True defines
 #ifndef FALSE
@@ -228,6 +228,9 @@ struct Context
    INT8U  SuspendedType;    ///< Task suspended type
   #endif
    INT8U  Priority;         ///< Task priority
+  #if (BRTOS_DYNAMIC_TASKS_ENABLED == 1)   
+   INT8U  Dynamic;
+  #endif
    struct Context *Next;
    struct Context *Previous;
 };
@@ -477,7 +480,7 @@ typedef struct
 ////////////////////////////////////////////////////////////
 
 /*****************************************************************************************//**
-* \fn INT8U InstallTask(void(*FctPtr)(void),const char *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority)
+* \fn INT8U InstallTask(void(*FctPtr)(void),const char *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, void *parameters, OS_CPU_TYPE *TaskHandle)
 * \brief Install a task. Initial state = running.
 * \param *FctPtr Pointer to the task to be installed
 * \param *TaskName Task Name or task description
@@ -495,6 +498,35 @@ typedef struct
 #else
   INT8U InstallTask(void(*FctPtr)(void),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, OS_CPU_TYPE *TaskHandle);
 #endif
+
+/*****************************************************************************************//**
+* \fn INT8U InstallDTask(void(*FctPtr)(void),const char *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, void *parameters, OS_CPU_TYPE *TaskHandle)
+* \brief Install a task in the dynamic memory. Initial state = running.
+* \param *FctPtr Pointer to the task to be installed
+* \param *TaskName Task Name or task description
+* \param USER_STACKED_BYTES Size of the task virtual stack. Depends on the user code and used interrupts.
+* \param iPriority Desired task priority
+* \param *parameters Task init parameters
+* \param *TaskHandle Pointer to the task handle id
+* \return OK Task successfully installed
+* \return NO_MEMORY Not enough memory available to install the task
+* \return END_OF_AVAILABLE_PRIORITIES All the available priorities are busy
+* \return BUSY_PRIORITY Desired priority busy
+*********************************************************************************************/
+#if (TASK_WITH_PARAMETERS == 1)
+  INT8U InstallDTask(void(*FctPtr)(void *),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, void *parameters, OS_CPU_TYPE *TaskHandle);
+#else
+  INT8U InstallDTask(void(*FctPtr)(void),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, OS_CPU_TYPE *TaskHandle);
+#endif
+
+/*****************************************************************************************//**
+* \fn INT8U UninstallDTask(BRTOS_TH TaskHandle)
+* \brief Uninstall a task from the dynamic memory
+* \param TaskHandle The task handle id
+* \return OK Task successfully uninstalled
+* \return NOT_VALID_TASK Not valid task id or task is waiting for an event
+*********************************************************************************************/
+INT8U UninstallDTask(BRTOS_TH TaskHandle);
 
 /*****************************************************************************************//**
 * \fn INT8U InstallIdle(void(*FctPtr)(void), INT16U USER_STACKED_BYTES)

@@ -59,8 +59,8 @@
 *   Date:     12/01/2013 ,  Date:     06/03/2014, 	Date:     02/09/2014
 *
 *   Authors:  Gustavo Weber Denardin
-*   Revision: 1.80
-*   Date:     11/11/2015
+*   Revision: 1.80		,	Revision: 1.90
+*   Date:     11/11/2015, 	Date: 12/11/2015
 *
 *
 *********************************************************************************************************/
@@ -967,6 +967,16 @@ INT8U UnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
 
 
 
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+/////  Tasks Installation Function                 		/////
+/////                                                  /////
+/////  Parameters:                                     /////
+/////  Function pointer, task name, task priority,     /////
+/////  parameters and task handler					   /////
+/////                                                  /////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 #if (TASK_WITH_PARAMETERS == 1)
   INT8U InstallTask(void(*FctPtr)(void *),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, void *parameters, OS_CPU_TYPE *TaskHandle)
 #else
@@ -1026,8 +1036,6 @@ INT8U UnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
        OSExitCritical();
       return CANNOT_ASSIGN_IDLE_TASK_PRIO;
    }
-
-   NumberOfInstalledTasks++;
       
    // Number Task Discovery
    for(i=0;i<NUMBER_OF_TASKS;i++)
@@ -1053,6 +1061,8 @@ INT8U UnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
       }
       return END_OF_AVAILABLE_TCB;
    }
+   
+    NumberOfInstalledTasks++;
      
    // Copy task handle id
    if (TaskHandle != NULL) 
@@ -1099,7 +1109,9 @@ INT8U UnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
    // Posiciona o endereço de stack virtual p/ a próxima tarefa instalada
    StackAddress = StackAddress + USER_STACKED_BYTES;
    
-
+   #if (BRTOS_DYNAMIC_TASKS_ENABLED == 1)   
+   Task->Dynamic = FALSE;
+   #endif
    Task->TimeToWait = NO_TIMEOUT;
    Task->Next     =  NULL;
    Task->Previous =  NULL;
@@ -1117,6 +1129,246 @@ INT8U UnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
    
    return OK;
 }
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+
+
+
+
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+/////  Dynamic Tasks Installation Function             /////
+/////                                                  /////
+/////  Parameters:                                     /////
+/////  Function pointer, task name, task priority,     /////
+/////  parameters and task handler					   /////
+/////                                                  /////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+#if (BRTOS_DYNAMIC_TASKS_ENABLED == 1)
+#if (TASK_WITH_PARAMETERS == 1)
+  INT8U InstallDTask(void(*FctPtr)(void *),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, void *parameters, OS_CPU_TYPE *TaskHandle)
+#else
+  INT8U InstallDTask(void(*FctPtr)(void),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, OS_CPU_TYPE *TaskHandle)
+#endif
+{
+  OS_SR_SAVE_VAR
+  INT8U i = 0;
+  INT8U TaskNumber = 0;
+  ContextType *Task;
+  OS_CPU_TYPE *Stack = NULL;
+
+   if (currentTask)
+    // Enter Critical Section
+    OSEnterCritical();
+
+   // Fix the stack size to the cpu type
+   USER_STACKED_BYTES = USER_STACKED_BYTES - (USER_STACKED_BYTES % sizeof(OS_CPU_TYPE));
+
+   if (USER_STACKED_BYTES < NUMBER_MIN_OF_STACKED_BYTES)
+   {
+       if (currentTask)
+        // Exit Critical Section
+        OSExitCritical();
+       return STACK_SIZE_TOO_SMALL;
+   }
+
+   if (iPriority)
+   {
+     if (iPriority > configMAX_TASK_PRIORITY)
+     {
+        if (currentTask)
+         // Exit Critical Section
+         OSExitCritical();
+        return END_OF_AVAILABLE_PRIORITIES;
+     }
+
+     if (PriorityVector[iPriority] != EMPTY_PRIO)
+     {
+        if (currentTask)
+         // Exit Critical Section
+         OSExitCritical();
+        return BUSY_PRIORITY;
+     }
+   }
+   else
+   {
+      if (currentTask)
+       // Exit Critical Section
+       OSExitCritical();
+      return CANNOT_ASSIGN_IDLE_TASK_PRIO;
+   }
+
+   // Allocate the task virtual stack
+   Stack = (OS_CPU_TYPE*)BRTOS_ALLOC(USER_STACKED_BYTES);
+
+   if (Stack == NULL)
+   {
+       if (currentTask)
+        // Exit Critical Section
+        OSExitCritical();
+       return NO_MEMORY;
+   }
+
+   // Number Task Discovery
+   for(i=0;i<NUMBER_OF_TASKS;i++)
+   {
+      INT32U teste = 1;
+      teste = teste<<i;
+
+      if (!(teste & TaskAlloc))
+      {
+         TaskNumber = i+1;
+         TaskAlloc = TaskAlloc | teste;
+         break;
+      }
+   }
+
+   // Verify if there is space for the task in the TCB Table
+   if (TaskNumber == 0)
+   {
+	  BRTOS_DEALLOC(Stack);
+	  if (currentTask)
+      {
+        // Exit Critical Section
+        OSExitCritical();
+      }
+      return END_OF_AVAILABLE_TCB;
+   }
+
+   NumberOfInstalledTasks++;
+
+   // Copy task handle id
+   if (TaskHandle != NULL)
+   {
+      *TaskHandle = (OS_CPU_TYPE)TaskNumber;
+   }
+
+   Task = (ContextType*)&ContextTask[TaskNumber];
+   Task->TaskName = TaskName;
+
+   // Posiciona o inicio do stack da tarefa
+   Task->StackInit = (OS_CPU_TYPE)Stack;
+
+   // Determina a prioridade da função
+   Task->Priority = iPriority;
+
+   // Determina a tarefa que irá ocupar esta prioridade
+   PriorityVector[iPriority] = TaskNumber;
+   // set the function entry address in the context
+
+   // Fill the virtual task stack
+   #if (TASK_WITH_PARAMETERS == 1)
+   Task->StackPoint = CreateDVirtualStack(FctPtr, (OS_CPU_TYPE)Stack + USER_STACKED_BYTES, parameters);
+   #else
+   Task->StackPoint = CreateDVirtualStack(FctPtr, (OS_CPU_TYPE)Stack + USER_STACKED_BYTES);
+   #endif
+
+   Task->Dynamic = TRUE;
+   Task->TimeToWait = NO_TIMEOUT;
+   Task->Next     =  NULL;
+   Task->Previous =  NULL;
+
+   #if (VERBOSE == 1)
+   Task->Blocked = FALSE;
+   Task->State = READY;
+   #endif
+
+   OSReadyList = OSReadyList | (PriorityMask[iPriority]);
+
+   if (currentTask)
+    // Exit Critical Section
+    OSExitCritical();
+
+   return OK;
+}
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+
+
+
+
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+/////  Tasks Uninstall Function             		   /////
+/////                                                  /////
+/////  Parameters:                                     /////
+/////  Task handler									   /////
+/////                                                  /////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+INT8U UninstallDTask(BRTOS_TH TaskHandle){
+	  OS_SR_SAVE_VAR
+	  ContextType *Task;
+
+	  if (currentTask)
+		  // Enter Critical Section
+		  OSEnterCritical();
+
+	  // Checks whether the task is uninstalling itself
+	  if (!TaskHandle){
+		  // If so, verify if the currentTask is valid
+		  if (currentTask){
+			  //If true, currentTask is the task being uninstall
+			  TaskHandle = currentTask;
+		  }else{
+			  // If not, not valid task
+			  // Exit Critical Section
+			  OSExitCritical();
+
+			  return NOT_VALID_TASK;
+		  }
+	  }
+
+	  Task = (ContextType*)&ContextTask[TaskHandle];
+	  // Checks whether the task handler is valid
+	  if (Task != NULL){
+		  // Verify if the task is waiting for an event
+		  if ((OSReadyList & PriorityMask[Task->Priority]) == PriorityMask[Task->Priority]){
+			  // Check if the task has a dynamic stack
+			  if (Task->Dynamic == TRUE){
+			  	  // If not, it is possible to proceed with the uninstall
+				  TaskAlloc = TaskAlloc & ~(1 << (TaskHandle-1));
+				  OSReadyList = OSReadyList & ~(PriorityMask[Task->Priority]);
+				  PriorityVector[Task->Priority] = EMPTY_PRIO;
+	
+				  BRTOS_DEALLOC((void*)Task->StackInit);
+	
+				  Task->StackInit = 0;
+				  Task->StackPoint = 0;
+				  Task->Priority = EMPTY_PRIO;
+				  Task->TimeToWait = NO_TIMEOUT;
+				  Task->Next     =  NULL;
+				  Task->Previous =  NULL;
+	
+				  NumberOfInstalledTasks--;
+	
+			      // If uninstalled task if the current task, change context
+				  /* OBS.: In the switch context, the context of the uninstalled task will be
+				  saved at the deallocated memory. That is not a problem, because the memory will be
+				  reused by another task and the current task will never be called again by the system */
+				  if (TaskHandle == currentTask) ChangeContext();
+	
+				  if (currentTask)
+					  // Exit Critical Section
+					  OSExitCritical();
+	
+				  return OK;
+			  }
+		  }
+	  }
+
+	  if (currentTask)
+		  // Exit Critical Section
+		  OSExitCritical();
+
+	  return NOT_VALID_TASK;
+}
+#endif
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
