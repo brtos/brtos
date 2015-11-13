@@ -200,6 +200,12 @@ void BRTOSStopModeSet(unsigned long ulStopMode);
   void CreateVirtualStack(void(*FctPtr)(void), INT16U NUMBER_OF_STACKED_BYTES);
 #endif
 
+#if (TASK_WITH_PARAMETERS == 1)
+  unsigned int CreateDVirtualStack(void(*FctPtr)(void*), unsigned int stk, void *parameters);
+#else
+  unsigned int CreateDVirtualStack(void(*FctPtr)(void), unsigned int stk);
+#endif
+
 /*****************************************************************************************//**
 * \fn void TickTimerSetup(void)
 * \brief Tick timer clock setup
