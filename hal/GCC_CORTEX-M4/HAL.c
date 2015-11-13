@@ -192,6 +192,7 @@ __attribute__ ((naked)) void SwitchContextToFirstTask(void)
 
 void          OS_TaskReturn             (void);
 
+#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
 #if (TASK_WITH_PARAMETERS == 1)
   void CreateVirtualStack(void(*FctPtr)(void*), INT16U NUMBER_OF_STACKED_BYTES, void *parameters)
 #else
@@ -229,8 +230,9 @@ void          OS_TaskReturn             (void);
     *--stk_pt = (INT32U)0x05050505u;                        /* R5                                                     */
     *--stk_pt = (INT32U)0x04040404u;                        /* R4                                                     */
 }
+#endif
 
-
+#if (BRTOS_DYNAMIC_TASKS_ENABLED == 1)
 #if (TASK_WITH_PARAMETERS == 1)
   unsigned int CreateDVirtualStack(void(*FctPtr)(void*), unsigned int stk, void *parameters)
 #else
@@ -269,6 +271,7 @@ void          OS_TaskReturn             (void);
 
     return (unsigned int)stk_pt;
 }
+#endif
 
 
 inline void CriticalDecNesting(void)

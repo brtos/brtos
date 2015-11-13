@@ -27,7 +27,6 @@
 *********************************************************************************************************/
 
 #include "BRTOS.h"
-#include "mcg.h"
 
 
 #if (SP_SIZE == 32)
@@ -43,22 +42,14 @@
 /////                                                  /////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
-#include "LPO.h"
 
 void TickTimerSetup(void)
 {
-	#if (TICK_TIMER == TICK_TIMER_SYSTICK)
 	INT32U 		module  = configCPU_CLOCK_HZ / (INT32U)configTICK_RATE_HZ;
 	
 	*(NVIC_SYSTICK_CTRL) = 0;			// Disable Sys Tick Timer
     *(NVIC_SYSTICK_LOAD) = module - 1u;	// Set tick timer module
     *(NVIC_SYSTICK_CTRL) = NVIC_SYSTICK_CLK | NVIC_SYSTICK_INT | NVIC_SYSTICK_ENABLE;
-	#endif
-
-	#if (TICK_TIMER == TICK_TIMER_LPO)
-    INT32U 		module  = (INT32U)(((INT32U)1000 / (INT32U)configTICK_RATE_HZ) - 1);
-    LPO_Init(module);
-	#endif
 }
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
@@ -177,9 +168,7 @@ __attribute__ ((naked)) void SwitchContextToFirstTask(void)
 {
 	/* Make PendSV and SysTick the lowest priority interrupts. */
 	*(NVIC_SYSPRI3) |= NVIC_PENDSV_PRI;
-	#if (TICK_TIMER == TICK_TIMER_SYSTICK)
 	*(NVIC_SYSPRI3) |= NVIC_SYSTICK_PRI;
-	#endif
 	OS_RESTORE_SP();
 	OS_RESTORE_CONTEXT();
 	OS_RESTORE_ISR();
@@ -199,6 +188,7 @@ __attribute__ ((naked)) void SwitchContextToFirstTask(void)
 
 void          OS_TaskReturn             (void);
 
+#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
 #if (TASK_WITH_PARAMETERS == 1)
   void CreateVirtualStack(void(*FctPtr)(void*), INT16U NUMBER_OF_STACKED_BYTES, void *parameters)
 #else
@@ -216,8 +206,7 @@ void          OS_TaskReturn             (void);
     *--stk_pt = (INT32U)0x12121212u;                        /* R12                                                    */
     *--stk_pt = (INT32U)0x03030303u;                        /* R3                                                     */
     *--stk_pt = (INT32U)0x02020202u;                        /* R2                                                     */
-    //*--stk_pt = (INT32U)p_stk_limit;                        /* R1                                                     */
-	*--stk_pt = (INT32U)(NUMBER_OF_STACKED_BYTES / 10);		/* R1                                                     */
+    *--stk_pt = (INT32U)(NUMBER_OF_STACKED_BYTES / 10);		/* R1                                                     */
    #if (TASK_WITH_PARAMETERS == 1)
 	*--stk_pt = (INT32U)parameters;                         /* R0 : argument                                          */
    #else
@@ -236,15 +225,16 @@ void          OS_TaskReturn             (void);
     *--stk_pt = (INT32U)0x09090909u;                        /* R9                                                     */
     *--stk_pt = (INT32U)0x08080808u;                        /* R8                                                     */
 }
+#endif
 
-
+#if (BRTOS_DYNAMIC_TASKS_ENABLED == 1)
 #if (TASK_WITH_PARAMETERS == 1)
   unsigned int CreateDVirtualStack(void(*FctPtr)(void*), unsigned int stk, void *parameters)
 #else
   unsigned int CreateDVirtualStack(void(*FctPtr)(void), unsigned int stk)
 #endif
 {  
-	OS_CPU_TYPE *stk_pt = (OS_CPU_TYPE*)&STACK[iStackAddress + (NUMBER_OF_STACKED_BYTES / sizeof(OS_CPU_TYPE))];
+	OS_CPU_TYPE *stk_pt = (OS_CPU_TYPE *)stk;
 	
 	*--stk_pt = (INT32U)INITIAL_XPSR;                   	/* xPSR                                                   */
 
@@ -255,8 +245,7 @@ void          OS_TaskReturn             (void);
     *--stk_pt = (INT32U)0x12121212u;                        /* R12                                                    */
     *--stk_pt = (INT32U)0x03030303u;                        /* R3                                                     */
     *--stk_pt = (INT32U)0x02020202u;                        /* R2                                                     */
-    //*--stk_pt = (INT32U)p_stk_limit;                        /* R1                                                     */
-	*--stk_pt = (INT32U)(NUMBER_OF_STACKED_BYTES / 10);		/* R1                                                     */
+	*--stk_pt = (INT32U)0x01010101u;						/* R1                                                     */
    #if (TASK_WITH_PARAMETERS == 1)
 	*--stk_pt = (INT32U)parameters;                         /* R0 : argument                                          */
    #else
@@ -277,7 +266,7 @@ void          OS_TaskReturn             (void);
     
     return (unsigned int)stk_pt;    
 }
-
+#endif
 
 inline void CriticalDecNesting(void)
 {
@@ -313,19 +302,6 @@ void OS_CPU_SR_Restore(INT32U SR)
 
 #endif
 
-void BRTOS_WakeUP(void)
-{
-	  if(LLWU_F3 & LLWU_F3_MWUF0_MASK)
-	  {
-	    LLWU_F3 |= LLWU_F3_MWUF0_MASK;
-		LPTMR0_CSR |= LPTMR_CSR_TCF_MASK;  //Clear LPT Compare flag
-	  }
-	  // ************************
-	  // Interrupt Exit
-	  // ************************
-	  OS_INT_EXIT_EXT();
-	  // ************************
-}
 
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
