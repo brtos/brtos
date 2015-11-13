@@ -112,6 +112,7 @@
 #define NO_TASK_DELAY                (INT8U)9     ///< Error - No valid time to wait
 #define END_OF_AVAILABLE_TCB         (INT8U)10    ///< Error - There are no more task control blocks (Context task)
 #define EXIT_BY_NO_ENTRY_AVAILABLE	 (INT8U)11	  ///< Error - There are no data into queues and mailboxes or semaphore value is zero with no timeout option
+#define TASK_WAITING_EVENT			 (INT8U)12	  ///< Error - The task being uninstalled is waiting for an event (uninstall aborted)
 
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
@@ -221,6 +222,9 @@ struct Context
    INT16U StackPoint;       ///< Current position of virtual stack pointer
    INT16U StackInit;        ///< Virtual stack pointer init  
   #endif
+#if (BRTOS_DYNAMIC_TASKS_ENABLED == 1)
+ INT16U StackSize;
+#endif
    INT16U TimeToWait;       ///< Time to wait - could be used by delay or timeout
   #if (VERBOSE == 1)
    INT8U  State;            ///< Task states
@@ -228,9 +232,6 @@ struct Context
    INT8U  SuspendedType;    ///< Task suspended type
   #endif
    INT8U  Priority;         ///< Task priority
-  #if (BRTOS_DYNAMIC_TASKS_ENABLED == 1)   
-   INT8U  Dynamic;
-  #endif
    struct Context *Next;
    struct Context *Previous;
 };
@@ -500,33 +501,13 @@ typedef struct
 #endif
 
 /*****************************************************************************************//**
-* \fn INT8U InstallDTask(void(*FctPtr)(void),const char *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, void *parameters, OS_CPU_TYPE *TaskHandle)
-* \brief Install a task in the dynamic memory. Initial state = running.
-* \param *FctPtr Pointer to the task to be installed
-* \param *TaskName Task Name or task description
-* \param USER_STACKED_BYTES Size of the task virtual stack. Depends on the user code and used interrupts.
-* \param iPriority Desired task priority
-* \param *parameters Task init parameters
-* \param *TaskHandle Pointer to the task handle id
-* \return OK Task successfully installed
-* \return NO_MEMORY Not enough memory available to install the task
-* \return END_OF_AVAILABLE_PRIORITIES All the available priorities are busy
-* \return BUSY_PRIORITY Desired priority busy
-*********************************************************************************************/
-#if (TASK_WITH_PARAMETERS == 1)
-  INT8U InstallDTask(void(*FctPtr)(void *),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, void *parameters, OS_CPU_TYPE *TaskHandle);
-#else
-  INT8U InstallDTask(void(*FctPtr)(void),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, OS_CPU_TYPE *TaskHandle);
-#endif
-
-/*****************************************************************************************//**
-* \fn INT8U UninstallDTask(BRTOS_TH TaskHandle)
+* \fn INT8U UninstallTask(BRTOS_TH TaskHandle)
 * \brief Uninstall a task from the dynamic memory
 * \param TaskHandle The task handle id
 * \return OK Task successfully uninstalled
 * \return NOT_VALID_TASK Not valid task id or task is waiting for an event
 *********************************************************************************************/
-INT8U UninstallDTask(BRTOS_TH TaskHandle);
+INT8U UninstallTask(BRTOS_TH TaskHandle);
 
 /*****************************************************************************************//**
 * \fn INT8U InstallIdle(void(*FctPtr)(void), INT16U USER_STACKED_BYTES)
@@ -588,7 +569,7 @@ void OS_TICK_HANDLER(void);
 INT8U BRTOSStart(void);
 
 /*****************************************************************************************//**
-* \fn INT8U DelayTask(INT16U time)
+* \fn INT8U OSDelayTask(INT16U time)
 * \brief Wait for a specified period.
 *  A task that calling this function will be suspended for a certain time.
 *  When this time is reached the task back to ready state.
@@ -596,10 +577,11 @@ INT8U BRTOSStart(void);
 * \return OK Success
 * \return IRQ_PEND_ERR - Can not use block priority function from interrupt handler code
 *********************************************************************************************/
-INT8U DelayTask(INT16U time);
+INT8U OSDelayTask(INT16U time);
+#define DelayTask OSDelayTask
 
 /*****************************************************************************************//**
-* \fn INT8U DelayTaskHMSM(INT8U hours, INT8U minutes, INT8U seconds, INT16U miliseconds)
+* \fn INT8U OSDelayTaskHMSM(INT8U hours, INT8U minutes, INT8U seconds, INT16U miliseconds)
 * \brief Wait for a specified period (in hours, minutes, seconds and miliseconds).
 *  A task that calling this function will be suspended for a certain time.
 *  When this time is reached the task back to ready state.
@@ -610,7 +592,8 @@ INT8U DelayTask(INT16U time);
 * \return OK Success
 * \return INVALID_TIME The specified parameters are outside of the permitted range
 *********************************************************************************************/  
-INT8U DelayTaskHMSM(INT8U hours, INT8U minutes, INT8U seconds, INT16U miliseconds);
+INT8U OSDelayTaskHMSM(INT8U hours, INT8U minutes, INT8U seconds, INT16U miliseconds);
+#define DelayTaskHMSM OSDelayTaskHMSM
 
 /*****************************************************************************************//**
 * \fn INT16U OSGetTickCount(INT16U time)
@@ -644,7 +627,7 @@ void OSIncCounter(void);
 void PreInstallTasks(void);
 
 /*****************************************************************************************//**
-* \fn INT8U BlockPriority(INT8U iPriority)
+* \fn INT8U OSBlockPriority(INT8U iPriority)
 * \brief Blocks a specific priority
 *  Blocks the task that is associated with the specified priority.
 *  The user must be careful when using this function in together with mutexes.
@@ -653,10 +636,11 @@ void PreInstallTasks(void);
 * \return OK - Success
 * \return IRQ_PEND_ERR - Can not use block priority function from interrupt handler code
 *********************************************************************************************/  
-INT8U BlockPriority(INT8U iPriority);
+INT8U OSBlockPriority(INT8U iPriority);
+#define BlockPriority OSBlockPriority
 
 /*****************************************************************************************//**
-* \fn INT8U UnBlockPriority(INT8U iPriority)
+* \fn INT8U OSUnBlockPriority(INT8U iPriority)
 * \brief UnBlock a specific priority
 *  UnBlocks the task that is associated with the specified priority.
 *  The user must be careful when using this function in together with mutexes.
@@ -665,45 +649,49 @@ INT8U BlockPriority(INT8U iPriority);
 * \return OK - Success
 * \return IRQ_PEND_ERR - Can not use unblock priority function from interrupt handler code
 *********************************************************************************************/
-INT8U UnBlockPriority(INT8U iPriority);
-
+INT8U OSUnBlockPriority(INT8U iPriority);
+#define UnBlockPriority OSUnBlockPriority
 /*****************************************************************************************//**
-* \fn INT8U BlockTask(INT8U iTaskNumber)
+* \fn INT8U OSBlockTask(INT8U iTaskNumber)
 * \brief Blocks a specific task
 * \param iTaskNumber Task number to be blocked
 * \return OK - Success
 * \return IRQ_PEND_ERR - Can not use block task function from interrupt handler code
 *********************************************************************************************/
-INT8U BlockTask(BRTOS_TH iTaskNumber);
+INT8U OSBlockTask(BRTOS_TH iTaskNumber);
+#define BlockTask OSBlockTask
 
 /*****************************************************************************************//**
-* \fn INT8U UnBlockTask(INT8U iTaskNumber)
+* \fn INT8U OSUnBlockTask(INT8U iTaskNumber)
 * \brief UnBlocks a specific task
 * \param iTaskNumber Task number to be unblocked
 * \return OK - Success
 * \return IRQ_PEND_ERR - Can not use unblock task function from interrupt handler code
 *********************************************************************************************/
-INT8U UnBlockTask(BRTOS_TH iTaskNumber);
+INT8U OSUnBlockTask(BRTOS_TH iTaskNumber);
+#define UnBlockTask OSUnBlockTask
 
 /*****************************************************************************************//**
-* \fn INT8U BlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
+* \fn INT8U OSBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
 * \brief Blocks a set of tasks
 * \param TaskStart Number of the first task to be blocked
 * \param TaskNumber Number of tasks to be blocked from the specified task start
 * \return OK - Success
 * \return IRQ_PEND_ERR - Can not use block multiple tasks function from interrupt handler code
 *********************************************************************************************/
-INT8U BlockMultipleTask(INT8U TaskStart, INT8U TaskNumber);
+INT8U OSBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber);
+#define BlockMultipleTask OSBlockMultipleTask
 
 /*****************************************************************************************//**
-* \fn INT8U UnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
+* \fn INT8U OSUnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
 * \brief UnBlocks a set of tasks
 * \param TaskStart Number of the first task to be unblocked
 * \param TaskNumber Number of tasks to be unblocked from the specified task start
 * \return OK - Success
 * \return IRQ_PEND_ERR - Can not use unblock multiple tasks function from interrupt handler code
 *********************************************************************************************/
-INT8U UnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber);
+INT8U OSUnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber);
+#define UnBlockMultipleTask OSUnBlockMultipleTask
 
 /*********************************************************************************//**
 * \fn void BRTOS_Init(void)
@@ -1219,7 +1207,9 @@ extern volatile INT32U      OSDutyTmp;
 #endif
 
 #ifdef OS_CPU_TYPE
+#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
   extern OS_CPU_TYPE STACK[(HEAP_SIZE / sizeof(OS_CPU_TYPE))];
+#endif
   extern OS_CPU_TYPE QUEUE_STACK[(QUEUE_HEAP_SIZE / sizeof(OS_CPU_TYPE))];
 #else
 	#error("You must define the OS_CPU_TYPE !!!")

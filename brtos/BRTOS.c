@@ -104,12 +104,14 @@ INT16U iStackAddress = 0;                       ///< Virtual stack counter - Inf
 
 INT16U iQueueAddress = 0;                       ///< Queue heap control
 
+#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
 #if (SP_SIZE == 32)
 INT32U StackAddress = (INT32U)&STACK;           ///< Virtual stack pointer
 #endif
 
 #if (SP_SIZE == 16)
 INT16U StackAddress = (INT16U)&STACK;           ///< Virtual stack pointer
+#endif
 #endif
 
 
@@ -216,10 +218,12 @@ volatile INT8U flag_load = TRUE;
 
 ///// RAM definitions
 #ifdef OS_CPU_TYPE
+#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
   #if (PROCESSOR == PIC18)
   #pragma udata stackram
   #endif
   OS_CPU_TYPE STACK[(HEAP_SIZE / sizeof(OS_CPU_TYPE))];  			       ///< Virtual Task stack
+#endif
 
   #if (PROCESSOR == PIC18)
   #pragma udata queueram
@@ -335,7 +339,7 @@ void OSIncCounter(void)
 ////////////////////////////////////////////////////////////
 
 // Atraso em passos de TickCount
-INT8U DelayTask(INT16U time_wait)
+INT8U OSDelayTask(INT16U time_wait)
 {
   OS_SR_SAVE_VAR
   INT32U timeout;
@@ -416,7 +420,7 @@ INT8U DelayTask(INT16U time_wait)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 // Miliseconds, seconds, minutes and hours delay
-INT8U DelayTaskHMSM(INT8U hours, INT8U minutes, INT8U seconds, INT16U miliseconds)
+INT8U OSDelayTaskHMSM(INT8U hours, INT8U minutes, INT8U seconds, INT16U miliseconds)
 {
   INT32U ticks=0;
   INT32U loops=0;
@@ -615,7 +619,7 @@ void PreInstallTasks(void)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U BlockPriority(INT8U iPriority)
+INT8U OSBlockPriority(INT8U iPriority)
 {
   OS_SR_SAVE_VAR
   INT8U BlockedTask = 0;
@@ -665,7 +669,7 @@ INT8U BlockPriority(INT8U iPriority)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U UnBlockPriority(INT8U iPriority)
+INT8U OSUnBlockPriority(INT8U iPriority)
 {
   OS_SR_SAVE_VAR
   #if (VERBOSE == 1)
@@ -719,7 +723,7 @@ INT8U UnBlockPriority(INT8U iPriority)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U BlockTask(BRTOS_TH iTaskNumber)
+INT8U OSBlockTask(BRTOS_TH iTaskNumber)
 {
   OS_SR_SAVE_VAR
   INT8U iPriority = 0;
@@ -766,7 +770,7 @@ INT8U BlockTask(BRTOS_TH iTaskNumber)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U UnBlockTask(BRTOS_TH iTaskNumber)
+INT8U OSUnBlockTask(BRTOS_TH iTaskNumber)
 {
   OS_SR_SAVE_VAR
   INT8U iPriority = 0;
@@ -819,7 +823,7 @@ INT8U UnBlockTask(BRTOS_TH iTaskNumber)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U BlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
+INT8U OSBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
 {
   OS_SR_SAVE_VAR
   INT8U iTask = 0;
@@ -871,7 +875,7 @@ INT8U BlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U UnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
+INT8U OSUnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
 {
   OS_SR_SAVE_VAR
   INT8U iTask = 0;
@@ -977,6 +981,7 @@ INT8U UnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
 /////                                                  /////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
+#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
 #if (TASK_WITH_PARAMETERS == 1)
   INT8U InstallTask(void(*FctPtr)(void *),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, void *parameters, OS_CPU_TYPE *TaskHandle)
 #else
@@ -1109,9 +1114,6 @@ INT8U UnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
    // Posiciona o endereço de stack virtual p/ a próxima tarefa instalada
    StackAddress = StackAddress + USER_STACKED_BYTES;
    
-   #if (BRTOS_DYNAMIC_TASKS_ENABLED == 1)   
-   Task->Dynamic = FALSE;
-   #endif
    Task->TimeToWait = NO_TIMEOUT;
    Task->Next     =  NULL;
    Task->Previous =  NULL;
@@ -1129,29 +1131,11 @@ INT8U UnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
    
    return OK;
 }
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-
-
-
-
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-/////  Dynamic Tasks Installation Function             /////
-/////                                                  /////
-/////  Parameters:                                     /////
-/////  Function pointer, task name, task priority,     /////
-/////  parameters and task handler					   /////
-/////                                                  /////
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-#if (BRTOS_DYNAMIC_TASKS_ENABLED == 1)
-#if (TASK_WITH_PARAMETERS == 1)
-  INT8U InstallDTask(void(*FctPtr)(void *),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, void *parameters, OS_CPU_TYPE *TaskHandle)
 #else
-  INT8U InstallDTask(void(*FctPtr)(void),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, OS_CPU_TYPE *TaskHandle)
+#if (TASK_WITH_PARAMETERS == 1)
+  INT8U InstallTask(void(*FctPtr)(void *),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, void *parameters, OS_CPU_TYPE *TaskHandle)
+#else
+  INT8U InstallTask(void(*FctPtr)(void),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, OS_CPU_TYPE *TaskHandle)
 #endif
 {
   OS_SR_SAVE_VAR
@@ -1250,6 +1234,7 @@ INT8U UnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
    Task->TaskName = TaskName;
 
    // Posiciona o inicio do stack da tarefa
+   // Todo: OS_CPU_TYPE não vai funcionar para processadores de 8 bits (tem que mudar a definição do SP_SiZE)
    Task->StackInit = (OS_CPU_TYPE)Stack;
 
    // Determina a prioridade da função
@@ -1266,7 +1251,7 @@ INT8U UnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
    Task->StackPoint = CreateDVirtualStack(FctPtr, (OS_CPU_TYPE)Stack + USER_STACKED_BYTES);
    #endif
 
-   Task->Dynamic = TRUE;
+   Task->StackSize = USER_STACKED_BYTES;
    Task->TimeToWait = NO_TIMEOUT;
    Task->Next     =  NULL;
    Task->Previous =  NULL;
@@ -1301,7 +1286,7 @@ INT8U UnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
 /////                                                  /////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
-INT8U UninstallDTask(BRTOS_TH TaskHandle){
+INT8U UninstallTask(BRTOS_TH TaskHandle){
 	  OS_SR_SAVE_VAR
 	  ContextType *Task;
 
@@ -1329,37 +1314,42 @@ INT8U UninstallDTask(BRTOS_TH TaskHandle){
 	  if (Task != NULL){
 		  // Verify if the task is waiting for an event
 		  if ((OSReadyList & PriorityMask[Task->Priority]) == PriorityMask[Task->Priority]){
-			  // Check if the task has a dynamic stack
-			  if (Task->Dynamic == TRUE){
-			  	  // If not, it is possible to proceed with the uninstall
-				  TaskAlloc = TaskAlloc & ~(1 << (TaskHandle-1));
-				  OSReadyList = OSReadyList & ~(PriorityMask[Task->Priority]);
-				  PriorityVector[Task->Priority] = EMPTY_PRIO;
-	
-				  BRTOS_DEALLOC((void*)Task->StackInit);
-	
-				  Task->StackInit = 0;
-				  Task->StackPoint = 0;
-				  Task->Priority = EMPTY_PRIO;
-				  Task->TimeToWait = NO_TIMEOUT;
-				  Task->Next     =  NULL;
-				  Task->Previous =  NULL;
-	
-				  NumberOfInstalledTasks--;
-	
-			      // If uninstalled task if the current task, change context
-				  /* OBS.: In the switch context, the context of the uninstalled task will be
-				  saved at the deallocated memory. That is not a problem, because the memory will be
-				  reused by another task and the current task will never be called again by the system */
-				  if (TaskHandle == currentTask) ChangeContext();
-	
-				  if (currentTask)
-					  // Exit Critical Section
-					  OSExitCritical();
-	
-				  return OK;
-			  }
+			  // If not, it is possible to proceed with the uninstall
+			  TaskAlloc = TaskAlloc & ~(1 << (TaskHandle-1));
+			  OSReadyList = OSReadyList & ~(PriorityMask[Task->Priority]);
+			  PriorityVector[Task->Priority] = EMPTY_PRIO;
+
+			  BRTOS_DEALLOC((void*)Task->StackInit);
+
+			  Task->StackInit = 0;
+			  Task->StackPoint = 0;
+			  Task->StackSize = 0;
+			  Task->Priority = 0;
+			  Task->TimeToWait = NO_TIMEOUT;
+			  Task->Next     =  NULL;
+			  Task->Previous =  NULL;
+
+			  NumberOfInstalledTasks--;
+
+			  // If uninstalled task if the current task, change context
+			  /* OBS.: In the switch context, the context of the uninstalled task will be
+			  saved at the deallocated memory. That is not a problem, because the memory will be
+			  reused by another task and the current task will never be called again by the system */
+			  if (TaskHandle == currentTask) ChangeContext();
+
+			  if (currentTask)
+				  // Exit Critical Section
+				  OSExitCritical();
+
+			  return OK;
+		  }else{
+			  if (currentTask)
+				  // Exit Critical Section
+				  OSExitCritical();
+
+			  return TASK_WAITING_EVENT;
 		  }
+
 	  }
 
 	  if (currentTask)
@@ -1408,7 +1398,8 @@ INT8U UninstallDTask(BRTOS_TH TaskHandle){
         OSExitCritical();
        return STACK_SIZE_TOO_SMALL;
    }    
-   
+
+#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
    if ((iStackAddress + (USER_STACKED_BYTES / sizeof(OS_CPU_TYPE))) > (HEAP_SIZE / sizeof(OS_CPU_TYPE)))
    {
       if (currentTask)
@@ -1417,21 +1408,33 @@ INT8U UninstallDTask(BRTOS_TH TaskHandle){
        return NO_MEMORY;
    }
 
-
 	// Posiciona o inicio do stack da tarefa
-   // no inicio da disponibilidade de RAM do HEAP
+    // no inicio da disponibilidade de RAM do HEAP
 	#if STACK_GROWTH == 1
 	ContextTask[NUMBER_OF_TASKS+1].StackPoint = StackAddress + NUMBER_MIN_OF_STACKED_BYTES;
 	#else
 	ContextTask[NUMBER_OF_TASKS+1].StackPoint = StackAddress + (USER_STACKED_BYTES - NUMBER_MIN_OF_STACKED_BYTES);
-    #endif
-                                                                      
-   // Virtual Stack Init
+   #endif
+
+    // Virtual Stack Init
 	#if STACK_GROWTH == 1
 	ContextTask[NUMBER_OF_TASKS+1].StackInit = StackAddress;
 	#else
 	ContextTask[NUMBER_OF_TASKS+1].StackInit = StackAddress + USER_STACKED_BYTES;
 	#endif
+#else
+   // Allocate the task virtual stack
+   ContextTask[NUMBER_OF_TASKS+1].StackInit = (OS_CPU_TYPE)BRTOS_ALLOC(USER_STACKED_BYTES);
+
+   if (ContextTask[NUMBER_OF_TASKS+1].StackInit == 0)
+   {
+       if (currentTask)
+        // Exit Critical Section
+        OSExitCritical();
+       return NO_MEMORY;
+   }
+#endif
+
 
    // Determina a prioridade da função
    ContextTask[NUMBER_OF_TASKS+1].Priority = 0;
@@ -1439,17 +1442,28 @@ INT8U UninstallDTask(BRTOS_TH TaskHandle){
    PriorityVector[0] = NUMBER_OF_TASKS+1;
    
    // Fill the virtual task stack
+#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
    #if (TASK_WITH_PARAMETERS == 1)   
       CreateVirtualStack(FctPtr, USER_STACKED_BYTES, parameters);
    #else
       CreateVirtualStack(FctPtr, USER_STACKED_BYTES);   
    #endif
-   
+#else
+#if (TASK_WITH_PARAMETERS == 1)
+   ContextTask[NUMBER_OF_TASKS+1].StackPoint = CreateDVirtualStack(FctPtr, (OS_CPU_TYPE)(ContextTask[NUMBER_OF_TASKS+1].StackInit + USER_STACKED_BYTES), parameters);
+#else
+   ContextTask[NUMBER_OF_TASKS+1].StackPoint = CreateDVirtualStack(FctPtr, (OS_CPU_TYPE)(ContextTask[NUMBER_OF_TASKS+1].StackInit + USER_STACKED_BYTES));
+#endif
+   ContextTask[NUMBER_OF_TASKS+1].StackSize = USER_STACKED_BYTES;
+#endif
+
+#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
    // Incrementa o contador de bytes do stack virtual (HEAP)
    iStackAddress = iStackAddress + (USER_STACKED_BYTES / sizeof(OS_CPU_TYPE));
    
    // Posiciona o endereço de stack virtual p/ a próxima tarefa instalada
-   StackAddress = StackAddress + USER_STACKED_BYTES;   
+   StackAddress = StackAddress + USER_STACKED_BYTES;
+#endif
    
    ContextTask[NUMBER_OF_TASKS+1].TimeToWait = NO_TIMEOUT;
    
