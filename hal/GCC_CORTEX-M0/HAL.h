@@ -47,14 +47,9 @@
 #define ARM_Cortex_M0   9u
 #define ARM_Cortex_M4F  10u
 
-#define TICK_TIMER_SYSTICK	0
-#define TICK_TIMER_LPO		1
 
 /// Define the used processor
 #define PROCESSOR 		ARM_Cortex_M0
-
-/// Define tick time source
-#define TICK_TIMER		TICK_TIMER_SYSTICK
 
 /// Define the CPU type
 #define OS_CPU_TYPE 	INT32U
@@ -66,7 +61,7 @@
 #define OPTIMIZED_SCHEDULER 0
 
 /// Define if InstallTask function will support parameters
-#define TASK_WITH_PARAMETERS 0
+#define TASK_WITH_PARAMETERS 1
 
 /// Define if 32 bits register for tick timer will be used
 #define TICK_TIMER_32BITS   1
@@ -151,20 +146,11 @@ void OS_CPU_SR_Restore(INT32U);
 #define UserExitCritical()  __asm(" CPSIE I")
 
 /// Defines the low power command of the choosen microcontroller
-#if (TICK_TIMER == TICK_SYSTICK)
 #define OS_Wait __asm(" WFI ");
-#else
-void BRTOSStopModeSet(unsigned long ulStopMode);
-#define OS_Wait BRTOSStopModeSet(0x00000001)
-#endif
 
 /// Defines the tick timer interrupt handler code (clear flag) of the choosen microcontroller
-#if (TICK_TIMER == TICK_TIMER_SYSTICK)
 #define TICKTIMER_INT_HANDLER
-#endif
-#if (TICK_TIMER == TICK_TIMER_LPO)
-#define TICKTIMER_INT_HANDLER LPTMR0_CSR |= LPTMR_CSR_TCF_MASK
-#endif
+
 #define TIMER_MODULE  SYST_RVR
 #define TIMER_COUNTER SYST_CVR
 
