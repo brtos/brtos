@@ -380,7 +380,7 @@ interrupt void SwitchContext(void)
    
    return (unsigned int)stk_pt;
 }
-
+#endif
 
 
 #if (NESTING_INT == 1)
