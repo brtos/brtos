@@ -207,6 +207,7 @@ interrupt void SwitchContext(void)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
+#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
 #if (TASK_WITH_PARAMETERS == 1)
   void CreateVirtualStack(void(*FctPtr)(void*), INT16U NUMBER_OF_STACKED_BYTES, void *parameters)
 #else
@@ -291,8 +292,94 @@ interrupt void SwitchContext(void)
    
    #endif
 }
+#endif
 
+#if (BRTOS_DYNAMIC_TASKS_ENABLED == 1)
+#if (TASK_WITH_PARAMETERS == 1)
+  unsigned int CreateDVirtualStack(void(*FctPtr)(void*), unsigned int stk, void *parameters)
+#else
+  unsigned int CreateDVirtualStack(void(*FctPtr)(void), unsigned int stk)
+#endif
+{
+	OS_CPU_TYPE *stk_pt = (OS_CPU_TYPE *)stk;
 
+   // Pointer to Task Entry
+   *--stk_pt = (INT32U)FctPtr;
+
+   // First 4 bytes defined to Coldfire Only
+   // Format: First 4 bits = processor indicating a two-longword frame, always 0x04 in MCF51QE
+   //         Other 4 bits = fault status field, always 0x00 if no error occurred
+   // Vector
+   // The 8-bit vector number, vector[7:0], defines the exception type and is
+   // calculated by the processor for all internal faults and represents the
+   // value supplied by the interrupt controller in the case of an interrupt   
+   
+   // Initial SR Register
+   // Interrupts Enabled
+   // CCR = 0x00   
+   
+   *--stk_pt = (INT32U)0x40802000;
+   
+   #if (NESTING_INT == 1)  
+   
+   // Initialize registers   
+   *--stk_pt = (INT32U)0x00;    // Save Int level
+   
+   *--stk_pt = (INT32U)0xA1;
+
+#if (TASK_WITH_PARAMETERS == 1)   
+   *--stk_pt = (INT32U)parameters;
+#else
+   *--stk_pt = (INT32U)0xA0;
+#endif
+
+   *--stk_pt = (INT32U)0xD2;
+   *--stk_pt = (INT32U)0xD1;
+   *--stk_pt = (INT32U)0xD0;
+   
+   *--stk_pt = (INT32U)0xA6;
+   *--stk_pt = (INT32U)0xA5;
+   *--stk_pt = (INT32U)0xA4;
+   *--stk_pt = (INT32U)0xA3;
+   *--stk_pt = (INT32U)0xA2;
+   
+   *--stk_pt = (INT32U)0xD7;   
+   *--stk_pt = (INT32U)0xD6;   
+   *--stk_pt = (INT32U)0xD5;   
+   *--stk_pt = (INT32U)0xD4;   
+   *--stk_pt = (INT32U)0xD3;               
+   
+   #else
+   
+   // Initialize registers
+   *--stk_pt = (INT32U)0xA1;
+   
+#if (TASK_WITH_PARAMETERS == 1)   
+   *--stk_pt = (INT32U)parameters;
+#else
+   *--stk_pt = (INT32U)0xA0;
+#endif
+   
+   *--stk_pt = (INT32U)0xD2;
+   *--stk_pt = (INT32U)0xD1;
+   *--stk_pt = (INT32U)0xD0;
+   
+   *--stk_pt = (INT32U)0xA6;
+   *--stk_pt = (INT32U)0xA5;
+   *--stk_pt = (INT32U)0xA4;
+   *--stk_pt = (INT32U)0xA3;
+   *--stk_pt = (INT32U)0xA2;
+   
+   *--stk_pt = (INT32U)0xD7;   
+   *--stk_pt = (INT32U)0xD6;   
+   *--stk_pt = (INT32U)0xD5;   
+   *--stk_pt = (INT32U)0xD4;   
+   *--stk_pt = (INT32U)0xD3;
+   
+   #endif
+   
+   return (unsigned int)stk_pt;
+}
 
 
 
