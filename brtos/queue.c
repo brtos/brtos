@@ -1230,6 +1230,8 @@ INT8U OSDQueueDelete (BRTOS_Queue **event)
   
   BRTOS_DEALLOC(pont_event);
   
+  *event = NULL;
+  
   // Exit Critical Section
   OSExitCritical();
   
