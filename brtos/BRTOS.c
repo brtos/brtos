@@ -1142,7 +1142,7 @@ INT8U OSUnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
   INT8U i = 0;
   INT8U TaskNumber = 0;
   ContextType *Task;
-  OS_CPU_TYPE *Stack = NULL;
+  void *Stack = NULL;
 
    if (currentTask)
     // Enter Critical Section
@@ -1186,7 +1186,7 @@ INT8U OSUnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
    }
 
    // Allocate the task virtual stack
-   Stack = (OS_CPU_TYPE*)BRTOS_ALLOC(USER_STACKED_BYTES);
+   Stack = BRTOS_ALLOC(USER_STACKED_BYTES);
 
    if (Stack == NULL)
    {
@@ -1234,8 +1234,7 @@ INT8U OSUnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
    Task->TaskName = TaskName;
 
    // Posiciona o inicio do stack da tarefa
-   // Todo: OS_CPU_TYPE não vai funcionar para processadores de 8 bits (tem que mudar a definição do SP_SiZE)
-   Task->StackInit = (OS_CPU_TYPE)Stack;
+   Task->StackInit = (unsigned int)Stack;
 
    // Determina a prioridade da função
    Task->Priority = iPriority;
