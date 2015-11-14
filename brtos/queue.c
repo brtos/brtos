@@ -1078,7 +1078,6 @@ INT8U OSCleanQueue32(OS_QUEUE_32 *cqueue)
 
 
 #if (BRTOS_DYNAMIC_QUEUE_ENABLED == 1)
-#include <stdlib.h>
 
 ///// Memory allocation definition tests
 #ifndef BRTOS_ALLOC
