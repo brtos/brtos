@@ -70,6 +70,10 @@
 *   Revision: 1.80
 *   Date:     11/11/2015
 *
+*   Authors:  Gustavo Weber Denardin
+*   Revision: 1.90
+*   Date:     14/11/2015
+*
 *********************************************************************************************************/
 
 #include "BRTOS.h"
@@ -662,11 +666,9 @@ INT8U OSQueuePost(BRTOS_Queue *pont_event, INT8U data)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSQueue16Create(OS_QUEUE_16 *cqueue, INT16U size, BRTOS_Queue **event)
+INT8U OSQueue16Create(OS_QUEUE_16 *cqueue, INT16U size)
 {
   OS_SR_SAVE_VAR
-  INT16S i=0;
-  BRTOS_Queue *pont_event;
 
   if (iNesting > 0) {                                // See if caller is an interrupt
      return(IRQ_PEND_ERR);                           // Can't be create by interrupt
@@ -689,31 +691,7 @@ INT8U OSQueue16Create(OS_QUEUE_16 *cqueue, INT16U size, BRTOS_Queue **event)
          OSExitCritical();
       
        return NO_MEMORY;
-  }  
-  
-  // Verifica se ainda há blocos de controle de eventos disponíveis
-  for(i=0;i<=BRTOS_MAX_QUEUE;i++)
-  {
-    
-    if(i >= BRTOS_MAX_QUEUE)
-    {
-      // Caso não haja mais blocos disponíveis, retorna exceção
-      
-      // Exit critical Section
-      if (currentTask)
-         OSExitCritical();      
-      
-      return(NO_AVAILABLE_EVENT);
-    }
-          
-    
-    if(BRTOS_Queue_Table[i].OSEventAllocated != TRUE)
-    {
-      BRTOS_Queue_Table[i].OSEventAllocated = TRUE;
-      pont_event = &BRTOS_Queue_Table[i];
-      break;      
-    }
-  } 
+  }
   
   // Configura dados de evento de lista
   cqueue->OSQStart    = (INT16U *)&QUEUE_STACK[iQueueAddress];
@@ -723,13 +701,6 @@ INT8U OSQueue16Create(OS_QUEUE_16 *cqueue, INT16U size, BRTOS_Queue **event)
   cqueue->OSQEnd      = cqueue->OSQStart + cqueue->OSQSize;
   cqueue->OSQIn       = cqueue->OSQStart;
   cqueue->OSQOut      = cqueue->OSQStart;
-  
-  // Aloca tipo de evento e dados do evento
-  pont_event->OSEventPointer = cqueue;
-  pont_event->OSEventWait = 0;    
-  pont_event->OSEventWaitList=0;
-  
-  *event = pont_event;
   
   // Exit critical Section
   if (currentTask)
@@ -909,11 +880,9 @@ INT8U OSCleanQueue16(OS_QUEUE_16 *cqueue)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSQueue32Create(OS_QUEUE_32 *cqueue, INT16U size, BRTOS_Queue **event)
+INT8U OSQueue32Create(OS_QUEUE_32 *cqueue, INT16U size)
 {
   OS_SR_SAVE_VAR
-  INT16S i=0;
-  BRTOS_Queue *pont_event;
 
   if (iNesting > 0) {                                // See if caller is an interrupt
      return(IRQ_PEND_ERR);                           // Can't be create by interrupt
@@ -932,30 +901,6 @@ INT8U OSQueue32Create(OS_QUEUE_32 *cqueue, INT16U size, BRTOS_Queue **event)
        return NO_MEMORY;
   }  
   
-  // Verifica se ainda há blocos de controle de eventos disponíveis
-  for(i=0;i<=BRTOS_MAX_QUEUE;i++)
-  {
-    
-    if(i >= BRTOS_MAX_QUEUE)
-    {
-      // Caso não haja mais blocos disponíveis, retorna exceção
-      
-      // Exit critical Section
-      if (currentTask)
-         OSExitCritical();
-      
-      return(NO_AVAILABLE_EVENT);
-    }
-          
-    
-    if(BRTOS_Queue_Table[i].OSEventAllocated != TRUE)
-    {
-      BRTOS_Queue_Table[i].OSEventAllocated = TRUE;
-      pont_event = &BRTOS_Queue_Table[i];
-      break;      
-    }
-  } 
-  
   // Configura dados de evento de lista
   cqueue->OSQStart    = (INT32U *)&QUEUE_STACK[iQueueAddress];
   iQueueAddress       = (INT16U)(iQueueAddress + ((size*sizeof(INT32U)) / sizeof(OS_CPU_TYPE)));
@@ -964,13 +909,6 @@ INT8U OSQueue32Create(OS_QUEUE_32 *cqueue, INT16U size, BRTOS_Queue **event)
   cqueue->OSQEnd      = cqueue->OSQStart + cqueue->OSQSize;
   cqueue->OSQIn       = cqueue->OSQStart;
   cqueue->OSQOut      = cqueue->OSQStart;
-  
-  // Aloca tipo de evento e dados do evento
-  pont_event->OSEventPointer = cqueue;
-  pont_event->OSEventWait = 0;    
-  pont_event->OSEventWaitList=0;
-  
-  *event = pont_event;
   
   // Exit critical Section
   if (currentTask)

@@ -1008,12 +1008,11 @@ void initEvents(void);
   * \brief Allocates a queue control block  
   * \param *cqueue Queue pointer
   * \param size Queue size
-  * \param **event Queue event pointer
   * \return IRQ_PEND_ERR Can not use queue create function from interrupt handler code
   * \return NO_AVAILABLE_EVENT No queue control blocks available
   * \return ALLOC_EVENT_OK Queue control block successfully allocated
   *********************************************************************************************/
-  INT8U OSQueue16Create(OS_QUEUE_16 *cqueue, INT16U size, BRTOS_Queue **event);
+  INT8U OSQueue16Create(OS_QUEUE_16 *cqueue, INT16U size);
   
   /*****************************************************************************************//**
   * \fn OSWQueue(OS_QUEUE *cqueue,INT8U data)
@@ -1065,12 +1064,11 @@ void initEvents(void);
   * \brief Allocates a queue control block  
   * \param *cqueue Queue pointer
   * \param size Queue size
-  * \param **event Queue event pointer
   * \return IRQ_PEND_ERR Can not use queue create function from interrupt handler code
   * \return NO_AVAILABLE_EVENT No queue control blocks available
   * \return ALLOC_EVENT_OK Queue control block successfully allocated
   *********************************************************************************************/
-  INT8U OSQueue32Create(OS_QUEUE_32 *cqueue, INT16U size, BRTOS_Queue **event);
+  INT8U OSQueue32Create(OS_QUEUE_32 *cqueue, INT16U size);
   
   /*****************************************************************************************//**
   * \fn OSWQueue(OS_QUEUE *cqueue,INT8U data)
