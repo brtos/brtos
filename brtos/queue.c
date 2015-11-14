@@ -1098,7 +1098,6 @@ INT8U OSCleanQueue32(OS_QUEUE_32 *cqueue)
 INT8U OSDQueueCreate(INT16U queue_length, OS_CPU_TYPE type_size, BRTOS_Queue **event)
 {
   OS_SR_SAVE_VAR
-  INT16S      i             = 0;
   INT16U      size_in_bytes = 0;
   BRTOS_Queue *pont_event   = NULL;
   OS_DQUEUE   *cqueue       = NULL;
@@ -1125,41 +1124,30 @@ INT8U OSDQueueCreate(INT16U queue_length, OS_CPU_TYPE type_size, BRTOS_Queue **e
 			
 			if(cqueue->OSQStart != NULL)
 			{  
-        // Verifies if there is available event control block
-        for(i=0;i<=BRTOS_MAX_QUEUE;i++)
-        {
-          
-          if(i >= BRTOS_MAX_QUEUE)
-          {
-            // If there is not, deallocate data and return exception
-            BRTOS_DEALLOC(cqueue->OSQStart);
-            BRTOS_DEALLOC(cqueue);
-            
-            // Exit critical Section
-            if (currentTask)
-               OSExitCritical();
-            
-            return(NO_AVAILABLE_EVENT);
-          }
-                
-          
-          if(BRTOS_Queue_Table[i].OSEventAllocated != TRUE)
-          {
-            BRTOS_Queue_Table[i].OSEventAllocated = TRUE;
-            pont_event = &BRTOS_Queue_Table[i];
-            break;      
-          }
-        }			
+				// Verifies if there is available event control block
+				pont_event = (BRTOS_Queue*)BRTOS_ALLOC(sizeof(BRTOS_Queue));
+
+				if(pont_event == NULL){
+					// If there is not, deallocate data and return exception
+					BRTOS_DEALLOC(cqueue->OSQStart);
+					BRTOS_DEALLOC(cqueue);
+
+					// Exit critical Section
+					if (currentTask)
+					   OSExitCritical();
+
+					return(NO_AVAILABLE_EVENT);
+				}
 			}else 
 			{
-        // Deallocate queue handler
-        BRTOS_DEALLOC(cqueue);
-        
-        // Exit critical Section
-        if (currentTask)
-           OSExitCritical();
-        
-        return(NO_AVAILABLE_MEMORY);			
+				// Deallocate queue handler
+				BRTOS_DEALLOC(cqueue);
+
+				// Exit critical Section
+				if (currentTask)
+				   OSExitCritical();
+
+				return(NO_AVAILABLE_MEMORY);
 			}
 		}else 
 		{
@@ -1238,10 +1226,9 @@ INT8U OSDQueueDelete (BRTOS_Queue **event)
   pont_event->OSEventAllocated = 0;
   pont_event->OSEventCount     = 0;                      
   pont_event->OSEventWait      = 0;
-  
   pont_event->OSEventWaitList=0;
   
-  *event = NULL;
+  BRTOS_DEALLOC(pont_event);
   
   // Exit Critical Section
   OSExitCritical();
