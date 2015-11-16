@@ -127,3 +127,4 @@
 - Added support for dynamic task install and uninstall
 - Now OSInfo support dynamic tasks
 - Some OS functions received an "OS" prefix (a define was used for compatibility purposes)
+- OS_RTC.c renamed to OSTime.c
