@@ -42,7 +42,7 @@
 
 #include "OS_types.h"
 #include "HAL.h"
-#include "OS_RTC.h"
+#include "OSTime.h"
 #include "BRTOSConfig.h"
 
 
