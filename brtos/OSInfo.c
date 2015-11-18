@@ -63,9 +63,8 @@ char *PrintDecimal(INT16S val, CHAR8 *buff)
 }
 
 
-// Imprimir ID, nome, prioridade, stack
-// memoria total heap de tarefas
-// memoria total heap de filas
+// Imprimir ID, nome, estado, prioridade, stack
+/* Tasks are reported as blocked ('B'), ready ('R') or suspended ('S'). */
 void OSTaskList(char *string)
 {
     INT16U VirtualStack = 0;
@@ -76,9 +75,9 @@ void OSTaskList(char *string)
     INT32U *sp_end = 0;
     INT32U *sp_address = 0;
 
-    string += mem_cpy(string,"\n\r******************************************\n\r");
-    string += mem_cpy(string,"ID   NAME           PRIORITY   STACK SIZE\n\r");
-    string += mem_cpy(string,"******************************************\n\r");
+    string += mem_cpy(string,"\n\r***************************************************\n\r");
+    string += mem_cpy(string,"ID   NAME            STATE   PRIORITY   STACK SIZE\n\r");
+    string += mem_cpy(string,"***************************************************\n\r");
 
     int z,count;
 	#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
@@ -107,6 +106,21 @@ void OSTaskList(char *string)
 		  {
 			  *string++ = ' ';
 		  }
+
+		  // Print the task state
+		  string += mem_cpy(string,"  ");
+		  UserEnterCritical();
+		  if ((OSBlockedList & (PriorityMask[ContextTask[j].Priority])) == 0){
+			  *string++ = 'B';
+		  }else{
+			  if ((OSReadyList & (PriorityMask[ContextTask[j].Priority])) == PriorityMask[ContextTask[j].Priority]){
+				  *string++ = 'R';
+			  }else{
+				  *string++ = 'S';
+			  }
+		  }
+		  UserExitCritical();
+		  string += mem_cpy(string,"      ");
 
 		  // Print the task priority
 		  UserEnterCritical();
@@ -182,6 +196,21 @@ void OSTaskList(char *string)
   	  *string++ = ' ';
     }
 
+	// Print the task state
+	string += mem_cpy(string,"  ");
+	UserEnterCritical();
+	if ((OSBlockedList & (PriorityMask[ContextTask[NUMBER_OF_TASKS+1].Priority])) == 0){
+	  *string++ = 'B';
+	}else{
+	  if ((OSReadyList & (PriorityMask[ContextTask[NUMBER_OF_TASKS+1].Priority])) == PriorityMask[ContextTask[NUMBER_OF_TASKS+1].Priority]){
+		  *string++ = 'R';
+	  }else{
+		  *string++ = 'S';
+	  }
+	}
+	UserExitCritical();
+	string += mem_cpy(string,"      ");
+
     // Print the task priority
     UserEnterCritical();
     prio = ContextTask[NUMBER_OF_TASKS+1].Priority;
@@ -235,9 +264,9 @@ void OSTaskList(char *string)
     *string = '\0';
 }
 
-#if (BRTOS_DYNAMIC_TASKS_ENABLED)
-unsigned int OSGetFreeHeapSize( void );
-#endif
+
+// memoria total heap de tarefas
+// memoria total heap de filas
 void OSAvailableMemory(char *string)
 {
     INT16U address = 0;
@@ -257,7 +286,7 @@ void OSAvailableMemory(char *string)
 #if (!BRTOS_DYNAMIC_TASKS_ENABLED)
     (void)PrintDecimal(address, str);
 #else
-    (void)PrintDecimal((INT16S)OSGetFreeHeapSize(), str);
+    (void)PrintDecimal((INT16S)OSGetUsedHeapSize(), str);
 #endif
     string += mem_cpy(string, &str[2]);
     string += mem_cpy(string, " of ");

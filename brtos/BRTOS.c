@@ -723,7 +723,7 @@ INT8U OSUnBlockPriority(INT8U iPriority)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSBlockTask(BRTOS_TH iTaskNumber)
+INT8U OSBlockTask(BRTOS_TH TaskHandle)
 {
   OS_SR_SAVE_VAR
   INT8U iPriority = 0;
@@ -734,17 +734,32 @@ INT8U OSBlockTask(BRTOS_TH iTaskNumber)
     
   // Enter critical Section
   if (currentTask)
-    OSEnterCritical();    
+    OSEnterCritical();
+
+  // Checks whether the task is uninstalling itself
+  if (!TaskHandle){
+	  // If so, verify if the currentTask is valid
+	  if (currentTask){
+		  //If true, currentTask is the task being uninstall
+		  TaskHandle = currentTask;
+	  }else{
+		  // If not, not valid task
+		  // Exit Critical Section
+		  OSExitCritical();
+
+		  return NOT_VALID_TASK;
+	  }
+  }
 
   // Determina a prioridade da função
   #if (VERBOSE == 1)
-  ContextTask[iTaskNumber].Blocked = TRUE;
+  ContextTask[TaskHandle].Blocked = TRUE;
   #endif
-  iPriority = ContextTask[iTaskNumber].Priority;
+  iPriority = ContextTask[TaskHandle].Priority;
   
   OSBlockedList = OSBlockedList & ~(PriorityMask[iPriority]);
   
-  if (currentTask == iTaskNumber)
+  if (currentTask == TaskHandle)
   {
      ChangeContext();     
   }
@@ -770,7 +785,7 @@ INT8U OSBlockTask(BRTOS_TH iTaskNumber)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSUnBlockTask(BRTOS_TH iTaskNumber)
+INT8U OSUnBlockTask(BRTOS_TH TaskHandle)
 {
   OS_SR_SAVE_VAR
   INT8U iPriority = 0;
@@ -782,11 +797,11 @@ INT8U OSUnBlockTask(BRTOS_TH iTaskNumber)
      OSEnterCritical();
 
   #if (VERBOSE == 1)
-  ContextTask[iTaskNumber].Blocked = FALSE;
+  ContextTask[TaskHandle].Blocked = FALSE;
   #endif
   
   // Determina a prioridade da função  
-  iPriority = ContextTask[iTaskNumber].Priority;
+  iPriority = ContextTask[TaskHandle].Priority;
 
   OSBlockedList = OSBlockedList | (PriorityMask[iPriority]);
   
