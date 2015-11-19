@@ -236,7 +236,7 @@ volatile INT8U flag_load = TRUE;
 #if (PROCESSOR == PIC18)
 #pragma udata ctxram
 #endif
-ContextType ContextTask[NUMBER_OF_TASKS + 2];          ///< Task context info
+ContextType ContextTask[NUMBER_OF_TASKS + 1];          ///< Task context info
                                                        ///< ContextTask[0] not used
                                                        ///< Last ContexTask is the Idle Task
 
@@ -554,9 +554,9 @@ void OS_TICK_HANDLER(void)
 INT8U BRTOSStart(void)
 {
  #if (TASK_WITH_PARAMETERS == 1)
-  if (InstallIdle(&Idle,IDLE_STACK_SIZE,(void*)NULL) != OK) 
+  if (InstallTask(&Idle, "Idle Task", IDLE_STACK_SIZE, 0, (void*)NULL, NULL) != OK)
  #else
-  if (InstallIdle(&Idle,IDLE_STACK_SIZE) != OK)
+  if (InstallTask(&Idle, "Idle Task", IDLE_STACK_SIZE, 0, NULL) != OK)
  #endif
   {
     return NO_MEMORY;
@@ -594,6 +594,11 @@ void PreInstallTasks(void)
   for(i=0;i<configMAX_TASK_INSTALL;i++)
   {
     PriorityVector[i]=EMPTY_PRIO;
+  }
+
+  for(i=1;i<=NUMBER_OF_TASKS;i++)
+  {
+	  ContextTask[i].Priority = EMPTY_PRIO;
   }
     
   Tail = NULL;
@@ -1051,10 +1056,13 @@ INT8U OSUnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
    }
    else
    {
-      if (currentTask)
-       // Exit Critical Section
-       OSExitCritical();
-      return CANNOT_ASSIGN_IDLE_TASK_PRIO;
+	   // Verify if trying to install a user task at priority 0
+	   if (FctPtr != Idle){
+		   if (currentTask)
+	       // Exit Critical Section
+	       OSExitCritical();
+		   return CANNOT_ASSIGN_IDLE_TASK_PRIO;
+	   }
    }
       
    // Number Task Discovery
@@ -1194,10 +1202,13 @@ INT8U OSUnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
    }
    else
    {
-      if (currentTask)
-       // Exit Critical Section
-       OSExitCritical();
-      return CANNOT_ASSIGN_IDLE_TASK_PRIO;
+	   // Verify if trying to install a user task at priority 0
+	   if (FctPtr != Idle){
+		   if (currentTask)
+	       // Exit Critical Section
+	       OSExitCritical();
+		   return CANNOT_ASSIGN_IDLE_TASK_PRIO;
+	   }
    }
 
    // Allocate the task virtual stack
@@ -1324,6 +1335,16 @@ INT8U UninstallTask(BRTOS_TH TaskHandle){
 	  }
 
 	  Task = (ContextType*)&ContextTask[TaskHandle];
+
+	  // Verify if is trying to uninstall the idle task
+	  if (!(Task->Priority)){
+		  if (currentTask)
+			  // Exit Critical Section
+			  OSExitCritical();
+
+		  return CANNOT_UNINSTALL_IDLE_TASK;
+	  }
+
 	  // Checks whether the task handler is valid
 	  if (Task != NULL){
 		  // Verify if the task is waiting for an event
@@ -1338,7 +1359,7 @@ INT8U UninstallTask(BRTOS_TH TaskHandle){
 			  Task->StackInit = 0;
 			  Task->StackPoint = 0;
 			  Task->StackSize = 0;
-			  Task->Priority = 0;
+			  Task->Priority = EMPTY_PRIO;
 			  Task->TimeToWait = NO_TIMEOUT;
 			  Task->Next     =  NULL;
 			  Task->Previous =  NULL;
@@ -1377,123 +1398,6 @@ INT8U UninstallTask(BRTOS_TH TaskHandle){
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
-
-
-
-
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-/////  Idle Task Installation Function                 /////
-/////                                                  /////
-/////  Parameters:                                     /////
-/////  Function pointer and task priority              /////
-/////                                                  /////
-////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
-#if (TASK_WITH_PARAMETERS == 1) 
-  INT8U InstallIdle(void(*FctPtr)(void*), INT16U USER_STACKED_BYTES, void *parameters)
-#else
-  INT8U InstallIdle(void(*FctPtr)(void), INT16U USER_STACKED_BYTES)
-#endif
-{ 
-  OS_SR_SAVE_VAR
-
-   if (currentTask)
-    // Enter Critical Section
-    OSEnterCritical();
-    
-   // Fix the stack size to the cpu type
-   USER_STACKED_BYTES = USER_STACKED_BYTES - (USER_STACKED_BYTES % sizeof(OS_CPU_TYPE));
-    
-   if (USER_STACKED_BYTES < NUMBER_MIN_OF_STACKED_BYTES)
-   {
-       if (currentTask)
-        // Exit Critical Section
-        OSExitCritical();
-       return STACK_SIZE_TOO_SMALL;
-   }    
-
-#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
-   if ((iStackAddress + (USER_STACKED_BYTES / sizeof(OS_CPU_TYPE))) > (HEAP_SIZE / sizeof(OS_CPU_TYPE)))
-   {
-      if (currentTask)
-       // Exit Critical Section
-       OSExitCritical();
-       return NO_MEMORY;
-   }
-
-	// Posiciona o inicio do stack da tarefa
-    // no inicio da disponibilidade de RAM do HEAP
-	#if STACK_GROWTH == 1
-	ContextTask[NUMBER_OF_TASKS+1].StackPoint = StackAddress + NUMBER_MIN_OF_STACKED_BYTES;
-	#else
-	ContextTask[NUMBER_OF_TASKS+1].StackPoint = StackAddress + (USER_STACKED_BYTES - NUMBER_MIN_OF_STACKED_BYTES);
-   #endif
-
-    // Virtual Stack Init
-	#if STACK_GROWTH == 1
-	ContextTask[NUMBER_OF_TASKS+1].StackInit = StackAddress;
-	#else
-	ContextTask[NUMBER_OF_TASKS+1].StackInit = StackAddress + USER_STACKED_BYTES;
-	#endif
-#else
-   // Allocate the task virtual stack
-   ContextTask[NUMBER_OF_TASKS+1].StackInit = (OS_CPU_TYPE)BRTOS_ALLOC(USER_STACKED_BYTES);
-
-   if (ContextTask[NUMBER_OF_TASKS+1].StackInit == 0)
-   {
-       if (currentTask)
-        // Exit Critical Section
-        OSExitCritical();
-       return NO_MEMORY;
-   }
-#endif
-
-
-   // Determina a prioridade da função
-   ContextTask[NUMBER_OF_TASKS+1].Priority = 0;
-   // Determina a tarefa que irá ocupar esta prioridade
-   PriorityVector[0] = NUMBER_OF_TASKS+1;
-   
-   // Fill the virtual task stack
-#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
-   #if (TASK_WITH_PARAMETERS == 1)   
-      CreateVirtualStack(FctPtr, USER_STACKED_BYTES, parameters);
-   #else
-      CreateVirtualStack(FctPtr, USER_STACKED_BYTES);   
-   #endif
-#else
-#if (TASK_WITH_PARAMETERS == 1)
-   ContextTask[NUMBER_OF_TASKS+1].StackPoint = CreateDVirtualStack(FctPtr, (OS_CPU_TYPE)(ContextTask[NUMBER_OF_TASKS+1].StackInit + USER_STACKED_BYTES), parameters);
-#else
-   ContextTask[NUMBER_OF_TASKS+1].StackPoint = CreateDVirtualStack(FctPtr, (OS_CPU_TYPE)(ContextTask[NUMBER_OF_TASKS+1].StackInit + USER_STACKED_BYTES));
-#endif
-   ContextTask[NUMBER_OF_TASKS+1].StackSize = USER_STACKED_BYTES;
-#endif
-
-#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
-   // Incrementa o contador de bytes do stack virtual (HEAP)
-   iStackAddress = iStackAddress + (USER_STACKED_BYTES / sizeof(OS_CPU_TYPE));
-   
-   // Posiciona o endereço de stack virtual p/ a próxima tarefa instalada
-   StackAddress = StackAddress + USER_STACKED_BYTES;
-#endif
-   
-   ContextTask[NUMBER_OF_TASKS+1].TimeToWait = NO_TIMEOUT;
-   
-   #if (VERBOSE == 1)
-   ContextTask[NUMBER_OF_TASKS+1].Blocked = FALSE;
-   ContextTask[NUMBER_OF_TASKS+1].State = READY;  
-   #endif
-   
-   OSReadyList = OSReadyList | (PriorityType)1;
-   
-   if (currentTask)
-    // Exit Critical Section
-    OSExitCritical();
-   
-   return OK;
-}
 
 
 

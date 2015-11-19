@@ -42,7 +42,7 @@
 
 #include "OS_types.h"
 #include "HAL.h"
-#include "OSTime.h"
+#include "OS_RTC.h"
 #include "BRTOSConfig.h"
 
 
@@ -113,6 +113,7 @@
 #define END_OF_AVAILABLE_TCB         (INT8U)10    ///< Error - There are no more task control blocks (Context task)
 #define EXIT_BY_NO_ENTRY_AVAILABLE	 (INT8U)11	  ///< Error - There are no data into queues and mailboxes or semaphore value is zero with no timeout option
 #define TASK_WAITING_EVENT			 (INT8U)12	  ///< Error - The task being uninstalled is waiting for an event (uninstall aborted)
+#define CANNOT_UNINSTALL_IDLE_TASK   (INT8U)13    ///< Error - It is not be allow to uninstall the idle task
 
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
@@ -509,19 +510,6 @@ typedef struct
 *********************************************************************************************/
 INT8U UninstallTask(BRTOS_TH TaskHandle);
 
-/*****************************************************************************************//**
-* \fn INT8U InstallIdle(void(*FctPtr)(void), INT16U USER_STACKED_BYTES)
-* \brief Install the idle task. Initial state = running.
-* \param *FctPtr Pointer to the task to be installed
-* \param USER_STACKED_BYTES Size of the task virtual stack.
-* \return OK Idle task successfully installed
-* \return NO_MEMORY Not enough memory available to install the idle task
-*********************************************************************************************/
-#if (TASK_WITH_PARAMETERS == 1)
-  INT8U InstallIdle(void(*FctPtr)(void*), INT16U USER_STACKED_BYTES, void *parameters);
-#else
-  INT8U InstallIdle(void(*FctPtr)(void), INT16U USER_STACKED_BYTES);
-#endif
 
 /*****************************************************************************************//**
 * \fn void Idle(void)
@@ -1191,7 +1179,7 @@ extern ContextType *Head;
 extern INT8U                iNesting;
 extern volatile INT8U       currentTask;
 extern volatile INT8U       SelectedTask;
-extern ContextType          ContextTask[NUMBER_OF_TASKS + 2];
+extern ContextType          ContextTask[NUMBER_OF_TASKS + 1];
 extern INT16U               iStackAddress;
 extern INT8U                NumberOfInstalledTasks;
 extern volatile INT32U      OSDuty;

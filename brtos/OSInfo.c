@@ -83,180 +83,107 @@ void OSTaskList(char *string)
 	#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
     for (j=1;j<=NumberOfInstalledTasks;j++)
 	#else
-    for (j=1;j<=(NUMBER_OF_TASKS+1);j++)
+    for (j=1;j<=NUMBER_OF_TASKS;j++)
 	#endif
     {
-      if (ContextTask[j].Priority != 0){
-		  *string++ = '[';
-		  if (j<10)
-		  {
-			  *string++ = j+'0';
-			  string += mem_cpy(string, "]  ");
-		  }else
-		  {
-			  (void)PrintDecimal(j, str);
-			  string += mem_cpy(string, (str+4));
-			  string += mem_cpy(string, "] ");
-		  }
-		  z = mem_cpy(string,(char*)ContextTask[j].TaskName);
-		  string +=z;
-
-		  // Task name align
-		  for(count=0;count<(16-z);count++)
-		  {
-			  *string++ = ' ';
-		  }
-
-		  // Print the task state
-		  string += mem_cpy(string,"  ");
-		  UserEnterCritical();
-		  if ((OSBlockedList & (PriorityMask[ContextTask[j].Priority])) == 0){
-			  *string++ = 'B';
-		  }else{
-			  if ((OSReadyList & (PriorityMask[ContextTask[j].Priority])) == PriorityMask[ContextTask[j].Priority]){
-				  *string++ = 'R';
-			  }else{
-				  *string++ = 'S';
+		  if (ContextTask[j].Priority != EMPTY_PRIO){
+			  *string++ = '[';
+			  if (j<10)
+			  {
+				  *string++ = j+'0';
+				  string += mem_cpy(string, "]  ");
+			  }else
+			  {
+				  (void)PrintDecimal(j, str);
+				  string += mem_cpy(string, (str+4));
+				  string += mem_cpy(string, "] ");
 			  }
-		  }
-		  UserExitCritical();
-		  string += mem_cpy(string,"      ");
+			  z = mem_cpy(string,(char*)ContextTask[j].TaskName);
+			  string +=z;
 
-		  // Print the task priority
-		  UserEnterCritical();
-		  prio = ContextTask[j].Priority;
-		  UserExitCritical();
+			  // Task name align
+			  for(count=0;count<(16-z);count++)
+			  {
+				  *string++ = ' ';
+			  }
 
-		  (void)PrintDecimal(prio, str);
-		  string += mem_cpy(string, (str+2));
-		  string += mem_cpy(string,"       ");
+			  // Print the task state
+			  string += mem_cpy(string,"  ");
+			  UserEnterCritical();
+			  if ((OSBlockedList & (PriorityMask[ContextTask[j].Priority])) == 0){
+				  *string++ = 'B';
+			  }else{
+				  if ((OSReadyList & (PriorityMask[ContextTask[j].Priority])) == PriorityMask[ContextTask[j].Priority]){
+					  *string++ = 'R';
+				  }else{
+					  *string++ = 'S';
+				  }
+			  }
+			  UserExitCritical();
+			  string += mem_cpy(string,"      ");
 
-		  // Print the task stack size
-		  UserEnterCritical();
-		  sp_address = (INT32U*)ContextTask[j].StackPoint;
-		  if (j == 1)
-		  {
-			  #if (!BRTOS_DYNAMIC_TASKS_ENABLED)
-			  sp_end = (INT32U*)&STACK[0];
-			  #else
-			  sp_end = (INT32U*)ContextTask[1].StackInit;
-			  #endif
-		  }else
-		  {
-			  #if (!BRTOS_DYNAMIC_TASKS_ENABLED)
-			  sp_end = (INT32U*)ContextTask[j-1].StackInit;
-			  #else
-			  sp_end = (INT32U*)ContextTask[j].StackInit;
-			  #endif
-		  }
-		  UserExitCritical();
+			  // Print the task priority
+			  UserEnterCritical();
+			  prio = ContextTask[j].Priority;
+			  UserExitCritical();
 
-		  // Find for at least 16 available sp data into task stack
-		  i = 0;
-		  while(i<16)
-		  {
-			if (sp_address <= sp_end)
-			{
-			  break;
-			}
-			if (*sp_address == 0)
-			{
-			  i++;
-			}else
-			{
+			  (void)PrintDecimal(prio, str);
+			  string += mem_cpy(string, (str+2));
+			  string += mem_cpy(string,"       ");
+
+			  // Print the task stack size
+			  UserEnterCritical();
+			  sp_address = (INT32U*)ContextTask[j].StackPoint;
+			  if (j == 1)
+			  {
+				  #if (!BRTOS_DYNAMIC_TASKS_ENABLED)
+				  sp_end = (INT32U*)&STACK[0];
+				  #else
+				  sp_end = (INT32U*)ContextTask[1].StackInit;
+				  #endif
+			  }else
+			  {
+				  #if (!BRTOS_DYNAMIC_TASKS_ENABLED)
+				  sp_end = (INT32U*)ContextTask[j-1].StackInit;
+				  #else
+				  sp_end = (INT32U*)ContextTask[j].StackInit;
+				  #endif
+			  }
+			  UserExitCritical();
+
+			  // Find for at least 16 available sp data into task stack
 			  i = 0;
-			}
-			sp_address--;
-		  }
+			  while(i<16)
+			  {
+				if (sp_address <= sp_end)
+				{
+				  break;
+				}
+				if (*sp_address == 0)
+				{
+				  i++;
+				}else
+				{
+				  i = 0;
+				}
+				sp_address--;
+			  }
 
 
-		  UserEnterCritical();
-		  #if (!BRTOS_DYNAMIC_TASKS_ENABLED)
-		  VirtualStack = ContextTask[j].StackInit - ((INT32U)sp_address + (i*4));
-		  #else
-		  VirtualStack = (ContextTask[j].StackInit + (INT32U)ContextTask[j].StackSize) - ((INT32U)sp_address + (i*4));
-		  #endif
-		  UserExitCritical();
+			  UserEnterCritical();
+			  #if (!BRTOS_DYNAMIC_TASKS_ENABLED)
+			  VirtualStack = ContextTask[j].StackInit - ((INT32U)sp_address + (i*4));
+			  #else
+			  VirtualStack = (ContextTask[j].StackInit + (INT32U)ContextTask[j].StackSize) - ((INT32U)sp_address + (i*4));
+			  #endif
+			  UserExitCritical();
 
-		  (void)PrintDecimal(VirtualStack, str);
-		  string += mem_cpy(string, str);
+			  (void)PrintDecimal(VirtualStack, str);
+			  string += mem_cpy(string, str);
 
-		  string += mem_cpy(string, "\n\r");
+			  string += mem_cpy(string, "\n\r");
 		}
     }
-
-    *string++ = '[';
-    (void)PrintDecimal((NUMBER_OF_TASKS+1), str);
-    string += mem_cpy(string, (str+4));
-    string += mem_cpy(string, "] ");
-
-    string += mem_cpy(string, "Idle Task");
-    for(count=0;count<7;count++)
-    {
-  	  *string++ = ' ';
-    }
-
-	// Print the task state
-	string += mem_cpy(string,"  ");
-	UserEnterCritical();
-	if ((OSBlockedList & (PriorityMask[ContextTask[NUMBER_OF_TASKS+1].Priority])) == 0){
-	  *string++ = 'B';
-	}else{
-	  if ((OSReadyList & (PriorityMask[ContextTask[NUMBER_OF_TASKS+1].Priority])) == PriorityMask[ContextTask[NUMBER_OF_TASKS+1].Priority]){
-		  *string++ = 'R';
-	  }else{
-		  *string++ = 'S';
-	  }
-	}
-	UserExitCritical();
-	string += mem_cpy(string,"      ");
-
-    // Print the task priority
-    UserEnterCritical();
-    prio = ContextTask[NUMBER_OF_TASKS+1].Priority;
-    UserExitCritical();
-
-    (void)PrintDecimal(prio, str);
-    string += mem_cpy(string, (str+2));
-    string += mem_cpy(string,"       ");
-
-    UserEnterCritical();
-    sp_address = (INT32U*)ContextTask[NUMBER_OF_TASKS+1].StackPoint;
-	#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
-    sp_end = (INT32U*)ContextTask[j-1].StackInit;
-	#else
-    sp_end = (INT32U*)ContextTask[NUMBER_OF_TASKS+1].StackInit;
-	#endif
-    UserExitCritical();
-
-    i = 0;
-    while(i<16)
-    {
-      if (sp_address <= sp_end)
-      {
-        break;
-      }
-      if (*sp_address == 0)
-      {
-        i++;
-      }else
-      {
-        i = 0;
-      }
-      sp_address--;
-    }
-
-
-    UserEnterCritical();
-	#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
-    VirtualStack = ContextTask[NUMBER_OF_TASKS+1].StackInit - ((INT32U)sp_address + (INT32U)i*4);
-	#else
-    VirtualStack = (ContextTask[NUMBER_OF_TASKS+1].StackInit + (INT32U)ContextTask[NUMBER_OF_TASKS+1].StackSize) - ((INT32U)sp_address + (INT32U)i*4);
-	#endif
-    UserExitCritical();
-
-    (void)PrintDecimal(VirtualStack, str);
-    string += mem_cpy(string, str);
 
     string += mem_cpy(string, "\n\r");
 

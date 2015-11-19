@@ -130,3 +130,4 @@
 - OS_RTC.c/.h renamed to OSTime.c/.h
 - Now a task can block itself by using 0 as argument
 - Now the OSTaskList function prints the state of the task
+- Function InstallIdle removed. Now the Idle task is installed by the InstallTask function.
