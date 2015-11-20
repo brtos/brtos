@@ -38,9 +38,13 @@
 /// must always be equal or higher to NumberOfInstalledTasks
 #define NUMBER_OF_TASKS 		(INT8U)10
 
+/// Enable or disable the dynamic task install and uninstall
+#define BRTOS_DYNAMIC_TASKS_ENABLED 1
+
 /// Defines the memory allocation and deallocation function to the dynamic queues
-#define BRTOS_ALLOC   malloc
-#define BRTOS_DEALLOC free
+#include "umm_malloc.h"
+#define BRTOS_ALLOC   umm_malloc
+#define BRTOS_DEALLOC umm_free
 
 #define configMAX_TASK_NAME_LEN 32
 
@@ -128,3 +132,7 @@
 // Queue heap defines
 // Configurado com 1KB p/ filas
 #define QUEUE_HEAP_SIZE 8*128
+
+// Dynamic head define. To be used by DynamicInstallTask and Dynamic Queues
+#define DYNAMIC_HEAP_SIZE		20*1024
+
