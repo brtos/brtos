@@ -131,3 +131,4 @@
 - Now a task can block itself by using 0 as argument
 - Now the OSTaskList function prints the state of the task
 - Function InstallIdle removed. Now the Idle task is installed by the InstallTask function.
+- Corrected bug in the mutex release. Now if a task waiting for the mutex receive it, such task will be its owner.

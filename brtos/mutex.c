@@ -438,6 +438,9 @@ INT8U OSMutexRelease(BRTOS_Mutex *pont_event)
     
     // Decreases the mutex wait list counter
     pont_event->OSEventWait--;
+    
+    // Changes the task that owns the mutex
+    pont_event->OSEventOwner = PriorityVector[iPriority];    
          
     // Indicates that selected task is ready to run
     #if (VERBOSE == 1)
