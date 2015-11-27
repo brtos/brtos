@@ -1,4 +1,4 @@
-basedirs	:= brtos hal
+basedirs	:= brtos
 manuals		:= $(shell find ./ -name "*.txt")
 filetypes	:= -iwholename "*/docs/*.txt"
 empty		:=
@@ -21,7 +21,7 @@ ifeq ($(HOST_OS),Windows)
   endif
 endif
 
-.PHONY: clean html pdf upload
+.PHONY: clean html pdf
 
 html: init doxygen.log
 
