@@ -2,6 +2,8 @@
 ## Acrônimo: Basic Real-Time Operating System
 =====
 
+[![Build Status](https://travis-ci.org/brtos/brtos.svg)](https://travis-ci.org/brtos/brtos)
+
 *Please see English version below.*
 
 Sistema operacional de tempo real para microcontroladores de pequeno porte.
