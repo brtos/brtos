@@ -1,5 +1,5 @@
 /**
-* \file OS_RTC.c
+* \file OSTime.c
 * \brief System Time managment functions
 *
 * Functions to reset and update the system time and date

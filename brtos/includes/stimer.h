@@ -1,5 +1,5 @@
 /**
-* \file timers.h
+* \file stimer.h
 * \brief OS Soft Timers service functions
 *
 * Functions to create, start, stop, delete and 

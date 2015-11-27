@@ -1,5 +1,5 @@
 /**
-* \file OS_RTC.h
+* \file OSTime.h
 * \brief System Time managment struct declarations and functions prototypes.
 *
 *
