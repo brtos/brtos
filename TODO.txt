@@ -13,9 +13,6 @@ Filas:
 
 [T] Integrar a estrutura da fila com a estrutura do evento. Deixar oculta ao usuário a declaração da estrutura de fila. Motivo: facilidade de uso.
 
-Mailbox:
-[D] Remover. Motivo: pouco uso. Pode-se usar uma fila com tamanho de ponteiro para a mesma função.
-
 Debug:
 
 [D] Usar a continuidade da pilha do BRTOS para detectar estouros de pilha de tarefa. Pode-se colocar, na instalação, um marcador no início da piha da tarefa (.StackInit), fim da pilha da tarefa anterior e verificar a integridade marcador. Pode ser colocado com uma função em OSInfo.c ou realizado antes da troca de contexto para gerar uma exceção de erro. Motivo: facilidade de debug e definição correta dos tamanhos de pilha.
