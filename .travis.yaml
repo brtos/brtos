@@ -1,0 +1,38 @@
+notifications:
+  email: false
+language: c #NOTE: this will set CC=gcc which might cause trouble
+
+before_script:
+  - WGET="travis_retry wget --continue --tries=20 --waitretry=10 --retry-connrefused --no-dns-cache --timeout 300"
+  - sudo apt-get -qq update
+
+  ## Install doxygen
+  - if [ ${BUILD_CATEGORY:-0} = doxygen ] ; then
+      sudo add-apt-repository ppa:libreoffice/libreoffice-4-4 -y && sudo apt-get -qq update &&
+      sudo apt-get --no-install-suggests --no-install-recommends -qq install doxygen  &&
+      doxygen --version ;
+    fi
+
+  ## Install avr toolchain
+  - sudo apt-get -qq install gcc-avr avr-libc
+
+  ## Install 32-bit compatibility libraries
+  - sudo apt-get -qq install libc6:i386 libgcc1:i386 gcc-4.6-base:i386
+      libstdc++5:i386 libstdc++6:i386
+
+
+script:
+  ## regression-tests/Makefile handles most of generic logic
+  - "make -C tests/??-$BUILD_TYPE RUNALL=true summary"
+
+after_script:
+  ## Print a basic summary
+  - "echo 'Summary:'; cat regression-tests/??-$BUILD_TYPE/summary"
+  - "FAILS=`grep -c  ' FAIL ' regression-tests/??-$BUILD_TYPE/summary`"
+  ## This will detect whether the build should pass or fail
+  - "test $FAILS -eq 0; exit $?"
+
+env:
+  ## This magically kick-off parallel jobs for each of the for the sets
+  ## of environment variable defined below
+  - BUILD_TYPE='doxygen'  BUILD_CATEGORY='doxygen'
