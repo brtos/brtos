@@ -542,7 +542,7 @@ void IdleHook(void);
 #endif
 
 /**************************************************************************//**
-* \fn interrupt void TickTimer(void)
+* \fn void OS_TICK_HANDLER(void)
 * \brief Tick timer interrupt handler routine (Internal kernel function).
 ******************************************************************************/
 void OS_TICK_HANDLER(void);
@@ -557,7 +557,7 @@ void OS_TICK_HANDLER(void);
 INT8U BRTOSStart(void);
 
 /*****************************************************************************************//**
-* \fn INT8U OSDelayTask(INT16U time)
+* \fn INT8U OSDelayTask(INT16U time_wait)
 * \brief Wait for a specified period.
 *  A task that calling this function will be suspended for a certain time.
 *  When this time is reached the task back to ready state.

@@ -73,7 +73,7 @@
 #pragma warn_implicitconv off
 #endif
 
-#if (PROCESSOR == ATMEGA)
+#if (PROCESSOR == ATMEGA) && (!DOXYGEN)
 const CHAR8 version[] PROGMEM = BRTOS_VERSION;	///< Informs BRTOS version
 PGM_P CONST BRTOSStringTable[] PROGMEM = 
 {
