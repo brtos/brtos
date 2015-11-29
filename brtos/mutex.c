@@ -198,10 +198,12 @@ INT8U OSMutexDelete (BRTOS_Mutex **event)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSMutexAcquire(BRTOS_Mutex *pont_event)
+INT8U OSMutexAcquire(BRTOS_Mutex *pont_event, INT16U time_wait)
 {
   OS_SR_SAVE_VAR
   INT8U  iPriority = 0;
+  INT32U timeout;
+  ContextType *Task;
 
   
   #if (ERROR_CHECK == 1)
@@ -249,6 +251,8 @@ INT8U OSMutexAcquire(BRTOS_Mutex *pont_event)
     return OK;
   }
   
+  Task = (ContextType*)&ContextTask[currentTask];
+
   // Verify if the shared resource is available
   if (pont_event->OSEventState == AVAILABLE_RESOURCE)
   {
@@ -268,7 +272,7 @@ INT8U OSMutexAcquire(BRTOS_Mutex *pont_event)
     if (pont_event->OSMaxPriority > ContextTask[currentTask].Priority)
     {
       // Receives the priority ceiling temporarily
-      ContextTask[currentTask].Priority = pont_event->OSMaxPriority;
+      Task->Priority = pont_event->OSMaxPriority;
       
       // Priority vector change       
       PriorityVector[pont_event->OSMaxPriority] = currentTask;
@@ -284,8 +288,15 @@ INT8U OSMutexAcquire(BRTOS_Mutex *pont_event)
   }
   else
   {
-    // Copy task priority to local scope
-    iPriority = ContextTask[currentTask].Priority;
+	// If no timeout is used and the mutex is not available, exit the mutex with an error
+	if (time_wait == NO_TIMEOUT){
+		// Exit Critical Section
+		OSExitCritical();
+		return EXIT_BY_NO_RESOURCE_AVAILABLE;
+	}
+
+	// Copy task priority to local scope
+    iPriority = Task->Priority;
     // Increases the mutex wait list counter
     pont_event->OSEventWait++;
     
@@ -300,6 +311,27 @@ INT8U OSMutexAcquire(BRTOS_Mutex *pont_event)
 
     // Remove current task from the Ready List
     OSReadyList = OSReadyList & ~(PriorityMask[iPriority]);
+
+    // Set timeout overflow
+    if (time_wait)
+    {
+      timeout = (INT32U)((INT32U)OSGetCount() + (INT32U)time_wait);
+
+      if (timeout >= TICK_COUNT_OVERFLOW)
+      {
+        Task->TimeToWait = (INT16U)(timeout - TICK_COUNT_OVERFLOW);
+      }
+      else
+      {
+        Task->TimeToWait = (INT16U)timeout;
+      }
+
+      // Put task into delay list
+      IncludeTaskIntoDelayList();
+    } else
+    {
+      Task->TimeToWait = NO_TIMEOUT;
+    }
             
     // Change Context - Returns on mutex release
     ChangeContext();
@@ -309,12 +341,36 @@ INT8U OSMutexAcquire(BRTOS_Mutex *pont_event)
     // Enter Critical Section
     OSEnterCritical();    
     
-    // Current task becomes the temporary owner of the mutex
-    pont_event->OSEventOwner = currentTask;
-    
-    ///////////////////////////////////////////////////////////////////////////////
-    // Performs the temporary exchange of mutex owner priority, if needed        //
-    ///////////////////////////////////////////////////////////////////////////////
+    if (time_wait){
+        // Verify if the reason of task wake up was queue timeout
+        if(Task->TimeToWait == EXIT_BY_TIMEOUT)
+        {
+            // Test if both timeout and post have occured before arrive here
+            if ((pont_event->OSEventWaitList & PriorityMask[iPriority]))
+            {
+              // Remove the task from the queue wait list
+              pont_event->OSEventWaitList = pont_event->OSEventWaitList & ~(PriorityMask[iPriority]);
+
+              // Decreases the queue wait list counter
+              pont_event->OSEventWait--;
+
+              // Exit Critical Section
+              OSExitCritical();
+
+              // Indicates resource not available
+              return EXIT_BY_NO_RESOURCE_AVAILABLE;
+            }
+        }
+        else
+        {
+            // Remove the time to wait condition
+            Task->TimeToWait = NO_TIMEOUT;
+
+            // Remove from delay list
+            RemoveFromDelayList();
+        }
+
+    }
     
     // Backup the original task priority
     pont_event->OSOriginalPriority = iPriority;
@@ -322,7 +378,7 @@ INT8U OSMutexAcquire(BRTOS_Mutex *pont_event)
     if (pont_event->OSMaxPriority > iPriority)
     {
       // Receives the priority ceiling temporarily
-      ContextTask[currentTask].Priority = pont_event->OSMaxPriority;
+      Task->Priority = pont_event->OSMaxPriority;
       
       // Priority vector change
       PriorityVector[pont_event->OSMaxPriority] = currentTask;

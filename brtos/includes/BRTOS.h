@@ -114,6 +114,7 @@
 #define EXIT_BY_NO_ENTRY_AVAILABLE	 (INT8U)11	  ///< Error - There are no data into queues and mailboxes or semaphore value is zero with no timeout option
 #define TASK_WAITING_EVENT			 (INT8U)12	  ///< Error - The task being uninstalled is waiting for an event (uninstall aborted)
 #define CANNOT_UNINSTALL_IDLE_TASK   (INT8U)13    ///< Error - It is not be allow to uninstall the idle task
+#define EXIT_BY_NO_RESOURCE_AVAILABLE (INT8U)14	  ///< Error - The resource is not available with no timeout option
 
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
@@ -557,15 +558,15 @@ void OS_TICK_HANDLER(void);
 INT8U BRTOSStart(void);
 
 /*****************************************************************************************//**
-* \fn INT8U OSDelayTask(INT16U time_wait)
+* \fn INT8U OSDelayTask(INT16U time)
 * \brief Wait for a specified period.
 *  A task that calling this function will be suspended for a certain time.
 *  When this time is reached the task back to ready state.
-* \param time_wait Time in ticks to delay. System default = 1ms. The user can change the time value.
+* \param time Time in ticks to delay. System default = 1ms. The user can change the time value.
 * \return OK Success
 * \return IRQ_PEND_ERR - Can not use block priority function from interrupt handler code
 *********************************************************************************************/
-INT8U OSDelayTask(INT16U time_wait);
+INT8U OSDelayTask(INT16U time);
 #define DelayTask OSDelayTask
 
 /*****************************************************************************************//**
@@ -821,16 +822,17 @@ void initEvents(void);
   INT8U OSMutexDelete (BRTOS_Mutex **event);
 
   /*****************************************************************************************//**
-  * \fn INT8U OSMutexAcquire(BRTOS_Mutex *pont_event)
+  * \fn INT8U OSMutexAcquire(BRTOS_Mutex *pont_event, INT16U timeout)
   * \brief Wait for a mutex release
   *  Mutex release may be used to manage shared resources, for exemple, a LCD.
   *  A acquired state exits with a mutex owner release
   * \param *pont_event Mutex pointer
+  * \param timeout Timeout to the mutex acquire exits
   * \return OK Success
   * \return IRQ_PEND_ERR Can not use mutex pend function from interrupt handler code
   * \return NO_EVENT_SLOT_AVAILABLE Full Event list
   *********************************************************************************************/
-  INT8U OSMutexAcquire(BRTOS_Mutex *pont_event);
+  INT8U OSMutexAcquire(BRTOS_Mutex *pont_event, INT16U time_wait);
 
   /*****************************************************************************************//**
   * \fn INT8U OSMutexRelease(BRTOS_Mutex *pont_event)
