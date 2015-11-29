@@ -822,12 +822,12 @@ void initEvents(void);
   INT8U OSMutexDelete (BRTOS_Mutex **event);
 
   /*****************************************************************************************//**
-  * \fn INT8U OSMutexAcquire(BRTOS_Mutex *pont_event, INT16U timeout)
+  * \fn INT8U OSMutexAcquire(BRTOS_Mutex *pont_event, INT16U time_wait)
   * \brief Wait for a mutex release
   *  Mutex release may be used to manage shared resources, for exemple, a LCD.
   *  A acquired state exits with a mutex owner release
   * \param *pont_event Mutex pointer
-  * \param timeout Timeout to the mutex acquire exits
+  * \param time_wait Timeout to the mutex acquire exits
   * \return OK Success
   * \return IRQ_PEND_ERR Can not use mutex pend function from interrupt handler code
   * \return NO_EVENT_SLOT_AVAILABLE Full Event list
