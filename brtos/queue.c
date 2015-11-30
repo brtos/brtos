@@ -297,7 +297,7 @@ INT8U OSRQueue(OS_QUEUE *cqueue, INT8U* pdata)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSCleanQueue(BRTOS_Queue *pont_event)
+INT8U OSQueueClean(BRTOS_Queue *pont_event)
 {
   OS_SR_SAVE_VAR
   OS_QUEUE *cqueue = pont_event->OSEventPointer;

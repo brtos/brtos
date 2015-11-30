@@ -483,7 +483,7 @@ typedef struct
 ////////////////////////////////////////////////////////////
 
 /*****************************************************************************************//**
-* \fn INT8U InstallTask(void(*FctPtr)(void),const char *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, void *parameters, OS_CPU_TYPE *TaskHandle)
+* \fn INT8U OSInstallTask(void(*FctPtr)(void),const char *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, void *parameters, OS_CPU_TYPE *TaskHandle)
 * \brief Install a task. Initial state = running.
 * \param *FctPtr Pointer to the task to be installed
 * \param *TaskName Task Name or task description
@@ -497,20 +497,22 @@ typedef struct
 * \return BUSY_PRIORITY Desired priority busy
 *********************************************************************************************/
 #if (TASK_WITH_PARAMETERS == 1)
-  INT8U InstallTask(void(*FctPtr)(void*),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, void *parameters, OS_CPU_TYPE *TaskHandle);
+  INT8U OSInstallTask(void(*FctPtr)(void*),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, void *parameters, OS_CPU_TYPE *TaskHandle);
+  #define InstallTask OSInstallTask
 #else
-  INT8U InstallTask(void(*FctPtr)(void),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, OS_CPU_TYPE *TaskHandle);
+  INT8U OSInstallTask(void(*FctPtr)(void),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, OS_CPU_TYPE *TaskHandle);
+  #define InstallTask OSInstallTask
 #endif
 
 /*****************************************************************************************//**
-* \fn INT8U UninstallTask(BRTOS_TH TaskHandle)
+* \fn INT8U OSUninstallTask(BRTOS_TH TaskHandle)
 * \brief Uninstall a task from the dynamic memory
 * \param TaskHandle The task handle id
 * \return OK Task successfully uninstalled
 * \return NOT_VALID_TASK Not valid task id or task is waiting for an event
 *********************************************************************************************/
-INT8U UninstallTask(BRTOS_TH TaskHandle);
-
+INT8U OSUninstallTask(BRTOS_TH TaskHandle);
+#define UninstallTask OSUninstallTask
 
 /*****************************************************************************************//**
 * \fn void Idle(void)
@@ -946,12 +948,12 @@ void initEvents(void);
   INT8U OSRQueue(OS_QUEUE *cqueue, INT8U* pdata);
   
   /*****************************************************************************************//**
-  * \fn INT8U OSCleanQueue(OS_QUEUE *cqueue)
+  * \fn INT8U OSQueueClean(OS_QUEUE *cqueue)
   * \brief Clean data in the specified queue
   * \param *cqueue Pointer to a queue
   * \return CLEAN_BUFFER_OK Queue successfully cleaned
   *********************************************************************************************/  
-  INT8U OSCleanQueue(BRTOS_Queue *pont_event);
+  INT8U OSQueueClean(BRTOS_Queue *pont_event);
   
   /*****************************************************************************************//**
   * \fn INT8U OSQueuePend (BRTOS_Queue *pont_event, OS_QUEUE *cqueue, INT16U timeout)

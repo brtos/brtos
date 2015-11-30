@@ -1003,9 +1003,9 @@ INT8U OSUnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
 ////////////////////////////////////////////////////////////
 #if (!BRTOS_DYNAMIC_TASKS_ENABLED)
 #if (TASK_WITH_PARAMETERS == 1)
-  INT8U InstallTask(void(*FctPtr)(void *),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, void *parameters, OS_CPU_TYPE *TaskHandle)
+  INT8U OSInstallTask(void(*FctPtr)(void *),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, void *parameters, OS_CPU_TYPE *TaskHandle)
 #else
-  INT8U InstallTask(void(*FctPtr)(void),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, OS_CPU_TYPE *TaskHandle)
+  INT8U OSInstallTask(void(*FctPtr)(void),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, OS_CPU_TYPE *TaskHandle)
 #endif
 {
   OS_SR_SAVE_VAR
@@ -1156,9 +1156,9 @@ INT8U OSUnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
 }
 #else
 #if (TASK_WITH_PARAMETERS == 1)
-  INT8U InstallTask(void(*FctPtr)(void *),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, void *parameters, OS_CPU_TYPE *TaskHandle)
+  INT8U OSInstallTask(void(*FctPtr)(void *),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, void *parameters, OS_CPU_TYPE *TaskHandle)
 #else
-  INT8U InstallTask(void(*FctPtr)(void),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, OS_CPU_TYPE *TaskHandle)
+  INT8U OSInstallTask(void(*FctPtr)(void),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, OS_CPU_TYPE *TaskHandle)
 #endif
 {
   OS_SR_SAVE_VAR
@@ -1311,7 +1311,7 @@ INT8U OSUnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
 /////                                                  /////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
-INT8U UninstallTask(BRTOS_TH TaskHandle){
+INT8U OSUninstallTask(BRTOS_TH TaskHandle){
 	  OS_SR_SAVE_VAR
 	  ContextType *Task;
 
