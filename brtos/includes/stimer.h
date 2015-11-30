@@ -89,9 +89,9 @@ typedef struct
 
 /* TIMER TASK prototype */  
 #if (TASK_WITH_PARAMETERS == 1)
-void BRTOS_TimerTask(void *param);
+void BRTOSTimerTask(void *param);
 #else
-void BRTOS_TimerTask(void);
+void BRTOSTimerTask(void);
 #endif
  
 /************* public API *********************/ 

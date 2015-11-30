@@ -685,10 +685,11 @@ INT8U OSUnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber);
 #define UnBlockMultipleTask OSUnBlockMultipleTask
 
 /*********************************************************************************//**
-* \fn void BRTOS_Init(void)
+* \fn void BRTOSInit(void)
 * \brief Initialize BRTOS control blocks and tick timer (Internal kernel function).
 *************************************************************************************/
-void BRTOS_Init(void);
+void BRTOSInit(void);
+#define BRTOS_Init BRTOSInit
 
 /*****************************************************************//**
 * \fn INT8U OSSchedule(void)

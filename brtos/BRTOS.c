@@ -1403,7 +1403,7 @@ INT8U OSUninstallTask(BRTOS_TH TaskHandle){
 
 
 
-void BRTOS_Init(void)
+void BRTOSInit(void)
 {  
   ////////////////////////////////////////////////////////////  
   /////      Initialize Event Control Blocks             /////

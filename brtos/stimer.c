@@ -146,9 +146,9 @@ static void BRTOS_TimerTaskSleep(TIMER_CNT next_time_to_wake)
 
 /* Timer Task */
 #if (TASK_WITH_PARAMETERS == 1)
-void BRTOS_TimerTask(void *param)
+void BRTOSTimerTask(void *param)
 #else
-void BRTOS_TimerTask(void)
+void BRTOSTimerTask(void)
 #endif
 {
      
@@ -280,9 +280,9 @@ void OSTimerInit(INT16U timertask_stacksize, INT8U prio){
    
    
 #if (TASK_WITH_PARAMETERS == 1)
-  if (InstallTask(&BRTOS_TimerTask, "BRTOS Timers Task", timertask_stacksize, prio, NULL, NULL) != OK)
+  if (InstallTask(&BRTOSTimerTask, "BRTOS Timers Task", timertask_stacksize, prio, NULL, NULL) != OK)
 #else
-  if (InstallTask(&BRTOS_TimerTask, "BRTOS Timers Task", timertask_stacksize, prio, NULL) != OK)
+  if (InstallTask(&BRTOSTimerTask, "BRTOS Timers Task", timertask_stacksize, prio, NULL) != OK)
 #endif
   {
 	  while (1){};
