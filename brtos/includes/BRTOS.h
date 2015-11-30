@@ -560,15 +560,15 @@ void OS_TICK_HANDLER(void);
 INT8U BRTOSStart(void);
 
 /*****************************************************************************************//**
-* \fn INT8U OSDelayTask(INT16U time)
+* \fn INT8U OSDelayTask(INT16U time_wait)
 * \brief Wait for a specified period.
 *  A task that calling this function will be suspended for a certain time.
 *  When this time is reached the task back to ready state.
-* \param time Time in ticks to delay. System default = 1ms. The user can change the time value.
+* \param time_wait Time in ticks to delay. System default = 1ms. The user can change the time value.
 * \return OK Success
 * \return IRQ_PEND_ERR - Can not use block priority function from interrupt handler code
 *********************************************************************************************/
-INT8U OSDelayTask(INT16U time);
+INT8U OSDelayTask(INT16U time_wait);
 #define DelayTask OSDelayTask
 
 /*****************************************************************************************//**

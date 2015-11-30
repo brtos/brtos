@@ -331,9 +331,10 @@ INT16U OS_CPU_SR_Save(void)
 {
 	INT16U cpu_sr;
 	__asm__ volatile  (	"MOVE.W   %/sr,%d0 	   \n\t" \
-						"MOVE.L   %d0,%0   	   \n\t" \
+						"MOVE.L   %d0,%/sp@-   \n\t" \
 						"ORI.L    #0x0700,%d0  \n\t" \
 						"MOVE.W   %d0,%/sr 	   \n\t" \
+						"MOVE.L   %/sp@+,%d0   \n\t" \
 						: "=d"   (cpu_sr)            );
 
 	return cpu_sr;
