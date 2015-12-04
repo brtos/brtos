@@ -245,12 +245,16 @@ void OSRTCSetup(void);
 * \brief Restore context function
 * \return NONE
 *********************************************************************************************/
-#define RestoreSR()			__asm__ volatile("MOVE.W   %SR,%D1 	\n\t" \
-								 	 	 	 "MOVE.W   %sp@(26),%D0 	\n\t" \
+#define RestoreSR()			__asm__ volatile("MOVE.L   %D0,%sp@- 	\n\t" \
+											 "MOVE.L   %D1,%sp@- 	\n\t" \
+											 "MOVE.W   %SR,%D1 	    \n\t" \
+											 "MOVE.W   %sp@(34),%D0 \n\t" \
 											 "ANDI.L   #0x0700,%D0  \n\t" \
 											 "ANDI.L   #0xF8FF,%D1 	\n\t" \
-											 "ORL       %D1,%D0 		\n\t" \
-											 "MOVE.W   %D0,%SR		\n\t" )
+											 "ORL      %D1,%D0 		\n\t" \
+											 "MOVE.W   %D0,%SR		\n\t" \
+											 "MOVE.L   %sp@+,%D1 	\n\t" \
+											 "MOVE.L   %sp@+,%D0 	\n\t" )
 
 #if (NESTING_INT == 1)
 #define OS_ENABLE_NESTING() RestoreSR() /// Restore Status Register Define
@@ -268,14 +272,12 @@ void OSRTCSetup(void);
 
 
 
-
-
-#define CriticalDecNesting()		__asm__ volatile("MOVE.W   %SR,%D2 	    \n\t" \
-											 "ORI.L    #0x0700,%D2      \n\t" \
-											 "MOVE.W   %D2,%SR 	    \n\t" \
-											 "MVZ.B    iNesting,%D0     \n\t" \
-        									 "SUBQ.L   #1,%D0 			\n\t" \
-        									 "MOVE.B   %D0,iNesting  	\n\t")
+#define CriticalDecNesting()		__asm__ volatile("MOVE.W   %SR,%D2 	        \n\t" \
+											 	 	 "ORI.L    #0x0700,%D2      \n\t" \
+													 "MOVE.W   %D2,%SR 	        \n\t" \
+													 "MVZ.B    iNesting,%D0     \n\t" \
+													 "SUBQ.L   #1,%D0 			\n\t" \
+													 "MOVE.B   %D0,iNesting  	\n\t")
 
 
 
@@ -337,7 +339,9 @@ return priority
 #define ISR_DEDICATED_STACK 1
 
 #if (defined ISR_DEDICATED_STACK && ISR_DEDICATED_STACK == 1)
-	#define OS_RESTORE_ISR_SP()    __asm__ volatile ("MOVE.L SPval_bkp, %sp \n\t")
+	#define OS_RESTORE_ISR_SP()    __asm__ volatile ("MOVE.W %sp@(26), %d1  \n\t" \
+													 "MOVE.L SPval_bkp, %sp \n\t" \
+													 "MOVE.W %d1, %sp@(26)  \n\t" )
 	#define ISR_STACK_SIZE  (128)
 	extern  OS_CPU_TYPE ISR_STACK[ISR_STACK_SIZE];
 	extern INT32U SPval_bkp;
