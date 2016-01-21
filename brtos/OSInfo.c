@@ -74,12 +74,12 @@ void OSTaskList(char *string)
     CHAR8  str[9];
     INT32U *sp_end = 0;
     INT32U *sp_address = 0;
-
+    int z,count;
+    
     string += mem_cpy(string,"\n\r***************************************************\n\r");
     string += mem_cpy(string,"ID   NAME            STATE   PRIORITY   STACK SIZE\n\r");
     string += mem_cpy(string,"***************************************************\n\r");
 
-    int z,count;
 	#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
     for (j=1;j<=NumberOfInstalledTasks;j++)
 	#else
