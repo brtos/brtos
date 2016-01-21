@@ -2,21 +2,29 @@
 #define OS_HAL_H
 
 #include "OS_types.h"
-#include "hardware.h"
+#include "IO_Map.h"
+#include "BRTOSConfig.h"
 
 /// Supported processors
-#define COLDFIRE_V1		1
-#define HCS08			    2
-#define MSP430			  3
-#define ATMEGA			  4
-#define PIC18			    5
-
+#define COLDFIRE_V1     1u
+#define HCS08           2u
+#define MSP430          3u
+#define ATMEGA          4u
+#define PIC18           5u
+#define RX600           6u
+#define ARM_Cortex_M3   7u
+#define ARM_Cortex_M4   8u
+#define ARM_Cortex_M0   9u
+#define ARM_Cortex_M4F  10u
 
 /// Define the used processor
 #define PROCESSOR 		HCS08
 
 /// Define the CPU type
 #define OS_CPU_TYPE 	INT8U
+
+/// Define if InstallTask function will support parameters
+#define TASK_WITH_PARAMETERS 1
 
 /// There is no optimized scheduler for HCS08 MCUs
 #define OPTIMIZED_SCHEDULER 0
@@ -42,7 +50,7 @@ extern INT16U SPvalue;
 #define ChangeContext() asm ("SWI");
 #define OSEnterCritical() asm ("SEI");
 #define OSExitCritical() asm ("CLI");
-#define OS_Wait _Wait;
+#define OS_Wait 		asm("WAIT");
 #define OS_ENABLE_NESTING() OSExitCritical()
 #define UserEnterCritical   OSEnterCritical
 #define UserExitCritical   OSExitCritical
@@ -67,8 +75,22 @@ extern INT16U SPvalue;
 // 4 bytes to Function Call
 
 
-
-void CreateVirtualStack(void(*FctPtr)(void), INT16U NUMBER_OF_STACKED_BYTES);
+#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
+#if (TASK_WITH_PARAMETERS == 1)
+  void CreateVirtualStack(void(*FctPtr)(void*), INT16U NUMBER_OF_STACKED_BYTES, void *parameters);
+#else
+  void CreateVirtualStack(void(*FctPtr)(void), INT16U NUMBER_OF_STACKED_BYTES);
+#endif
+#endif
+  
+#if (BRTOS_DYNAMIC_TASKS_ENABLED == 1)
+#if (TASK_WITH_PARAMETERS == 1)
+  unsigned int CreateDVirtualStack(void(*FctPtr)(void*), unsigned int stk, void *parameters);
+#else
+  unsigned int CreateDVirtualStack(void(*FctPtr)(void), unsigned int stk);
+#endif
+#endif
+  
 void TickTimerSetup(void);                      
 
 

@@ -1,4 +1,3 @@
-#include "hardware.h"
 #include "BRTOS.h"
 
 INT16U SPvalue = 0;
@@ -126,15 +125,39 @@ interrupt void SwitchContext(void)
 ////////////////////////////////////////////////////////////
 
 
-void CreateVirtualStack(void(*FctPtr)(void), INT16U NUMBER_OF_STACKED_BYTES)
+#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
+#if (TASK_WITH_PARAMETERS == 1)
+  void CreateVirtualStack(void(*FctPtr)(void*), INT16U NUMBER_OF_STACKED_BYTES, void *parameters)
+#else
+  void CreateVirtualStack(void(*FctPtr)(void), INT16U NUMBER_OF_STACKED_BYTES)
+#endif
 {  
     // Pointer to Task Entry
    STACK[iStackAddress + NUMBER_OF_STACKED_BYTES - 1] = ((unsigned long) (FctPtr)) & 0x00FF;
-   STACK[iStackAddress + NUMBER_OF_STACKED_BYTES - 2] = ((unsigned long) (FctPtr)) >> 8;  
+   STACK[iStackAddress + NUMBER_OF_STACKED_BYTES - 2] = ((unsigned long) (FctPtr)) >> 8;
+   STACK[iStackAddress + NUMBER_OF_STACKED_BYTES - 3] = ((unsigned long) (parameters)) & 0x00FF;
+   STACK[iStackAddress + NUMBER_OF_STACKED_BYTES - 6] = ((unsigned long) (parameters)) >> 8;
 }
+#endif
 
-
-
-
+#if (BRTOS_DYNAMIC_TASKS_ENABLED == 1)
+#if (TASK_WITH_PARAMETERS == 1)
+  unsigned int CreateDVirtualStack(void(*FctPtr)(void*), unsigned int stk, void *parameters)
+#else
+  unsigned int CreateDVirtualStack(void(*FctPtr)(void), unsigned int stk)
+#endif
+{
+	OS_CPU_TYPE *stk_pt = (OS_CPU_TYPE *)stk;
+	
+    // Pointer to Task Entry
+	*--stk_pt = ((unsigned long) (FctPtr)) & 0x00FF;
+	*--stk_pt = ((unsigned long) (FctPtr)) >> 8;
+	*--stk_pt = ((unsigned long) (parameters)) & 0x00FF;
+	stk_pt -= 2;
+	*--stk_pt = ((unsigned long) (parameters)) >> 8;
+	
+	return (unsigned int)stk_pt;
+}
+#endif
 
 
