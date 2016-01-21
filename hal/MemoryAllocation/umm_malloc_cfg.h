@@ -73,7 +73,11 @@
 // A couple of macros to make packing structures less compiler dependent
 
 #define UMM_H_ATTPACKPRE
+#if defined(__GNUC__) || defined(gcc)
 #define UMM_H_ATTPACKSUF __attribute__((__packed__))
+#else
+#define UMM_H_ATTPACKSUF
+#endif
 
 // ----------------------------------------------------------------------------
 // A couple of macros to make it easier to protect the memory allocator

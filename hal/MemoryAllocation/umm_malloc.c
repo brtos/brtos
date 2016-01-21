@@ -739,7 +739,7 @@ void umm_free( void *ptr ) {
 
    // Figure out which block we're in. Note the use of truncated division...
 
-   c = (ptr-(void *)(&(umm_heap[0])))/sizeof(umm_block);
+   c = ((int)ptr-(int)(&(umm_heap[0])))/sizeof(umm_block);
 
    //DBG_LOG_DEBUG( "Freeing block %6i\n", c );
 
