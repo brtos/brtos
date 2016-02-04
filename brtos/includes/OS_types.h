@@ -27,24 +27,39 @@
 #ifndef OS_TYPES_H
 #define OS_TYPES_H
 
-
-
-
-
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 /////    Portable OS Types                             /////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
+#if __CWCC__
+#define HAVE_STDINT 0
+#else
+#define HAVE_STDINT 1
+#endif
 
-typedef unsigned char      BOOLEAN;
+#if HAVE_STDINT == 1
+#include "stdint.h"
+#include "stdbool.h"
+#else
+typedef unsigned char      bool;
+typedef unsigned char      uint8_t;
+typedef signed char        int8_t;
+typedef unsigned short int uint16_t;
+typedef signed short int   int16_t;
+typedef unsigned long      uint32_t;
+typedef signed long        int32_t;
+#endif
+
+/* for compatibility purpose */
 typedef char               CHAR8;
-typedef unsigned char      INT8U;
-typedef signed char        INT8S;
-typedef unsigned short int INT16U;
-typedef signed short int   INT16S;
-typedef unsigned long      INT32U;
-typedef signed long        INT32S;
+typedef bool     		   BOOLEAN;
+typedef uint8_t      	   INT8U;
+typedef int8_t             INT8S;
+typedef uint16_t           INT16U;
+typedef int16_t            INT16S;
+typedef uint32_t      	   INT32U;
+typedef int32_t            INT32S;
 
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
