@@ -23,14 +23,10 @@ before_script:
 
 script:
   ## regression-tests/Makefile handles most of generic logic
-  - "make -C tests/??-$BUILD_TYPE RUNALL=true summary"
+  - "make -C tests/$BUILD_TYPE all"
 
 after_script:
   ## Print a basic summary
-  - "echo 'Summary:'; cat tests/??-$BUILD_TYPE/summary"
-  - "FAILS=`grep -c  ' FAIL ' tests/??-$BUILD_TYPE/summary`"
-  ## This will detect whether the build should pass or fail
-  - "test $FAILS -eq 0; exit $?"
 
 env:
   ## This magically kick-off parallel jobs for each of the for the sets
