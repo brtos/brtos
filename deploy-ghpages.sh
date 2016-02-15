@@ -10,5 +10,4 @@ if [ -n "$GH_TOKEN" ]; then
 	git push --force --quiet "https://${GH_TOKEN}@github.com/brtos/brtos.git" master:gh-pages
 	echo "Published doxygen to gh-pages. \n"
 fi
-
-
+echo "Published doxygen failed. \n"

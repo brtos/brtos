@@ -24,4 +24,4 @@ after_success:
 - doxygen docs/Doxyfile > /dev/null
 - ls ./docs
 - chmod +x ./deploy-ghpages.sh
-- sh ./deploy-ghpages.sh
+- ./deploy-ghpages.sh
