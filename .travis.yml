@@ -24,4 +24,11 @@ after_success:
 - doxygen docs/Doxyfile > /dev/null
 - ls ./docs
 - chmod +x ./deploy-ghpages.sh
-- ./deploy-ghpages.sh
+- cd docs/html
+- git init
+- git config --global user.email "travis@travis-ci.org"
+- git config --global user.name "travis-ci"
+- git add *
+- git commit -m "Deployed to Github Pages"
+- git push --force --quiet "https://${GH_TOKEN}@github.com/brtos/brtos.git" master:gh-pages
+##- ./deploy-ghpages.sh
