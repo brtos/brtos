@@ -34,7 +34,7 @@ after_success:
     - ls ./docs
     - chmod +x ./deploy-ghpages.sh
     # publish doxygen documentation
-    - bash ./deploy-ghpages.sh
+    - sh ./deploy-ghpages.sh
 
 env:
   global:
