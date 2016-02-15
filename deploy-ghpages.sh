@@ -1,6 +1,5 @@
 #!/bin/sh
 echo -e "Publishing doxygen. \n"
-set -e
 
 if [ -n "$GH_TOKEN" ]; then
 	cd docs/html
