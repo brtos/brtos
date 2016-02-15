@@ -30,7 +30,8 @@ script:
 after_success:
     # Create doxygen documentation
     - cd $PROJ_ROOT
-    - doxygen docs/Doxyfile
+    - doxygen docs/Doxyfile > /dev/null
+    - ls ./docs
 
     # publish doxygen documentation
     - ./deploy-ghpages.sh
