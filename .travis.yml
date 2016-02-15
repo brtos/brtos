@@ -1,49 +1,27 @@
 notifications:
   email: false
-language: c #NOTE: this will set CC=gcc which might cause trouble
-
-env:
-  global:
-  - secure: "RQW6JLQGhylTZ3P9SZywApgPurhC0qZ4ymHqA4/yk2NVPL0xX1XMBR6c5UUoJbOmPHeTxOdvdD+mZ9yDu3XuFUwUxmKap/Il1d7SoCUcM70U7p4Dsdfjt/1/ejAkVzmm7SVNSRWi4hczJnG0l93FY/8+hwDUpZsl8ifz1XIE7n1DE1Bn+TirPl5Zy654AJFxA/CLnGqSxFnezlt+GJdXGwPVjB8Qo/87r57fAzcvkpbyRlMwTyAx4RACNUqAWskm3reJD34+Bu+i8rKRHh8kvwEiPeVi/UnZuFuWOtMvBNGrvhwDm9azr+KWBaBhU/BU7XcMHlqItIHiizywaq0L1JMdIF+udooBmOEEp2SZn8uUoymRH2rtxL6gPVesrAQxAK/zSR6dsuV6O//AUQeHnsOBBhvgDGNNtEQ9d+Xgsm2PvlZY8NO2Ri4nkkVSHTC3mjv2smkSJrYq6o0vguF0JV6A+3KCzFYVtnMZbu9Vfkw5Agg1lg/69W61HxdVRPjzcAE2B5sJaiY88NqrUTIAfW18iOKYnQ6njzXRsyzyia+FHyL+GxKIwNWrYej8gBF75eaVmQyKHyL6xQLpQHbw7yIr0JvSLdU4KtLce9l3JcHZrSbRgAZQPeEAq76RWEzexcWfhwgL88lp98gl8fhSt8tBWfelScqauFwDQkEfm/o="
-  - GH_REF=github.com/brtos/brtos.git
-  
-before_script:
-  - WGET="travis_retry wget --continue --tries=20 --waitretry=10 --retry-connrefused --no-dns-cache --timeout 300"
-  - sudo apt-get -qq update
-  - export PROJ_ROOT=$(pwd)
-
-  ## Install doxygen
-  - if [ ${BUILD_CATEGORY:-0} = doxygen ] ; then
-      sudo add-apt-repository ppa:libreoffice/libreoffice-4-4 -y && sudo apt-get -qq update &&
-      sudo apt-get --no-install-suggests --no-install-recommends -qq install doxygen  &&
-      doxygen --version ;
-    fi
-
-  ## Install avr toolchain
-  - sudo apt-get -qq install gcc-avr avr-libc
-
-  ## Install 32-bit compatibility libraries
-  - sudo apt-get -qq install libc6:i386 libgcc1:i386 gcc-4.6-base:i386
-      libstdc++5:i386 libstdc++6:i386
-
-
-script:
-  ## regression-tests/Makefile handles most of generic logic
-  - "make -C tests/$BUILD_TYPE all"
-
- 
-after_success:
-    # Create doxygen documentation
-    - cd $PROJ_ROOT
-    - doxygen docs/Doxyfile > /dev/null
-    - ls ./docs
-    - chmod +x ./deploy-ghpages.sh
-    # publish doxygen documentation
-    - sh ./deploy-ghpages.sh
-
+language: c
 env:
   matrix:
-  ## This magically kick-off parallel jobs for each of the for the sets
-  ## of environment variable defined below
   - BUILD_TYPE='doxygen'  BUILD_CATEGORY='doxygen'
-
+  global:
+    secure: KhV4pJR1xOFksX+ExDqqGi91R6t3oxtk5jzYu4Ii9nfWymu5DNCZXZu8C2GuTy+jhDeShSmqAVqTI6cMNCCOfo8KZmKEnWtjj/Dbp0jOTyYCfLTH0tjeYuLNoHFOwCnbcw+8QOEPr3aKC5vDKmiDNxU3KLsHOybnItMRGHJI1kYL163WSMAE67BZ9fTkaSZtP6XkHmkTEpE9vI/eZoOJk9F8ctEz27HxlA7ptdiPp1AsfCRiY6oGnDGkFQ+q05rNlIqtOJV5rmG//w+xUC0OIe0BxxL7vm+0rvITZd3ghCAuvTWoYBnRwu8+pH3vdchCk6ARJOooq/P4kAfHtEKNxs2OBAjewtNoCqm2Mj2o+iEZIvl/zSHh4Fn7nSx015v9XQ0ModbqnOxT+UXP+Qm0oehj5pmasG8q8+gsx1Y06MCUxJ7hb8CpBg+w3Ha8LUKnNIpDWoSjKOwFHumh1XItRz1f6XG9f/3KXMd8VZYTayGxQnAC9wgocgrvXvRsR+z9CjqP+x2OPO/HNwRS/Su8/Xjk7GfSagxQImNk5ny+bqWa4aAX6cTrawkMAWEiqSthNeDc74fmm3O5SrZkUs1iC+wBuZyUv3tl72fla2j781ZKNLSl76Yj0sN6BlhJ0RiA9VJKwp+JYcwfSFRQQgPeFMsHoDVt/azIk1Csn+eSjMI=
+before_script:
+- WGET="travis_retry wget --continue --tries=20 --waitretry=10 --retry-connrefused
+  --no-dns-cache --timeout 300"
+- sudo apt-get -qq update
+- export PROJ_ROOT=$(pwd)
+- if [ ${BUILD_CATEGORY:-0} = doxygen ] ; then sudo add-apt-repository ppa:libreoffice/libreoffice-4-4
+  -y && sudo apt-get -qq update && sudo apt-get --no-install-suggests --no-install-recommends
+  -qq install doxygen  && doxygen --version ; fi
+- sudo apt-get -qq install gcc-avr avr-libc
+- sudo apt-get -qq install libc6:i386 libgcc1:i386 gcc-4.6-base:i386 libstdc++5:i386
+  libstdc++6:i386
+script:
+- make -C tests/$BUILD_TYPE all
+after_success:
+- cd $PROJ_ROOT
+- doxygen docs/Doxyfile > /dev/null
+- ls ./docs
+- chmod +x ./deploy-ghpages.sh
+- sh ./deploy-ghpages.sh
