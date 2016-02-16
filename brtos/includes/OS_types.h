@@ -32,7 +32,7 @@
 /////    Portable OS Types                             /////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
-#if __CWCC__
+#if (defined __CWCC__)
 #define HAVE_STDINT 0
 #else
 #define HAVE_STDINT 1
@@ -60,6 +60,10 @@ typedef uint16_t           INT16U;
 typedef int16_t            INT16S;
 typedef uint32_t      	   INT32U;
 typedef int32_t            INT32S;
+
+/* for portability purpose */
+typedef unsigned int       stack_pointer_t;	
+typedef unsigned int       uint_t;
 
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////

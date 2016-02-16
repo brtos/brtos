@@ -7,7 +7,7 @@
 #include "BRTOS.h"
 #include "OSInfo.h"
 
-int mem_cpy(char *dst, char *src)
+static int mem_cpy(char *dst, const char *src)
 {
 	int i = 0;
 	while(*src)
