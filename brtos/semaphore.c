@@ -74,7 +74,7 @@
 
 #include "BRTOS.h"
 
-#if (PROCESSOR == COLDFIRE_V1)
+#if (PROCESSOR == COLDFIRE_V1 && __CWCC__)
 #pragma warn_implicitconv off
 #endif
 
