@@ -42,9 +42,7 @@
 #include "stdint.h"
 #include "stdbool.h"
 #else
-#if !WINNT
 typedef unsigned char      bool;
-#endif
 typedef unsigned char      uint8_t;
 typedef signed char        int8_t;
 typedef unsigned short int uint16_t;
@@ -55,7 +53,9 @@ typedef signed long        int32_t;
 
 /* for compatibility purpose */
 typedef char               CHAR8;
+#if !WINNT
 typedef bool     		   BOOLEAN;
+#endif
 typedef uint8_t      	   INT8U;
 typedef int8_t             INT8S;
 typedef uint16_t           INT16U;
