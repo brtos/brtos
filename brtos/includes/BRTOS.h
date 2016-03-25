@@ -1232,13 +1232,8 @@ extern const CHAR8 *version;
 extern CHAR8 BufferText[32];
 #endif
 
-#if (SP_SIZE == 32)
-  extern INT32U StackAddress;
-#endif
 
-#if (SP_SIZE == 16)
-  extern INT16U StackAddress;
-#endif
+extern stack_pointer_t StackAddress;
 
 
 
