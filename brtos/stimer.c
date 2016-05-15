@@ -25,6 +25,9 @@
 *   Authors:  Carlos Henrique Barriquelo, Gustavo Denardin
 *   Revision: 1.1
 *   Date:     01/05/2015
+*   Authors:  Gustavo Denardin
+*   Revision: 1.9x
+*   Date:     15/05/2016
 *********************************************************************************************************/
 
 
@@ -154,7 +157,6 @@ void BRTOSTimerTask(void)
      
      OS_SR_SAVE_VAR
      BRTOS_TIMER p;
-     TIMER_CNT   tickcount;
      TIMER_CNT   repeat;
      INT32U      timeout;
      TIMER_CNT   next_time_to_wake;      /* tick count of next timer */
@@ -183,13 +185,60 @@ void BRTOSTimerTask(void)
      
         BRTOS_TimerTaskSleep(next_time_to_wake);
 
-        tickcount = OSGetTickCount();               
-
-timer_loop:         
         list = BRTOS_TIMER_VECTOR.current;
         p=list->timers[1];
 
-        while(p!= NULL && p->timeout <= tickcount)
+        /* Some high priority task ran and took more than one tick to complete.
+        So, if the timer overflows in such time, we must execute all the remaining
+        softtimers and switch the lists. */
+		if(p!= NULL && p->timeout > OSGetTickCount()){
+            while(p!= NULL)
+            {
+                // some timer has expired
+                if((p)->func_cb != NULL)
+                {
+                  repeat = (TIMER_CNT)((p)->func_cb()); /* callback */
+
+                  OSEnterCritical();
+
+                  if (repeat > 0)
+                  { /* needs to repeat after "repeat" time ? */
+                	  timeout = (INT32U)((INT32U)OSGetTickCount() + (INT32U)repeat);
+                	  p->timeout = (TIMER_CNT)timeout;
+					  list_tmp = BRTOS_TIMER_VECTOR.future; // add into future list
+					  list_tmp->timers[++list_tmp->count] = p; // insert in the end
+					  Subir(list_tmp->timers,list_tmp->count);
+					  list->timers[1]=list->timers[list->count]; // remove from current list
+					  list->timers[list->count] = NULL;
+					  list->count--;
+                   }
+                   else
+                   {
+                      p->timeout = 0;
+                      p->state = TIMER_NOT_ALLOCATED;
+                      p->func_cb = NULL;
+                      list->timers[1]=list->timers[list->count]; // remove from current list
+                      list->timers[list->count] = NULL;
+                      list->count--;
+                   }
+                 }
+
+                 Descer (list->timers, 1, list->count); // order it
+                 p=list->timers[1];
+                 OSExitCritical();
+            }
+            if(p==NULL)
+            {
+              /* time to switch lists */
+              void* tmp = BRTOS_TIMER_VECTOR.current;
+              BRTOS_TIMER_VECTOR.current = BRTOS_TIMER_VECTOR.future;
+              BRTOS_TIMER_VECTOR.future = tmp;
+              list = BRTOS_TIMER_VECTOR.current;
+              p=list->timers[1];
+            }
+        }
+
+        while(p!= NULL && p->timeout <= OSGetTickCount())
         {  
             // some timer has expired
             if((p)->func_cb != NULL) 
@@ -200,7 +249,7 @@ timer_loop:
                            
               if (repeat > 0)
               { /* needs to repeat after "repeat" time ? */
-                  timeout = (INT32U)((INT32U)tickcount + (INT32U)repeat);                  
+            	  timeout = (INT32U)((INT32U)OSGetTickCount() + (INT32U)repeat);
                   if (timeout >= TICK_COUNT_OVERFLOW)
                   {
                     p->timeout = (TIMER_CNT)(timeout - TICK_COUNT_OVERFLOW);                                 
@@ -232,7 +281,7 @@ timer_loop:
              OSExitCritical();                           
         }
                 
-        if(tickcount == TIMER_MAX_COUNTER)
+        if(timeout > TIMER_MAX_COUNTER)
         {
           if(p==NULL)
           {            
@@ -242,12 +291,6 @@ timer_loop:
             BRTOS_TIMER_VECTOR.future = tmp; 
             list = BRTOS_TIMER_VECTOR.current;
             p=list->timers[1];
-          }
-          else
-          {
-            /* there is a delayed timer */
-            tickcount++;
-            goto timer_loop;            
           }
         }
         
