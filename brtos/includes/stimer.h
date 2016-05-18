@@ -47,7 +47,7 @@
 
 /* config defines */ 
 // do not change, unless we know what are you doing
-#define TIMER_CNT             INT16U                  
+#define TIMER_CNT             ostime_t
 #define TIMER_MAX_COUNTER     (TIMER_CNT)(TICK_COUNT_OVERFLOW-1)   
 
 /* typedefs for callback struct */  
