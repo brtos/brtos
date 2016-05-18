@@ -275,11 +275,11 @@ INT8U OSSemDelete (BRTOS_Sem **event)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSSemPend (BRTOS_Sem *pont_event, INT16U time_wait)
+INT8U OSSemPend (BRTOS_Sem *pont_event, ostime_t time_wait)
 {
   OS_SR_SAVE_VAR
   INT8U  iPriority = 0;
-  INT32U timeout;
+  osdtime_t timeout;
   ContextType *Task;
   
   #if (ERROR_CHECK == 1)
@@ -358,19 +358,23 @@ INT8U OSSemPend (BRTOS_Sem *pont_event, INT16U time_wait)
   // Set timeout overflow
   if (time_wait)
   {  
-    timeout = (INT32U)((INT32U)OSGetCount() + (INT32U)time_wait);
+	  timeout = (osdtime_t)((osdtime_t)OSGetCount() + (osdtime_t)time_wait);
     
-    if (timeout >= TICK_COUNT_OVERFLOW)
-    {
-      Task->TimeToWait = (INT16U)(timeout - TICK_COUNT_OVERFLOW);
-    }
-    else
-    {
-      Task->TimeToWait = (INT16U)timeout;
-    }
+	  if (sizeof_ostime_t < 8){
+		  if (timeout >= TICK_COUNT_OVERFLOW)
+		  {
+			  Task->TimeToWait = (ostime_t)(timeout - TICK_COUNT_OVERFLOW);
+		  }
+		  else
+		  {
+			  Task->TimeToWait = (ostime_t)timeout;
+		  }
+	  }else{
+		  Task->TimeToWait = (ostime_t)timeout;
+	  }
     
-    // Put task into delay list
-    IncludeTaskIntoDelayList();
+	  // Put task into delay list
+	  IncludeTaskIntoDelayList();
   } else
   {
     Task->TimeToWait = NO_TIMEOUT;

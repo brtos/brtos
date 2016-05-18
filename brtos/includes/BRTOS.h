@@ -39,6 +39,10 @@
 *   Revision: 1.91					
 *   Date:     04/12/2015			
 *
+*   Author:  Gustavo Weber Denardin
+*   Revision: 2.00
+*   Date:     18/05/2016
+*
 *********************************************************************************************************/
 
 #ifndef OS_BRTOS_H
@@ -62,7 +66,7 @@
 
 
 // Brtos version
-#define BRTOS_VERSION   "BRTOS Ver. 1.90"
+#define BRTOS_VERSION   "BRTOS Ver. 2.00"
 
 /// False and True defines
 #ifndef FALSE
@@ -88,6 +92,12 @@
 #define BRTOS_TH                      OS_CPU_TYPE
 #endif
 
+#if (!defined(ostime_t) && !defined(osdtime_t))
+#define ostime_t					  INT16U
+#define osdtime_t					  INT32U
+#endif
+#define sizeof_ostime_t			sizeof(ostime_t)
+
 
 /// Task States
 #define READY                        (INT8U)0     ///< Task is ready to be executed - waiting for the scheduler authorization
@@ -98,10 +108,17 @@
 
 
 /// Timer defines
-#define NO_TIMEOUT                  (INT16U)65000
-#define EXIT_BY_TIMEOUT             (INT16U)65001
-#define TICK_COUNT_OVERFLOW         (INT16U)64000       ///< Determines the tick timer overflow
-#define TickCountOverFlow           (INT16U)64000       ///< Compatibility with BRTOS less than or equal to 1.7
+#if  (ostime_t == uint64_t)
+#define MAX_TIMER					0xffffffffffffffff
+#elif (ostime_t == uint32_t)
+#define MAX_TIMER					0xffffffff
+#else
+#define MAX_TIMER					0xffff
+#endif
+#define NO_TIMEOUT                  (ostime_t)(MAX_TIMER - 1)
+#define EXIT_BY_TIMEOUT             (ostime_t)(MAX_TIMER - 2)
+#define TICK_COUNT_OVERFLOW         (ostime_t)(MAX_TIMER - 3)       ///< Determines the tick timer overflow
+#define TickCountOverFlow           TICK_COUNT_OVERFLOW ///< Compatibility with BRTOS less than or equal to 1.7
 
 /// Error codes
 #define OK                           (INT8U)0     ///< OK define
@@ -231,7 +248,7 @@ struct Context
 #if (BRTOS_DYNAMIC_TASKS_ENABLED == 1)
  INT16U StackSize;
 #endif
-   INT16U TimeToWait;       ///< Time to wait - could be used by delay or timeout
+   ostime_t TimeToWait;     ///< Time to wait - could be used by delay or timeout
   #if (VERBOSE == 1)
    INT8U  State;            ///< Task states
    INT8U  Blocked;          ///< Task blocked state
@@ -564,7 +581,7 @@ void OS_TICK_HANDLER(void);
 INT8U BRTOSStart(void);
 
 /*****************************************************************************************//**
-* \fn INT8U OSDelayTask(INT16U time_wait)
+* \fn INT8U OSDelayTask(ostime_t time_wait)
 * \brief Wait for a specified period.
 *  A task that calling this function will be suspended for a certain time.
 *  When this time is reached the task back to ready state.
@@ -572,7 +589,7 @@ INT8U BRTOSStart(void);
 * \return OK Success
 * \return IRQ_PEND_ERR - Can not use block priority function from interrupt handler code
 *********************************************************************************************/
-INT8U OSDelayTask(INT16U time_wait);
+INT8U OSDelayTask(ostime_t time_wait);
 #define DelayTask OSDelayTask
 
 /*****************************************************************************************//**
@@ -591,20 +608,20 @@ INT8U OSDelayTaskHMSM(INT8U hours, INT8U minutes, INT8U seconds, INT16U miliseco
 #define DelayTaskHMSM OSDelayTaskHMSM
 
 /*****************************************************************************************//**
-* \fn INT16U OSGetTickCount(INT16U time)
+* \fn ostime_t OSGetTickCount(void)
 * \brief Return current tick count.
 *  The user must call this function in order to receive the current tick count.
 * \return current tick count
 *********************************************************************************************/
-INT16U OSGetTickCount(void);
+ostime_t OSGetTickCount(void);
 
 /*****************************************************************************************//**
-* \fn INT16U OSGetCount(INT16U time)
+* \fn ostime_t OSGetCount(void)
 * \brief Return current tick count.
 *  Internal BRTOS function.
 * \return current tick count
 *********************************************************************************************/
-INT16U OSGetCount(void);
+ostime_t OSGetCount(void);
 
 /*****************************************************************************************//**
 * \fn void OSIncCounter(void)
@@ -783,7 +800,7 @@ void initEvents(void);
   INT8U OSSemDelete (BRTOS_Sem **event);
 
   /*****************************************************************************************//**
-  * \fn INT8U OSSemPend (BRTOS_Sem *pont_event, INT16U timeout)
+  * \fn INT8U OSSemPend (BRTOS_Sem *pont_event, ostime_t timeout)
   * \brief Wait for a semaphore post
   *  Semaphore pend may be used to syncronize tasks or wait for an event occurs.
   *  A task exits a pending state with a semaphore post or by timeout.
@@ -794,7 +811,7 @@ void initEvents(void);
   * \return IRQ_PEND_ERR Can not use semaphore pend function from interrupt handler code
   * \return NO_EVENT_SLOT_AVAILABLE Full Event list
   *********************************************************************************************/
-  INT8U OSSemPend (BRTOS_Sem *pont_event, INT16U timeout);
+  INT8U OSSemPend (BRTOS_Sem *pont_event, ostime_t timeout);
   
   /*****************************************************************************************//**
   * \fn INT8U OSSemPost(BRTOS_Sem *pont_event)
@@ -829,7 +846,7 @@ void initEvents(void);
   INT8U OSMutexDelete (BRTOS_Mutex **event);
 
   /*****************************************************************************************//**
-  * \fn INT8U OSMutexAcquire(BRTOS_Mutex *pont_event, INT16U time_wait)
+  * \fn INT8U OSMutexAcquire(BRTOS_Mutex *pont_event, ostime_t time_wait)
   * \brief Wait for a mutex release
   *  Mutex release may be used to manage shared resources, for exemple, a LCD.
   *  A acquired state exits with a mutex owner release
@@ -839,7 +856,7 @@ void initEvents(void);
   * \return IRQ_PEND_ERR Can not use mutex pend function from interrupt handler code
   * \return NO_EVENT_SLOT_AVAILABLE Full Event list
   *********************************************************************************************/
-  INT8U OSMutexAcquire(BRTOS_Mutex *pont_event, INT16U time_wait);
+  INT8U OSMutexAcquire(BRTOS_Mutex *pont_event, ostime_t time_wait);
 
   /*****************************************************************************************//**
   * \fn INT8U OSMutexRelease(BRTOS_Mutex *pont_event)
@@ -877,7 +894,7 @@ void initEvents(void);
   INT8U OSMboxDelete (BRTOS_Mbox **event);
   
   /*****************************************************************************************//**
-  * \fn void *OSMboxPend (BRTOS_Mbox *pont_event, INT16U timeout)
+  * \fn void *OSMboxPend (BRTOS_Mbox *pont_event, ostime_t timeout)
   * \brief Wait for a message post
   *  Mailbox pend may be used to receive messages from tasks and interrupts.
   *  A task exits a pending state with a mailbox post or by timeout.
@@ -889,7 +906,7 @@ void initEvents(void);
   * \return TIMEOUT There was no post for this semaphore in the specified time
   * \return IRQ_PEND_ERR Can not use semaphore pend function from interrupt handler code
   *********************************************************************************************/  
-  INT8U OSMboxPend (BRTOS_Mbox *pont_event, void **Mail, INT16U timeout);
+  INT8U OSMboxPend (BRTOS_Mbox *pont_event, void **Mail, ostime_t timeout);
   
   /*****************************************************************************************//**
   * \fn INT8U OSMboxPost(BRTOS_Mbox *pont_event, void *message)
@@ -961,7 +978,7 @@ void initEvents(void);
   INT8U OSQueueClean(BRTOS_Queue *pont_event);
   
   /*****************************************************************************************//**
-  * \fn INT8U OSQueuePend (BRTOS_Queue *pont_event, OS_QUEUE *cqueue, INT16U timeout)
+  * \fn INT8U OSQueuePend (BRTOS_Queue *pont_event, OS_QUEUE *cqueue, ostime_t timeout)
   * \brief Wait for a queue post 
   *  A task exits a pending state with a queue post or by timeout.
   * \param *pont_event Queue event pointer
@@ -969,7 +986,7 @@ void initEvents(void);
   * \param timeout Timeout to the queue pend exits
   * \return First data in the output buffer of the specified queue
   *********************************************************************************************/
-  INT8U OSQueuePend (BRTOS_Queue *pont_event, INT8U* pdata, INT16U timeout);
+  INT8U OSQueuePend (BRTOS_Queue *pont_event, INT8U* pdata, ostime_t timeout);
   
   /*****************************************************************************************//**
   * \fn INT8U OSQueuePost(BRTOS_Queue *pont_event, OS_QUEUE *cqueue,INT8U data)
@@ -1139,7 +1156,7 @@ void initEvents(void);
   INT8U OSDQueueClean(BRTOS_Queue *pont_event);
   
   /*****************************************************************************************//**
-  * \fn INT8U OSDQueuePend (BRTOS_Queue *pont_event, void *pdata, INT16U time_wait)
+  * \fn INT8U OSDQueuePend (BRTOS_Queue *pont_event, void *pdata, ostime_t time_wait)
   * \brief Wait for a queue post 
   *  A task exits a pending state with a queue post or by timeout.
   * \param *pont_event Queue event pointer
@@ -1149,7 +1166,7 @@ void initEvents(void);
   * \return TIMEOUT The queue pend exit by timeout
   * \return READ_BUFFER_OK The queue was successfully read
   *********************************************************************************************/
-  INT8U OSDQueuePend (BRTOS_Queue *pont_event, void *pdata, INT16U time_wait);
+  INT8U OSDQueuePend (BRTOS_Queue *pont_event, void *pdata, ostime_t time_wait);
   
   /*****************************************************************************************//**
   * \fn INT8U OSDQueuePost(BRTOS_Queue *pont_event, void *pdata)

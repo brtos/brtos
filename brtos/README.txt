@@ -133,3 +133,7 @@
 - Function InstallIdle removed. Now the Idle task is installed by the InstallTask function.
 - Corrected bug in the mutex release. Now if a task waiting for the mutex receive it, such task will be its owner.
 - Added option of timeout in the mutex acquire
+
+== BRTOS 2.00 Changelog ==
+- Added support for different sizes of the timer variables
+- Added support for mutex without priority ceiling protocol

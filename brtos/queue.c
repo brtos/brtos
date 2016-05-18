@@ -337,11 +337,11 @@ INT8U OSQueueClean(BRTOS_Queue *pont_event)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSQueuePend (BRTOS_Queue *pont_event, INT8U* pdata, INT16U time_wait)
+INT8U OSQueuePend (BRTOS_Queue *pont_event, INT8U* pdata, ostime_t time_wait)
 {
   OS_SR_SAVE_VAR
   INT8U iPriority = 0;
-  INT32U timeout;
+  osdtime_t timeout;
   ContextType *Task;
   OS_QUEUE *cqueue = pont_event->OSEventPointer;
    
@@ -433,16 +433,20 @@ INT8U OSQueuePend (BRTOS_Queue *pont_event, INT8U* pdata, INT16U time_wait)
     // Set timeout overflow
     if (time_wait)
     {  
-      timeout = (INT32U)((INT32U)OSGetCount() + (INT32U)time_wait);
+  	  timeout = (osdtime_t)((osdtime_t)OSGetCount() + (osdtime_t)time_wait);
       
-      if (timeout >= TICK_COUNT_OVERFLOW)
-      {
-        Task->TimeToWait = (INT16U)(timeout - TICK_COUNT_OVERFLOW);
-      }
-      else
-      {
-        Task->TimeToWait = (INT16U)timeout;
-      }
+  	  if (sizeof_ostime_t < 8){
+  		  if (timeout >= TICK_COUNT_OVERFLOW)
+  		  {
+  			  Task->TimeToWait = (ostime_t)(timeout - TICK_COUNT_OVERFLOW);
+  		  }
+  		  else
+  		  {
+  			  Task->TimeToWait = (ostime_t)timeout;
+  		  }
+  	  }else{
+  		  Task->TimeToWait = (ostime_t)timeout;
+  	  }
     
       // Put task into delay list
       IncludeTaskIntoDelayList();
@@ -1291,11 +1295,11 @@ INT8U OSDQueueClean(BRTOS_Queue *pont_event)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSDQueuePend (BRTOS_Queue *pont_event, void *pdata, INT16U time_wait)
+INT8U OSDQueuePend (BRTOS_Queue *pont_event, void *pdata, ostime_t time_wait)
 {
   OS_SR_SAVE_VAR
   INT8U       iPriority = 0;
-  INT32U      timeout;
+  osdtime_t   timeout;
   INT16U      n;  
   ContextType *Task;
   OS_DQUEUE   *cqueue;
@@ -1394,16 +1398,20 @@ INT8U OSDQueuePend (BRTOS_Queue *pont_event, void *pdata, INT16U time_wait)
     // Set timeout overflow
     if (time_wait)
     {  
-      timeout = (INT32U)((INT32U)OSGetCount() + (INT32U)time_wait);
+  	  timeout = (osdtime_t)((osdtime_t)OSGetCount() + (osdtime_t)time_wait);
       
-      if (timeout >= TICK_COUNT_OVERFLOW)
-      {
-        Task->TimeToWait = (INT16U)(timeout - TICK_COUNT_OVERFLOW);
-      }
-      else
-      {
-        Task->TimeToWait = (INT16U)timeout;
-      }
+  	  if (sizeof_ostime_t < 8){
+  		  if (timeout >= TICK_COUNT_OVERFLOW)
+  		  {
+  			  Task->TimeToWait = (ostime_t)(timeout - TICK_COUNT_OVERFLOW);
+  		  }
+  		  else
+  		  {
+  			  Task->TimeToWait = (ostime_t)timeout;
+  		  }
+  	  }else{
+  		  Task->TimeToWait = (ostime_t)timeout;
+  	  }
     
       // Put task into delay list
       IncludeTaskIntoDelayList();

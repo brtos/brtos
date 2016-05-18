@@ -85,16 +85,20 @@ INT8U OSMutexCreate (BRTOS_Mutex **event, INT8U HigherPriority)
   if (currentTask)
      OSEnterCritical();
   
-  if (PriorityVector[HigherPriority] != EMPTY_PRIO)
-  {
-      // Exit critical Section
-      if (currentTask)
-        OSExitCritical();
-      return BUSY_PRIORITY;                          // The priority is busy
+  /* If HigherPriority is set to zero, do not use priority ceiling in the mutex.
+   * In such case, the mutex is the same of a binary semaphore adding ownership feature. */
+  if (HigherPriority > 0){
+	  if (PriorityVector[HigherPriority] != EMPTY_PRIO)
+	  {
+		  // Exit critical Section
+		  if (currentTask)
+			OSExitCritical();
+		  return BUSY_PRIORITY;                          // The priority is busy
+	  }
+
+	  // Allocate priority to the mutex
+	  PriorityVector[HigherPriority] = MUTEX_PRIO;
   }
-  
-  // Allocate priority to the mutex
-  PriorityVector[HigherPriority] = MUTEX_PRIO;
 
   // Verifica se ainda há blocos de controle de eventos disponíveis
   for(i=0;i<=BRTOS_MAX_MUTEX;i++)
@@ -198,11 +202,11 @@ INT8U OSMutexDelete (BRTOS_Mutex **event)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSMutexAcquire(BRTOS_Mutex *pont_event, INT16U time_wait)
+INT8U OSMutexAcquire(BRTOS_Mutex *pont_event, ostime_t time_wait)
 {
   OS_SR_SAVE_VAR
   INT8U  iPriority = 0;
-  INT32U timeout;
+  osdtime_t timeout;
   ContextType *Task;
 
   
@@ -315,16 +319,20 @@ INT8U OSMutexAcquire(BRTOS_Mutex *pont_event, INT16U time_wait)
     // Set timeout overflow
     if (time_wait)
     {
-      timeout = (INT32U)((INT32U)OSGetCount() + (INT32U)time_wait);
+  	  timeout = (osdtime_t)((osdtime_t)OSGetCount() + (osdtime_t)time_wait);
 
-      if (timeout >= TICK_COUNT_OVERFLOW)
-      {
-        Task->TimeToWait = (INT16U)(timeout - TICK_COUNT_OVERFLOW);
-      }
-      else
-      {
-        Task->TimeToWait = (INT16U)timeout;
-      }
+  	  if (sizeof_ostime_t < 8){
+  		  if (timeout >= TICK_COUNT_OVERFLOW)
+  		  {
+  			  Task->TimeToWait = (ostime_t)(timeout - TICK_COUNT_OVERFLOW);
+  		  }
+  		  else
+  		  {
+  			  Task->TimeToWait = (ostime_t)timeout;
+  		  }
+  	  }else{
+  		  Task->TimeToWait = (ostime_t)timeout;
+  	  }
 
       // Put task into delay list
       IncludeTaskIntoDelayList();
@@ -518,7 +526,10 @@ INT8U OSMutexRelease(BRTOS_Mutex *pont_event)
       
   // Release Mutex
   pont_event->OSEventState = AVAILABLE_RESOURCE;
-  PriorityVector[pont_event->OSMaxPriority] = MUTEX_PRIO;
+
+  if (pont_event->OSMaxPriority > 0){
+	  PriorityVector[pont_event->OSMaxPriority] = MUTEX_PRIO;
+  }
       
   // Exit Critical Section
   OSExitCritical();      

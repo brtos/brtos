@@ -158,7 +158,7 @@ void BRTOSTimerTask(void)
      OS_SR_SAVE_VAR
      BRTOS_TIMER p;
      TIMER_CNT   repeat;
-     INT32U      timeout;
+     osdtime_t   timeout = 0;
      TIMER_CNT   next_time_to_wake;      /* tick count of next timer */
      BRTOS_TMR_T *list, *list_tmp;          
      
@@ -203,7 +203,7 @@ void BRTOSTimerTask(void)
 
                   if (repeat > 0)
                   { /* needs to repeat after "repeat" time ? */
-                	  timeout = (INT32U)((INT32U)OSGetTickCount() + (INT32U)repeat);
+                	  timeout = (osdtime_t)((osdtime_t)OSGetTickCount() + (osdtime_t)repeat);
                 	  p->timeout = (TIMER_CNT)timeout;
 					  list_tmp = BRTOS_TIMER_VECTOR.future; // add into future list
 					  list_tmp->timers[++list_tmp->count] = p; // insert in the end
@@ -249,7 +249,7 @@ void BRTOSTimerTask(void)
                            
               if (repeat > 0)
               { /* needs to repeat after "repeat" time ? */
-            	  timeout = (INT32U)((INT32U)OSGetTickCount() + (INT32U)repeat);
+            	  timeout = (osdtime_t)((osdtime_t)OSGetTickCount() + (osdtime_t)repeat);
                   if (timeout >= TICK_COUNT_OVERFLOW)
                   {
                     p->timeout = (TIMER_CNT)(timeout - TICK_COUNT_OVERFLOW);                                 
@@ -353,7 +353,7 @@ INT8U OSTimerSet (BRTOS_TIMER *cbp, FCN_CALLBACK cb, TIMER_CNT time_wait)
     
     INT8U i;     
     BRTOS_TIMER p;
-    INT32U timeout;
+    osdtime_t timeout;
     BRTOS_TMR_T* list;
     
     if((cb == NULL) || (cbp == NULL)) return NULL_EVENT_POINTER;    /* return error code */        
@@ -398,18 +398,18 @@ INT8U OSTimerSet (BRTOS_TIMER *cbp, FCN_CALLBACK cb, TIMER_CNT time_wait)
     if(time_wait > 0)
     {      
     
-      timeout = (INT32U)((INT32U)OSGetCount() + (INT32U)time_wait);
+      timeout = (osdtime_t)((osdtime_t)OSGetCount() + (osdtime_t)time_wait);
       
       if (timeout >= TICK_COUNT_OVERFLOW)
       {
-        p->timeout = (INT16U)(timeout - TICK_COUNT_OVERFLOW);
+        p->timeout = (TIMER_CNT)(timeout - TICK_COUNT_OVERFLOW);
         list = BRTOS_TIMER_VECTOR.future;   // add into future list
         list->timers[++list->count] = p; // insert in the end                            
         Subir (list->timers, list->count); // order it 
       }
       else
       {
-        p->timeout = (INT16U)timeout;
+        p->timeout = (TIMER_CNT)timeout;
         list = BRTOS_TIMER_VECTOR.current;  // add into current list
         list->timers[++list->count] = p; // insert in the end                            
         Subir (list->timers, list->count); // order it 
@@ -488,7 +488,7 @@ TIMER_CNT OSTimerGet (BRTOS_TIMER p)
 INT8U OSTimerStart (BRTOS_TIMER p, TIMER_CNT time_wait){
  
   OS_SR_SAVE_VAR
-  INT32U timeout;
+  osdtime_t timeout;
   BRTOS_TMR_T* list;
   
   if(p!= NULL && time_wait != 0)
@@ -502,7 +502,7 @@ INT8U OSTimerStart (BRTOS_TIMER p, TIMER_CNT time_wait){
       if(time_wait > 0)
       {      
     
-        timeout = (INT32U)((INT32U)OSGetCount() + (INT32U)time_wait);
+        timeout = (osdtime_t)((osdtime_t)OSGetCount() + (osdtime_t)time_wait);
         
         if (timeout >= TICK_COUNT_OVERFLOW)
         {
