@@ -129,7 +129,7 @@ volatile INT8U SelectedTask;
   #endif
 #endif
 
-static   ostime_t OSTickCounter;                  ///< Incremented each tick timer - Used in delay and timeout functions
+static   ostick_t OSTickCounter;                  ///< Incremented each tick timer - Used in delay and timeout functions
 volatile INT32U OSDuty=0;                         ///< Used to compute the CPU load
 volatile INT32U OSDutyTmp=0;                      ///< Used to compute the CPU load
 
@@ -270,10 +270,10 @@ INT8U OSSchedule(void)
 /////      Get the current tick count                  /////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
-ostime_t OSGetTickCount(void)
+ostick_t OSGetTickCount(void)
 {
   OS_SR_SAVE_VAR
-  ostime_t cnt;
+  ostick_t cnt;
   
   OSEnterCritical();
   cnt = OSTickCounter;
@@ -294,7 +294,7 @@ ostime_t OSGetTickCount(void)
 /////      Get the current tick count                  /////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
-ostime_t OSGetCount(void)
+ostick_t OSGetCount(void)
 {
   return OSTickCounter;
 }
@@ -333,10 +333,10 @@ void OSIncCounter(void)
 ////////////////////////////////////////////////////////////
 
 // Atraso em passos de TickCount
-INT8U OSDelayTask(ostime_t time_wait)
+INT8U OSDelayTask(ostick_t time_wait)
 {
   OS_SR_SAVE_VAR
-  osdtime_t timeout;
+  osdtick_t timeout;
   ContextType *Task = (ContextType*)&ContextTask[currentTask];
    
   if (iNesting > 0) {                                // See if caller is an interrupt
@@ -359,19 +359,19 @@ INT8U OSDelayTask(ostime_t time_wait)
             #endif
         #endif    
 
-        timeout = (osdtime_t)((osdtime_t)OSTickCounter + (osdtime_t)time_wait);
+        timeout = (osdtick_t)((osdtick_t)OSTickCounter + (osdtick_t)time_wait);
         
-        if (sizeof_ostime_t < 8){
+        if (sizeof_ostick_t < 8){
         	if (timeout >= TICK_COUNT_OVERFLOW)
         	{
-        		Task->TimeToWait = (ostime_t)(timeout - TICK_COUNT_OVERFLOW);
+        		Task->TimeToWait = (ostick_t)(timeout - TICK_COUNT_OVERFLOW);
         	}
         	else
         	{
-        		Task->TimeToWait = (ostime_t)timeout;
+        		Task->TimeToWait = (ostick_t)timeout;
         	}
         }else{
-        	Task->TimeToWait = (ostime_t)timeout;
+        	Task->TimeToWait = (ostick_t)timeout;
         }
         
         // Put task into delay list

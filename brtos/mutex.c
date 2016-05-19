@@ -202,11 +202,11 @@ INT8U OSMutexDelete (BRTOS_Mutex **event)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSMutexAcquire(BRTOS_Mutex *pont_event, ostime_t time_wait)
+INT8U OSMutexAcquire(BRTOS_Mutex *pont_event, ostick_t time_wait)
 {
   OS_SR_SAVE_VAR
   INT8U  iPriority = 0;
-  osdtime_t timeout;
+  osdtick_t timeout;
   ContextType *Task;
 
   
@@ -319,19 +319,19 @@ INT8U OSMutexAcquire(BRTOS_Mutex *pont_event, ostime_t time_wait)
     // Set timeout overflow
     if (time_wait)
     {
-  	  timeout = (osdtime_t)((osdtime_t)OSGetCount() + (osdtime_t)time_wait);
+  	  timeout = (osdtick_t)((osdtick_t)OSGetCount() + (osdtick_t)time_wait);
 
-  	  if (sizeof_ostime_t < 8){
+  	  if (sizeof_ostick_t < 8){
   		  if (timeout >= TICK_COUNT_OVERFLOW)
   		  {
-  			  Task->TimeToWait = (ostime_t)(timeout - TICK_COUNT_OVERFLOW);
+  			  Task->TimeToWait = (ostick_t)(timeout - TICK_COUNT_OVERFLOW);
   		  }
   		  else
   		  {
-  			  Task->TimeToWait = (ostime_t)timeout;
+  			  Task->TimeToWait = (ostick_t)timeout;
   		  }
   	  }else{
-  		  Task->TimeToWait = (ostime_t)timeout;
+  		  Task->TimeToWait = (ostick_t)timeout;
   	  }
 
       // Put task into delay list
