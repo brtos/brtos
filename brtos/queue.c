@@ -90,10 +90,10 @@
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSQueueCreate(INT16U size, BRTOS_Queue **event)
+uint8_t OSQueueCreate(uint16_t size, BRTOS_Queue **event)
 {
   OS_SR_SAVE_VAR
-  INT16S i=0;
+  int16_t i=0;
   BRTOS_Queue *pont_event;
   OS_QUEUE *cqueue; 
 
@@ -108,7 +108,7 @@ INT8U OSQueueCreate(INT16U size, BRTOS_Queue **event)
   // Fix the queue size to the OS_CPU_TYPE
   if (size % sizeof(OS_CPU_TYPE))
   {
-    size = (INT16U)(size + (sizeof(OS_CPU_TYPE) - (size % sizeof(OS_CPU_TYPE))));
+    size = (uint16_t)(size + (sizeof(OS_CPU_TYPE) - (size % sizeof(OS_CPU_TYPE))));
   }
   
   if ((iQueueAddress + (size / sizeof(OS_CPU_TYPE))) > (QUEUE_HEAP_SIZE / sizeof(OS_CPU_TYPE)))
@@ -146,8 +146,8 @@ INT8U OSQueueCreate(INT16U size, BRTOS_Queue **event)
   } 
   
   // Configura dados de evento de lista
-  cqueue->OSQStart    = (INT8U *)&QUEUE_STACK[iQueueAddress];
-  iQueueAddress       = (INT16U)(iQueueAddress + (size / sizeof(OS_CPU_TYPE)));
+  cqueue->OSQStart    = (uint8_t *)&QUEUE_STACK[iQueueAddress];
+  iQueueAddress       = (uint16_t)(iQueueAddress + (size / sizeof(OS_CPU_TYPE)));
   cqueue->OSQSize     = size;
   cqueue->OSQEntries  = 0;
   cqueue->OSQEnd      = cqueue->OSQStart + cqueue->OSQSize;
@@ -185,7 +185,7 @@ INT8U OSQueueCreate(INT16U size, BRTOS_Queue **event)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSWQueue(OS_QUEUE *cqueue,INT8U data)
+uint8_t OSWQueue(OS_QUEUE *cqueue,uint8_t data)
 {  
   OS_SR_SAVE_VAR
   
@@ -241,7 +241,7 @@ INT8U OSWQueue(OS_QUEUE *cqueue,INT8U data)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSRQueue(OS_QUEUE *cqueue, INT8U* pdata)
+uint8_t OSRQueue(OS_QUEUE *cqueue, uint8_t* pdata)
 {
   OS_SR_SAVE_VAR
   
@@ -297,7 +297,7 @@ INT8U OSRQueue(OS_QUEUE *cqueue, INT8U* pdata)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSQueueClean(BRTOS_Queue *pont_event)
+uint8_t OSQueueClean(BRTOS_Queue *pont_event)
 {
   OS_SR_SAVE_VAR
   OS_QUEUE *cqueue = pont_event->OSEventPointer;
@@ -337,10 +337,10 @@ INT8U OSQueueClean(BRTOS_Queue *pont_event)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSQueuePend (BRTOS_Queue *pont_event, INT8U* pdata, ostick_t time_wait)
+uint8_t OSQueuePend (BRTOS_Queue *pont_event, uint8_t* pdata, ostick_t time_wait)
 {
   OS_SR_SAVE_VAR
-  INT8U iPriority = 0;
+  uint8_t iPriority = 0;
   osdtick_t timeout;
   ContextType *Task;
   OS_QUEUE *cqueue = pont_event->OSEventPointer;
@@ -529,12 +529,12 @@ INT8U OSQueuePend (BRTOS_Queue *pont_event, INT8U* pdata, ostick_t time_wait)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSQueuePost(BRTOS_Queue *pont_event, INT8U data)
+uint8_t OSQueuePost(BRTOS_Queue *pont_event, uint8_t data)
 {
   OS_SR_SAVE_VAR
-  INT8U iPriority = (INT8U)0;
+  uint8_t iPriority = (uint8_t)0;
   #if (VERBOSE == 1)
-  INT8U TaskSelect = 0;
+  uint8_t TaskSelect = 0;
   #endif
   OS_QUEUE *cqueue = pont_event->OSEventPointer;
   
@@ -670,7 +670,7 @@ INT8U OSQueuePost(BRTOS_Queue *pont_event, INT8U data)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSQueue16Create(OS_QUEUE_16 *cqueue, INT16U size)
+uint8_t OSQueue16Create(OS_QUEUE_16 *cqueue, uint16_t size)
 {
   OS_SR_SAVE_VAR
 
@@ -683,12 +683,12 @@ INT8U OSQueue16Create(OS_QUEUE_16 *cqueue, INT16U size)
      OSEnterCritical();
   
   // Fix the queue size to the OS_CPU_TYPE
-  if ((size*sizeof(INT16U)) % sizeof(OS_CPU_TYPE))
+  if ((size*sizeof(uint16_t)) % sizeof(OS_CPU_TYPE))
   {
-    size = (INT16U)(size + 1);
+    size = (uint16_t)(size + 1);
   }
   
-  if ((iQueueAddress + ((size*sizeof(INT16U)) / sizeof(OS_CPU_TYPE))) > (QUEUE_HEAP_SIZE / sizeof(OS_CPU_TYPE)))
+  if ((iQueueAddress + ((size*sizeof(uint16_t)) / sizeof(OS_CPU_TYPE))) > (QUEUE_HEAP_SIZE / sizeof(OS_CPU_TYPE)))
   {
       // Exit critical Section
       if (currentTask)
@@ -698,8 +698,8 @@ INT8U OSQueue16Create(OS_QUEUE_16 *cqueue, INT16U size)
   }
   
   // Configura dados de evento de lista
-  cqueue->OSQStart    = (INT16U *)&QUEUE_STACK[iQueueAddress];
-  iQueueAddress       = (INT16U)(iQueueAddress + ((size*sizeof(INT16U)) / sizeof(OS_CPU_TYPE)));
+  cqueue->OSQStart    = (uint16_t *)&QUEUE_STACK[iQueueAddress];
+  iQueueAddress       = (uint16_t)(iQueueAddress + ((size*sizeof(uint16_t)) / sizeof(OS_CPU_TYPE)));
   cqueue->OSQSize     = size;
   cqueue->OSQEntries  = 0;
   cqueue->OSQEnd      = cqueue->OSQStart + cqueue->OSQSize;
@@ -728,7 +728,7 @@ INT8U OSQueue16Create(OS_QUEUE_16 *cqueue, INT16U size)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSWQueue16(OS_QUEUE_16 *cqueue,INT16U data)
+uint8_t OSWQueue16(OS_QUEUE_16 *cqueue,uint16_t data)
 {
   OS_SR_SAVE_VAR
   
@@ -784,7 +784,7 @@ INT8U OSWQueue16(OS_QUEUE_16 *cqueue,INT16U data)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSRQueue16(OS_QUEUE_16 *cqueue, INT16U *pdata)
+uint8_t OSRQueue16(OS_QUEUE_16 *cqueue, uint16_t *pdata)
 {
   OS_SR_SAVE_VAR
     
@@ -840,7 +840,7 @@ INT8U OSRQueue16(OS_QUEUE_16 *cqueue, INT16U *pdata)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSCleanQueue16(OS_QUEUE_16 *cqueue)
+uint8_t OSCleanQueue16(OS_QUEUE_16 *cqueue)
 {
   OS_SR_SAVE_VAR
   OS_QUEUE_16 *tmp_queue = cqueue;
@@ -884,7 +884,7 @@ INT8U OSCleanQueue16(OS_QUEUE_16 *cqueue)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSQueue32Create(OS_QUEUE_32 *cqueue, INT16U size)
+uint8_t OSQueue32Create(OS_QUEUE_32 *cqueue, uint16_t size)
 {
   OS_SR_SAVE_VAR
 
@@ -896,7 +896,7 @@ INT8U OSQueue32Create(OS_QUEUE_32 *cqueue, INT16U size)
   if (currentTask)
      OSEnterCritical();
   
-  if ((iQueueAddress + ((size*sizeof(INT32U)) / sizeof(OS_CPU_TYPE))) > (QUEUE_HEAP_SIZE / sizeof(OS_CPU_TYPE)))
+  if ((iQueueAddress + ((size*sizeof(uint32_t)) / sizeof(OS_CPU_TYPE))) > (QUEUE_HEAP_SIZE / sizeof(OS_CPU_TYPE)))
   {
       // Exit critical Section
       if (currentTask)
@@ -906,8 +906,8 @@ INT8U OSQueue32Create(OS_QUEUE_32 *cqueue, INT16U size)
   }  
   
   // Configura dados de evento de lista
-  cqueue->OSQStart    = (INT32U *)&QUEUE_STACK[iQueueAddress];
-  iQueueAddress       = (INT16U)(iQueueAddress + ((size*sizeof(INT32U)) / sizeof(OS_CPU_TYPE)));
+  cqueue->OSQStart    = (uint32_t *)&QUEUE_STACK[iQueueAddress];
+  iQueueAddress       = (uint16_t)(iQueueAddress + ((size*sizeof(uint32_t)) / sizeof(OS_CPU_TYPE)));
   cqueue->OSQSize     = size;
   cqueue->OSQEntries  = 0;
   cqueue->OSQEnd      = cqueue->OSQStart + cqueue->OSQSize;
@@ -936,7 +936,7 @@ INT8U OSQueue32Create(OS_QUEUE_32 *cqueue, INT16U size)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSWQueue32(OS_QUEUE_32 *cqueue,INT32U data)
+uint8_t OSWQueue32(OS_QUEUE_32 *cqueue,uint32_t data)
 {
   OS_SR_SAVE_VAR
   
@@ -992,7 +992,7 @@ INT8U OSWQueue32(OS_QUEUE_32 *cqueue,INT32U data)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSRQueue32(OS_QUEUE_32 *cqueue, INT32U *pdata)
+uint8_t OSRQueue32(OS_QUEUE_32 *cqueue, uint32_t *pdata)
 {
   OS_SR_SAVE_VAR
     
@@ -1048,7 +1048,7 @@ INT8U OSRQueue32(OS_QUEUE_32 *cqueue, INT32U *pdata)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSCleanQueue32(OS_QUEUE_32 *cqueue)
+uint8_t OSCleanQueue32(OS_QUEUE_32 *cqueue)
 {
   OS_SR_SAVE_VAR
   OS_QUEUE_32 *tmp_queue = cqueue;
@@ -1098,10 +1098,10 @@ INT8U OSCleanQueue32(OS_QUEUE_32 *cqueue)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSDQueueCreate(INT16U queue_length, OS_CPU_TYPE type_size, BRTOS_Queue **event)
+uint8_t OSDQueueCreate(uint16_t queue_length, OS_CPU_TYPE type_size, BRTOS_Queue **event)
 {
   OS_SR_SAVE_VAR
-  INT16U      size_in_bytes = 0;
+  uint16_t      size_in_bytes = 0;
   BRTOS_Queue *pont_event   = NULL;
   OS_DQUEUE   *cqueue       = NULL;
 
@@ -1120,10 +1120,10 @@ INT8U OSDQueueCreate(INT16U queue_length, OS_CPU_TYPE type_size, BRTOS_Queue **e
 		if( cqueue != NULL )
 		{
 			// Calculate the queue size in bytes
-			size_in_bytes = (INT16U)(queue_length * type_size);
+			size_in_bytes = (uint16_t)(queue_length * type_size);
 
 			// Allocate the queue in the heap
-			cqueue->OSQStart = (INT8U*)BRTOS_ALLOC(size_in_bytes);
+			cqueue->OSQStart = (uint8_t*)BRTOS_ALLOC(size_in_bytes);
 			
 			if(cqueue->OSQStart != NULL)
 			{  
@@ -1173,7 +1173,7 @@ INT8U OSDQueueCreate(INT16U queue_length, OS_CPU_TYPE type_size, BRTOS_Queue **e
   
   // Configura dados de evento de lista
   cqueue->OSQLength  = queue_length;
-  cqueue->OSQTSize   = (INT16U)type_size;
+  cqueue->OSQTSize   = (uint16_t)type_size;
   cqueue->OSQEntries = 0;
   cqueue->OSQEnd     = cqueue->OSQStart + size_in_bytes;
   cqueue->OSQIn      = cqueue->OSQStart;
@@ -1210,7 +1210,7 @@ INT8U OSDQueueCreate(INT16U queue_length, OS_CPU_TYPE type_size, BRTOS_Queue **e
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSDQueueDelete (BRTOS_Queue **event)
+uint8_t OSDQueueDelete (BRTOS_Queue **event)
 {
   OS_SR_SAVE_VAR
   BRTOS_Queue   *pont_event = *event;
@@ -1256,7 +1256,7 @@ INT8U OSDQueueDelete (BRTOS_Queue **event)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSDQueueClean(BRTOS_Queue *pont_event)
+uint8_t OSDQueueClean(BRTOS_Queue *pont_event)
 {
   OS_SR_SAVE_VAR
   OS_DQUEUE *cqueue = pont_event->OSEventPointer;
@@ -1295,15 +1295,15 @@ INT8U OSDQueueClean(BRTOS_Queue *pont_event)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSDQueuePend (BRTOS_Queue *pont_event, void *pdata, ostick_t time_wait)
+uint8_t OSDQueuePend (BRTOS_Queue *pont_event, void *pdata, ostick_t time_wait)
 {
   OS_SR_SAVE_VAR
-  INT8U       iPriority = 0;
+  uint8_t       iPriority = 0;
   osdtick_t   timeout;
-  INT16U      n;  
+  uint16_t      n;  
   ContextType *Task;
   OS_DQUEUE   *cqueue;
-  INT8U       *dst;  
+  uint8_t       *dst;  
    
   #if (ERROR_CHECK == 1)
     /// Can not use Queue pend function from interrupt handling code
@@ -1323,7 +1323,7 @@ INT8U OSDQueuePend (BRTOS_Queue *pont_event, void *pdata, ostick_t time_wait)
   OSEnterCritical();
   cqueue  = pont_event->OSEventPointer;
   n       = cqueue->OSQTSize;
-  dst     = (INT8U*)pdata;
+  dst     = (uint8_t*)pdata;
 
   #if (ERROR_CHECK == 1)
     // Verifies if the event is allocated
@@ -1496,17 +1496,17 @@ INT8U OSDQueuePend (BRTOS_Queue *pont_event, void *pdata, ostick_t time_wait)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSDQueuePost(BRTOS_Queue *pont_event, void *pdata)
+uint8_t OSDQueuePost(BRTOS_Queue *pont_event, void *pdata)
 {
   OS_SR_SAVE_VAR
-  INT8U iPriority = (INT8U)0;
+  uint8_t iPriority = (uint8_t)0;
   
   #if (VERBOSE == 1)
-  INT8U TaskSelect = 0;
+  uint8_t TaskSelect = 0;
   #endif
   
-  INT16U    n;
-  INT8U     *src;
+  uint16_t    n;
+  uint8_t     *src;
   OS_DQUEUE *cqueue;
   
   #if (ERROR_CHECK == 1)    
@@ -1524,7 +1524,7 @@ INT8U OSDQueuePost(BRTOS_Queue *pont_event, void *pdata)
      OSEnterCritical();
      
   cqueue  = pont_event->OSEventPointer;
-  src     = (INT8U*)pdata;
+  src     = (uint8_t*)pdata;
   n       = cqueue->OSQTSize;
 
   #if (ERROR_CHECK == 1)        

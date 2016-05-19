@@ -70,7 +70,7 @@
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSMutexCreate (BRTOS_Mutex **event, INT8U HigherPriority)
+uint8_t OSMutexCreate (BRTOS_Mutex **event, uint8_t HigherPriority)
 {
   OS_SR_SAVE_VAR
   int i=0;
@@ -157,7 +157,7 @@ INT8U OSMutexCreate (BRTOS_Mutex **event, INT8U HigherPriority)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSMutexDelete (BRTOS_Mutex **event)
+uint8_t OSMutexDelete (BRTOS_Mutex **event)
 {
   OS_SR_SAVE_VAR
   BRTOS_Mutex *pont_event;
@@ -202,10 +202,10 @@ INT8U OSMutexDelete (BRTOS_Mutex **event)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSMutexAcquire(BRTOS_Mutex *pont_event, ostick_t time_wait)
+uint8_t OSMutexAcquire(BRTOS_Mutex *pont_event, ostick_t time_wait)
 {
   OS_SR_SAVE_VAR
-  INT8U  iPriority = 0;
+  uint8_t  iPriority = 0;
   osdtick_t timeout;
   ContextType *Task;
 
@@ -417,12 +417,12 @@ INT8U OSMutexAcquire(BRTOS_Mutex *pont_event, ostick_t time_wait)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSMutexRelease(BRTOS_Mutex *pont_event)
+uint8_t OSMutexRelease(BRTOS_Mutex *pont_event)
 {
   OS_SR_SAVE_VAR
-  INT8U iPriority = (INT8U)0;
+  uint8_t iPriority = (uint8_t)0;
   #if (VERBOSE == 1)
-  INT8U TaskSelect = 0;
+  uint8_t TaskSelect = 0;
   #endif
   
   #if (ERROR_CHECK == 1)      

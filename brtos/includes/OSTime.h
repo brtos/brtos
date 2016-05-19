@@ -46,9 +46,9 @@
 
 typedef struct {
 
-	INT8U RTC_Second;         ///< Seconds of the clock
-	INT8U RTC_Minute;         ///< Minutes of the clock
-	INT8U RTC_Hour;	          ///< Hours of the clock
+	uint8_t RTC_Second;         ///< Seconds of the clock
+	uint8_t RTC_Minute;         ///< Minutes of the clock
+	uint8_t RTC_Hour;	          ///< Hours of the clock
 
 } OSTime;
 
@@ -74,9 +74,9 @@ typedef struct {
 
 typedef struct {
 
-	INT8U       RTC_Day;          ///< Day of the date
-	INT8U       RTC_Month;        ///< Month of the date
-  INT16U RTC_Year;         ///< Year of the date
+	uint8_t       RTC_Day;          ///< Day of the date
+	uint8_t       RTC_Month;        ///< Month of the date
+  uint16_t RTC_Year;         ///< Year of the date
 } OSDate; 
 
 ////////////////////////////////////////////////////////////
@@ -115,12 +115,12 @@ typedef struct {
 
 struct _OSRTC
 {
-  INT16U Year;
-  INT8U  Month;
-  INT8U  Day;
-  INT8U  Hour;
-  INT8U  Min;
-  INT8U  Sec;
+  uint16_t Year;
+  uint8_t  Month;
+  uint8_t  Day;
+  uint8_t  Hour;
+  uint8_t  Min;
+  uint8_t  Sec;
 };
 
 

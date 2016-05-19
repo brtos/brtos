@@ -59,8 +59,8 @@
 *   Date:     12/01/2013 ,  Date:     06/03/2014, 	Date:     02/09/2014
 *
 *   Authors:  Gustavo Weber Denardin
-*   Revision: 1.80		,	Revision: 1.90
-*   Date:     11/11/2015, 	Date: 12/11/2015
+*   Revision: 1.80		,	Revision: 1.90,		Revision: 2.00
+*   Date:     11/11/2015, 	Date: 12/11/2015, 	Date: 19/05/2015
 *
 *
 *********************************************************************************************************/
@@ -98,11 +98,11 @@ const CHAR8 *version=                            ///< Informs BRTOS version
 CHAR8 BufferText[TEXT_BUFFER_SIZE];
 #endif
                      
-INT8U PriorityVector[configMAX_TASK_INSTALL];   ///< Allocate task priorities
-INT16U iStackAddress = 0;                       ///< Virtual stack counter - Informs the stack occupation in bytes
+uint8_t PriorityVector[configMAX_TASK_INSTALL];   ///< Allocate task priorities
+uint16_t iStackAddress = 0;                       ///< Virtual stack counter - Informs the stack occupation in bytes
 
 
-INT16U iQueueAddress = 0;                       ///< Queue heap control
+uint16_t iQueueAddress = 0;                       ///< Queue heap control
 
 #if (!BRTOS_DYNAMIC_TASKS_ENABLED)
 stack_pointer_t StackAddress;           ///< Virtual stack pointer
@@ -112,9 +112,9 @@ stack_pointer_t StackAddress;           ///< Virtual stack pointer
 
 // global variables
 // Task Manager Variables
-INT8U NumberOfInstalledTasks;                 ///< Number of Installed tasks at the moment
-volatile INT8U currentTask;                            ///< Current task being executed
-volatile INT8U SelectedTask;
+uint8_t NumberOfInstalledTasks;                 ///< Number of Installed tasks at the moment
+volatile uint8_t currentTask;                            ///< Current task being executed
+volatile uint8_t SelectedTask;
 
 #if (NUMBER_OF_PRIORITIES > 16)
   PriorityType OSReadyList = 0;
@@ -130,24 +130,24 @@ volatile INT8U SelectedTask;
 #endif
 
 static   ostick_t OSTickCounter;                  ///< Incremented each tick timer - Used in delay and timeout functions
-volatile INT32U OSDuty=0;                         ///< Used to compute the CPU load
-volatile INT32U OSDutyTmp=0;                      ///< Used to compute the CPU load
+volatile uint32_t OSDuty=0;                         ///< Used to compute the CPU load
+volatile uint32_t OSDutyTmp=0;                      ///< Used to compute the CPU load
 
 #ifdef TICK_TIMER_32BITS
-volatile INT32U LastOSDuty = 0;                   ///< Last CPU load computed
+volatile uint32_t LastOSDuty = 0;                   ///< Last CPU load computed
 #else
-volatile INT16U LastOSDuty = 0;                   ///< Last CPU load computed
+volatile uint16_t LastOSDuty = 0;                   ///< Last CPU load computed
 #endif
 
-INT16U DutyCnt = 0;                               ///< Used to compute the CPU load
-INT32U TaskAlloc = 0;                             ///< Used to search a empty task control block
-INT8U  iNesting = 0;                              ///< Used to inform if the current code position is an interrupt handler code
+uint16_t DutyCnt = 0;                               ///< Used to compute the CPU load
+uint32_t TaskAlloc = 0;                             ///< Used to search a empty task control block
+uint8_t  iNesting = 0;                              ///< Used to inform if the current code position is an interrupt handler code
 
 ContextType *Tail;
 ContextType *Head;
 
 #if (DEBUG == 0)
-volatile INT8U flag_load = TRUE;
+volatile uint8_t flag_load = TRUE;
 #endif
 
 
@@ -246,10 +246,10 @@ ContextType ContextTask[NUMBER_OF_TASKS + 1];          ///< Task context info
 * \brief Priority Preemptive Scheduler (Internal kernel function).
 ****************************************************************/
 
-INT8U OSSchedule(void)
+uint8_t OSSchedule(void)
 {
-	INT8U TaskSelect = 0xFF;
-	INT8U Priority   = 0;
+	uint8_t TaskSelect = 0xFF;
+	uint8_t Priority   = 0;
 	
   Priority = SAScheduler(OSReadyList & OSBlockedList);
   TaskSelect = PriorityVector[Priority];
@@ -333,7 +333,7 @@ void OSIncCounter(void)
 ////////////////////////////////////////////////////////////
 
 // Atraso em passos de TickCount
-INT8U OSDelayTask(ostick_t time_wait)
+uint8_t OSDelayTask(ostick_t time_wait)
 {
   OS_SR_SAVE_VAR
   osdtick_t timeout;
@@ -418,10 +418,10 @@ INT8U OSDelayTask(ostick_t time_wait)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 // Miliseconds, seconds, minutes and hours delay
-INT8U OSDelayTaskHMSM(INT8U hours, INT8U minutes, INT8U seconds, INT16U miliseconds)
+uint8_t OSDelayTaskHMSM(uint8_t hours, uint8_t minutes, uint8_t seconds, uint16_t miliseconds)
 {
-  INT32U ticks=0;
-  INT32U loops=0;
+  uint32_t ticks=0;
+  uint32_t loops=0;
   
   if (minutes > 59)
     return INVALID_TIME;
@@ -432,10 +432,10 @@ INT8U OSDelayTaskHMSM(INT8U hours, INT8U minutes, INT8U seconds, INT16U miliseco
   if (miliseconds > 999)
     return INVALID_TIME;  
   
-  ticks = (INT32U)hours   * 3600L * configTICK_RATE_HZ
-        + (INT32U)minutes * 60L   * configTICK_RATE_HZ
-        + (INT32U)seconds *         configTICK_RATE_HZ
-        + ((INT32U)miliseconds    * configTICK_RATE_HZ)/1000L;
+  ticks = (uint32_t)hours   * 3600L * configTICK_RATE_HZ
+        + (uint32_t)minutes * 60L   * configTICK_RATE_HZ
+        + (uint32_t)seconds *         configTICK_RATE_HZ
+        + ((uint32_t)miliseconds    * configTICK_RATE_HZ)/1000L;
   
   // Task Delay limit = TickCounterOverflow
   if (ticks > 0)
@@ -443,7 +443,7 @@ INT8U OSDelayTaskHMSM(INT8U hours, INT8U minutes, INT8U seconds, INT16U miliseco
       loops = ticks / 60000L;
       ticks = ticks % 60000L;
       
-      (void)DelayTask((INT16U)ticks);
+      (void)DelayTask((uint16_t)ticks);
       
       while(loops > 0)
       {
@@ -475,7 +475,7 @@ INT8U OSDelayTaskHMSM(INT8U hours, INT8U minutes, INT8U seconds, INT16U miliseco
 void OS_TICK_HANDLER(void)
 {
   OS_SR_SAVE_VAR
-  INT8U  iPrio = 0;  
+  uint8_t  iPrio = 0;  
   ContextType *Task = Head;  
    
   ////////////////////////////////////////////////////
@@ -549,7 +549,7 @@ void OS_TICK_HANDLER(void)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U BRTOSStart(void)
+uint8_t BRTOSStart(void)
 {
  #if (TASK_WITH_PARAMETERS == 1)
   if (InstallTask(&Idle, "Idle Task", IDLE_STACK_SIZE, 0, (void*)NULL, NULL) != OK)
@@ -582,7 +582,7 @@ INT8U BRTOSStart(void)
 
 void PreInstallTasks(void)
 {
-  INT8U i=0;
+  uint8_t i=0;
   OSTickCounter = 0;
   currentTask = 0;
   NumberOfInstalledTasks = 0;
@@ -624,10 +624,10 @@ void PreInstallTasks(void)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSBlockPriority(INT8U iPriority)
+uint8_t OSBlockPriority(uint8_t iPriority)
 {
   OS_SR_SAVE_VAR
-  INT8U BlockedTask = 0;
+  uint8_t BlockedTask = 0;
   
   if (iNesting > 0) {                                // See if caller is an interrupt
      return(IRQ_PEND_ERR);                           // Can't be blocked by interrupt
@@ -674,11 +674,11 @@ INT8U OSBlockPriority(INT8U iPriority)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSUnBlockPriority(INT8U iPriority)
+uint8_t OSUnBlockPriority(uint8_t iPriority)
 {
   OS_SR_SAVE_VAR
   #if (VERBOSE == 1)
-  INT8U BlockedTask = 0;
+  uint8_t BlockedTask = 0;
   #endif
   
   
@@ -728,10 +728,10 @@ INT8U OSUnBlockPriority(INT8U iPriority)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSBlockTask(BRTOS_TH TaskHandle)
+uint8_t OSBlockTask(BRTOS_TH TaskHandle)
 {
   OS_SR_SAVE_VAR
-  INT8U iPriority = 0;
+  uint8_t iPriority = 0;
   
   if (iNesting > 0) {                                // See if caller is an interrupt
      return(IRQ_PEND_ERR);                           // Can't be blocked by interrupt
@@ -790,10 +790,10 @@ INT8U OSBlockTask(BRTOS_TH TaskHandle)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSUnBlockTask(BRTOS_TH TaskHandle)
+uint8_t OSUnBlockTask(BRTOS_TH TaskHandle)
 {
   OS_SR_SAVE_VAR
-  INT8U iPriority = 0;
+  uint8_t iPriority = 0;
   
   // Enter Critical Section
   #if (NESTING_INT == 0)
@@ -843,12 +843,12 @@ INT8U OSUnBlockTask(BRTOS_TH TaskHandle)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
+uint8_t OSBlockMultipleTask(uint8_t TaskStart, uint8_t TaskNumber)
 {
   OS_SR_SAVE_VAR
-  INT8U iTask = 0;
-  INT8U TaskFinish = 0;
-  INT8U iPriority = 0;  
+  uint8_t iTask = 0;
+  uint8_t TaskFinish = 0;
+  uint8_t iPriority = 0;  
   
   if (iNesting > 0) {                                // See if caller is an interrupt
      return(IRQ_PEND_ERR);                           // Can't be blocked by interrupt
@@ -858,7 +858,7 @@ INT8U OSBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
   if (currentTask)
     OSEnterCritical();
   
-  TaskFinish = (INT8U)(TaskStart + TaskNumber);
+  TaskFinish = (uint8_t)(TaskStart + TaskNumber);
   
   for (iTask = TaskStart; iTask <TaskFinish; iTask++)
   {
@@ -895,12 +895,12 @@ INT8U OSBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-INT8U OSUnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
+uint8_t OSUnBlockMultipleTask(uint8_t TaskStart, uint8_t TaskNumber)
 {
   OS_SR_SAVE_VAR
-  INT8U iTask = 0;
-  INT8U TaskFinish = 0;
-  INT8U iPriority = 0;    
+  uint8_t iTask = 0;
+  uint8_t TaskFinish = 0;
+  uint8_t iPriority = 0;    
   
   if (iNesting > 0) {                                // See if caller is an interrupt
      return(IRQ_PEND_ERR);                           // Can't be blocked by interrupt
@@ -910,7 +910,7 @@ INT8U OSUnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
   if (currentTask)
     OSEnterCritical();
   
-  TaskFinish = (INT8U)(TaskStart + TaskNumber);
+  TaskFinish = (uint8_t)(TaskStart + TaskNumber);
   
   for (iTask = TaskStart; iTask <TaskFinish; iTask++)
   {
@@ -1003,14 +1003,14 @@ INT8U OSUnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
 ////////////////////////////////////////////////////////////
 #if (!BRTOS_DYNAMIC_TASKS_ENABLED)
 #if (TASK_WITH_PARAMETERS == 1)
-  INT8U OSInstallTask(void(*FctPtr)(void *),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, void *parameters, OS_CPU_TYPE *TaskHandle)
+  uint8_t OSInstallTask(void(*FctPtr)(void *),const CHAR8 *TaskName, uint16_t USER_STACKED_BYTES,uint8_t iPriority, void *parameters, OS_CPU_TYPE *TaskHandle)
 #else
-  INT8U OSInstallTask(void(*FctPtr)(void),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, OS_CPU_TYPE *TaskHandle)
+  uint8_t OSInstallTask(void(*FctPtr)(void),const CHAR8 *TaskName, uint16_t USER_STACKED_BYTES,uint8_t iPriority, OS_CPU_TYPE *TaskHandle)
 #endif
 {
   OS_SR_SAVE_VAR
-  INT8U i = 0; 
-  INT8U TaskNumber = 0;
+  uint8_t i = 0; 
+  uint8_t TaskNumber = 0;
   ContextType * Task;    
   
    if (currentTask)
@@ -1068,7 +1068,7 @@ INT8U OSUnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
    // Number Task Discovery
    for(i=0;i<NUMBER_OF_TASKS;i++)
    {
-      INT32U teste = 1;
+      uint32_t teste = 1;
       teste = teste<<i;
     
       if (!(teste & TaskAlloc))
@@ -1156,14 +1156,14 @@ INT8U OSUnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
 }
 #else
 #if (TASK_WITH_PARAMETERS == 1)
-  INT8U OSInstallTask(void(*FctPtr)(void *),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, void *parameters, OS_CPU_TYPE *TaskHandle)
+  uint8_t OSInstallTask(void(*FctPtr)(void *),const CHAR8 *TaskName, uint16_t USER_STACKED_BYTES,uint8_t iPriority, void *parameters, OS_CPU_TYPE *TaskHandle)
 #else
-  INT8U OSInstallTask(void(*FctPtr)(void),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, OS_CPU_TYPE *TaskHandle)
+  uint8_t OSInstallTask(void(*FctPtr)(void),const CHAR8 *TaskName, uint16_t USER_STACKED_BYTES,uint8_t iPriority, OS_CPU_TYPE *TaskHandle)
 #endif
 {
   OS_SR_SAVE_VAR
-  INT8U i = 0;
-  INT8U TaskNumber = 0;
+  uint8_t i = 0;
+  uint8_t TaskNumber = 0;
   ContextType *Task;
   void *Stack = NULL;
 
@@ -1225,7 +1225,7 @@ INT8U OSUnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
    // Number Task Discovery
    for(i=0;i<NUMBER_OF_TASKS;i++)
    {
-      INT32U teste = 1;
+      uint32_t teste = 1;
       teste = teste<<i;
 
       if (!(teste & TaskAlloc))
@@ -1311,7 +1311,7 @@ INT8U OSUnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
 /////                                                  /////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
-INT8U OSUninstallTask(BRTOS_TH TaskHandle){
+uint8_t OSUninstallTask(BRTOS_TH TaskHandle){
 	  OS_SR_SAVE_VAR
 	  ContextType *Task;
 
@@ -1433,7 +1433,7 @@ void BRTOSInit(void)
 
 void initEvents(void)
 {
-  INT8U i=0;
+  uint8_t i=0;
   
   #if (BRTOS_SEM_EN == 1)
     for(i=0;i<BRTOS_MAX_SEM;i++)
@@ -1471,16 +1471,16 @@ void initEvents(void)
 ////////////////////////////////////////////////////////////
 #if (OPTIMIZED_SCHEDULER == 1)
 
-INT8U SAScheduler(PriorityType READY_LIST_VAR)
+uint8_t SAScheduler(PriorityType READY_LIST_VAR)
 {
   Optimezed_Scheduler();
 }
 
 #else
 
-INT8U SAScheduler(PriorityType ReadyList)
+uint8_t SAScheduler(PriorityType ReadyList)
 {
-  INT8U prio = 0;
+  uint8_t prio = 0;
   
   #if (NUMBER_OF_PRIORITIES > 16)
   

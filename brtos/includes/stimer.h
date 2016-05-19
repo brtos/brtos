@@ -83,7 +83,7 @@ typedef  BRTOS_TIMER_T*  BRTOS_TIMER;
 typedef struct
 {    
     BRTOS_TIMER timers [BRTOS_MAX_TIMER];
-    INT8S       count;
+    int8_t      count;
 }BRTOS_TMR_T;
 
 
@@ -95,11 +95,11 @@ void BRTOSTimerTask(void);
 #endif
  
 /************* public API *********************/ 
-void OSTimerInit(INT16U timertask_stacksize, INT8U prio);
-INT8U OSTimerSet (BRTOS_TIMER *cbp, FCN_CALLBACK cb, TIMER_CNT timeout);
+void OSTimerInit(uint16_t timertask_stacksize, uint8_t prio);
+uint8_t OSTimerSet (BRTOS_TIMER *cbp, FCN_CALLBACK cb, TIMER_CNT timeout);
 TIMER_CNT OSTimerGet (BRTOS_TIMER p);
-INT8U OSTimerStart (BRTOS_TIMER p, TIMER_CNT timeout);  
-INT8U OSTimerStop (BRTOS_TIMER p, INT8U del); 
+uint8_t OSTimerStart (BRTOS_TIMER p, TIMER_CNT timeout);  
+uint8_t OSTimerStop (BRTOS_TIMER p, uint8_t del); 
 
 /***************************************/
 

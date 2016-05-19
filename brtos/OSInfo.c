@@ -18,10 +18,10 @@ static int mem_cpy(char *dst, const char *src)
 	return i;
 }
 
-char *PrintDecimal(INT16S val, CHAR8 *buff)
+char *PrintDecimal(int16_t val, CHAR8 *buff)
 {
-   INT16U backup;
-   INT32U i = 0;
+   uint16_t backup;
+   uint32_t i = 0;
    CHAR8 s = ' ';
 
    // Fill buffer with spaces
@@ -67,13 +67,13 @@ char *PrintDecimal(INT16S val, CHAR8 *buff)
 /* Tasks are reported as blocked ('B'), ready ('R') or suspended ('S'). */
 void OSTaskList(char *string)
 {
-    INT16U VirtualStack = 0;
-    INT8U  j = 0;
-    INT8U  i = 0;
-    INT8U  prio = 0;
+    uint16_t VirtualStack = 0;
+    uint8_t  j = 0;
+    uint8_t  i = 0;
+    uint8_t  prio = 0;
     CHAR8  str[9];
-    INT32U *sp_end = 0;
-    INT32U *sp_address = 0;
+    uint32_t *sp_end = 0;
+    uint32_t *sp_address = 0;
     int z,count;
     
     string += mem_cpy(string,"\n\r***************************************************\n\r");
@@ -133,20 +133,20 @@ void OSTaskList(char *string)
 
 			  // Print the task stack size
 			  UserEnterCritical();
-			  sp_address = (INT32U*)ContextTask[j].StackPoint;
+			  sp_address = (uint32_t*)ContextTask[j].StackPoint;
 			  if (j == 1)
 			  {
 				  #if (!BRTOS_DYNAMIC_TASKS_ENABLED)
-				  sp_end = (INT32U*)&STACK[0];
+				  sp_end = (uint32_t*)&STACK[0];
 				  #else
-				  sp_end = (INT32U*)ContextTask[1].StackInit;
+				  sp_end = (uint32_t*)ContextTask[1].StackInit;
 				  #endif
 			  }else
 			  {
 				  #if (!BRTOS_DYNAMIC_TASKS_ENABLED)
-				  sp_end = (INT32U*)ContextTask[j-1].StackInit;
+				  sp_end = (uint32_t*)ContextTask[j-1].StackInit;
 				  #else
-				  sp_end = (INT32U*)ContextTask[j].StackInit;
+				  sp_end = (uint32_t*)ContextTask[j].StackInit;
 				  #endif
 			  }
 			  UserExitCritical();
@@ -172,9 +172,9 @@ void OSTaskList(char *string)
 
 			  UserEnterCritical();
 			  #if (!BRTOS_DYNAMIC_TASKS_ENABLED)
-			  VirtualStack = ContextTask[j].StackInit - ((INT32U)sp_address + (i*4));
+			  VirtualStack = ContextTask[j].StackInit - ((uint32_t)sp_address + (i*4));
 			  #else
-			  VirtualStack = (ContextTask[j].StackInit + (INT32U)ContextTask[j].StackSize) - ((INT32U)sp_address + (i*4));
+			  VirtualStack = (ContextTask[j].StackInit + (uint32_t)ContextTask[j].StackSize) - ((uint32_t)sp_address + (i*4));
 			  #endif
 			  UserExitCritical();
 
@@ -196,7 +196,7 @@ void OSTaskList(char *string)
 // memoria total heap de filas
 void OSAvailableMemory(char *string)
 {
-    INT16U address = 0;
+    uint16_t address = 0;
     CHAR8  str[8];
 
     string += mem_cpy(string, "\n\r***** BRTOS Memory Info *****\n\r");
@@ -213,7 +213,7 @@ void OSAvailableMemory(char *string)
 #if (!BRTOS_DYNAMIC_TASKS_ENABLED)
     (void)PrintDecimal(address, str);
 #else
-    (void)PrintDecimal((INT16S)OSGetUsedHeapSize(), str);
+    (void)PrintDecimal((int16_t)OSGetUsedHeapSize(), str);
 #endif
     string += mem_cpy(string, &str[2]);
     string += mem_cpy(string, " of ");
@@ -284,9 +284,9 @@ void OSUptimeInfo(char *string)
 #if (COMPUTES_CPU_LOAD == 1)
 void OSCPULoad(char *string)
 {
-    INT32U percent = 0;
-    INT8U caracter = 0;
-    INT8U cent,dez;
+    uint32_t percent = 0;
+    uint8_t caracter = 0;
+    uint8_t cent,dez;
 
     UserEnterCritical();
     percent = LastOSDuty;

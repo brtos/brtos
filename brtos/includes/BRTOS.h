@@ -93,18 +93,18 @@
 #endif
 
 #if (!defined(ostick_t) && !defined(osdtick_t))
-#define ostick_t					  INT16U
-#define osdtick_t					  INT32U
+#define ostick_t					  uint16_t
+#define osdtick_t					  uint32_t
 #endif
 #define sizeof_ostick_t			sizeof(ostick_t)
 
 
 /// Task States
-#define READY                        (INT8U)0     ///< Task is ready to be executed - waiting for the scheduler authorization
-#define SUSPENDED                    (INT8U)1     ///< Task is suspended
-#define BLOCKED                      (INT8U)2     ///< Task is blocked - Will not run until be released
-#define MUTEX_PRIO                   (INT8U)0xFE
-#define EMPTY_PRIO                   (INT8U)0xFF
+#define READY                        (uint8_t)0     ///< Task is ready to be executed - waiting for the scheduler authorization
+#define SUSPENDED                    (uint8_t)1     ///< Task is suspended
+#define BLOCKED                      (uint8_t)2     ///< Task is blocked - Will not run until be released
+#define MUTEX_PRIO                   (uint8_t)0xFE
+#define EMPTY_PRIO                   (uint8_t)0xFF
 
 
 /// Timer defines
@@ -121,21 +121,21 @@
 #define TickCountOverFlow           TICK_COUNT_OVERFLOW ///< Compatibility with BRTOS less than or equal to 1.7
 
 /// Error codes
-#define OK                           (INT8U)0     ///< OK define
-#define NO_MEMORY                    (INT8U)1     ///< Error - Lack of memory to allocate a task
-#define STACK_SIZE_TOO_SMALL         (INT8U)2     ///< Error - Stack size too small to allocate a task
-#define END_OF_AVAILABLE_PRIORITIES  (INT8U)3     ///< Error - There are no more priorities available
-#define BUSY_PRIORITY                (INT8U)4     ///< Error - Priority is being used by another task
-#define INVALID_TIME                 (INT8U)5     ///< Error - Informed time is out of the limits
-#define TIMEOUT                      (INT8U)6     ///< Error - Timeout
-#define CANNOT_ASSIGN_IDLE_TASK_PRIO (INT8U)7     ///< Error - A task can not be assigned into the idle task slot
-#define NOT_VALID_TASK               (INT8U)8     ///< There current task number is not valid for this function
-#define NO_TASK_DELAY                (INT8U)9     ///< Error - No valid time to wait
-#define END_OF_AVAILABLE_TCB         (INT8U)10    ///< Error - There are no more task control blocks (Context task)
-#define EXIT_BY_NO_ENTRY_AVAILABLE	 (INT8U)11	  ///< Error - There are no data into queues and mailboxes or semaphore value is zero with no timeout option
-#define TASK_WAITING_EVENT			 (INT8U)12	  ///< Error - The task being uninstalled is waiting for an event (uninstall aborted)
-#define CANNOT_UNINSTALL_IDLE_TASK   (INT8U)13    ///< Error - It is not be allow to uninstall the idle task
-#define EXIT_BY_NO_RESOURCE_AVAILABLE (INT8U)14	  ///< Error - The resource is not available with no timeout option
+#define OK                           (uint8_t)0     ///< OK define
+#define NO_MEMORY                    (uint8_t)1     ///< Error - Lack of memory to allocate a task
+#define STACK_SIZE_TOO_SMALL         (uint8_t)2     ///< Error - Stack size too small to allocate a task
+#define END_OF_AVAILABLE_PRIORITIES  (uint8_t)3     ///< Error - There are no more priorities available
+#define BUSY_PRIORITY                (uint8_t)4     ///< Error - Priority is being used by another task
+#define INVALID_TIME                 (uint8_t)5     ///< Error - Informed time is out of the limits
+#define TIMEOUT                      (uint8_t)6     ///< Error - Timeout
+#define CANNOT_ASSIGN_IDLE_TASK_PRIO (uint8_t)7     ///< Error - A task can not be assigned into the idle task slot
+#define NOT_VALID_TASK               (uint8_t)8     ///< There current task number is not valid for this function
+#define NO_TASK_DELAY                (uint8_t)9     ///< Error - No valid time to wait
+#define END_OF_AVAILABLE_TCB         (uint8_t)10    ///< Error - There are no more task control blocks (Context task)
+#define EXIT_BY_NO_ENTRY_AVAILABLE	 (uint8_t)11	  ///< Error - There are no data into queues and mailboxes or semaphore value is zero with no timeout option
+#define TASK_WAITING_EVENT			 (uint8_t)12	  ///< Error - The task being uninstalled is waiting for an event (uninstall aborted)
+#define CANNOT_UNINSTALL_IDLE_TASK   (uint8_t)13    ///< Error - It is not be allow to uninstall the idle task
+#define EXIT_BY_NO_RESOURCE_AVAILABLE (uint8_t)14	  ///< Error - The resource is not available with no timeout option
 
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
@@ -145,21 +145,21 @@
 
 
 // Return defines to events control blocks
-#define ALLOC_EVENT_OK          (INT8U)0      ///< Event allocated with success
-#define NO_AVAILABLE_EVENT      (INT8U)1      ///< No event control blocks available
-#define NO_AVAILABLE_MEMORY     (INT8U)2      ///< Error - Lack of memory to allocate an event
-#define INVALID_PARAMETERS      (INT8U)3      ///< There is at least one invalid parameter
-#define IRQ_PEND_ERR            (INT8U)4      ///< Function can not be called inside an interrupt
-#define ERR_SEM_OVF             (INT8U)5      ///< Semaphore counter overflow
-#define ERR_MUTEX_OVF           (INT8U)6      ///< Mutex counter overflow
-#define ERR_EVENT_NO_CREATED    (INT8U)7      ///< There are no task waiting for the event
-#define NULL_EVENT_POINTER      (INT8U)8      ///< The passed event pointer is NULL
-#define ERR_EVENT_OWNER         (INT8U)9      ///< Function caller is not the owner of the event control block. Used to mutex implementation
-#define DELETE_EVENT_OK         (INT8U)10     ///< Event deleted with success
-#define AVAILABLE_RESOURCE      (INT8U)11     ///< The resource is available
-#define BUSY_RESOURCE           (INT8U)12     ///< The resource is busy
-#define AVAILABLE_MESSAGE       (INT8U)13     ///< There is a message
-#define NO_MESSAGE              (INT8U)14     ///< There is no message
+#define ALLOC_EVENT_OK          (uint8_t)0      ///< Event allocated with success
+#define NO_AVAILABLE_EVENT      (uint8_t)1      ///< No event control blocks available
+#define NO_AVAILABLE_MEMORY     (uint8_t)2      ///< Error - Lack of memory to allocate an event
+#define INVALID_PARAMETERS      (uint8_t)3      ///< There is at least one invalid parameter
+#define IRQ_PEND_ERR            (uint8_t)4      ///< Function can not be called inside an interrupt
+#define ERR_SEM_OVF             (uint8_t)5      ///< Semaphore counter overflow
+#define ERR_MUTEX_OVF           (uint8_t)6      ///< Mutex counter overflow
+#define ERR_EVENT_NO_CREATED    (uint8_t)7      ///< There are no task waiting for the event
+#define NULL_EVENT_POINTER      (uint8_t)8      ///< The passed event pointer is NULL
+#define ERR_EVENT_OWNER         (uint8_t)9      ///< Function caller is not the owner of the event control block. Used to mutex implementation
+#define DELETE_EVENT_OK         (uint8_t)10     ///< Event deleted with success
+#define AVAILABLE_RESOURCE      (uint8_t)11     ///< The resource is available
+#define BUSY_RESOURCE           (uint8_t)12     ///< The resource is busy
+#define AVAILABLE_MESSAGE       (uint8_t)13     ///< There is a message
+#define NO_MESSAGE              (uint8_t)14     ///< There is no message
 
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
@@ -202,16 +202,16 @@
 #if (NUMBER_OF_PRIORITIES > 16)
   #define configMAX_TASK_INSTALL  32                 ///< Defines the maximum number of tasks that can be installed
   #define configMAX_TASK_PRIORITY 31  
-  typedef INT32U PriorityType;
+  typedef uint32_t PriorityType;
 #else
   #if (NUMBER_OF_PRIORITIES > 8)
     #define configMAX_TASK_INSTALL  16                 ///< Defines the maximum number of tasks that can be installed
     #define configMAX_TASK_PRIORITY 15
-    typedef INT16U PriorityType;
+    typedef uint16_t PriorityType;
   #else
     #define configMAX_TASK_INSTALL  8                 ///< Defines the maximum number of tasks that can be installed
     #define configMAX_TASK_PRIORITY 7  
-    typedef INT8U PriorityType;
+    typedef uint8_t PriorityType;
   #endif
 #endif
 
@@ -239,22 +239,22 @@ struct Context
 {
    const CHAR8 * TaskName;  ///< Task name
   #if SP_SIZE == 32
-   INT32U StackPoint;       ///< Current position of virtual stack pointer
-   INT32U StackInit;        ///< Virtual stack pointer init
+   uint32_t StackPoint;       ///< Current position of virtual stack pointer
+   uint32_t StackInit;        ///< Virtual stack pointer init
   #else
-   INT16U StackPoint;       ///< Current position of virtual stack pointer
-   INT16U StackInit;        ///< Virtual stack pointer init  
+   uint16_t StackPoint;       ///< Current position of virtual stack pointer
+   uint16_t StackInit;        ///< Virtual stack pointer init  
   #endif
 #if (BRTOS_DYNAMIC_TASKS_ENABLED == 1)
- INT16U StackSize;
+ uint16_t StackSize;
 #endif
    ostick_t TimeToWait;     ///< Time to wait - could be used by delay or timeout
   #if (VERBOSE == 1)
-   INT8U  State;            ///< Task states
-   INT8U  Blocked;          ///< Task blocked state
-   INT8U  SuspendedType;    ///< Task suspended type
+   uint8_t  State;            ///< Task states
+   uint8_t  Blocked;          ///< Task blocked state
+   uint8_t  SuspendedType;    ///< Task suspended type
   #endif
-   INT8U  Priority;         ///< Task priority
+   uint8_t  Priority;         ///< Task priority
    struct Context *Next;
    struct Context *Previous;
 };
@@ -281,11 +281,11 @@ typedef struct Context ContextType;
 * Semaphore Control Block Structure
 */
 typedef struct {
-  INT8U        OSEventAllocated;              ///< Indicate if the event is allocated or not
-  INT8U        OSEventCount;                  ///< Semaphore Count - This value is increased with a post and decremented with a pend
-  INT8U        OSEventWait;                   ///< Counter of waiting Tasks
+  uint8_t        OSEventAllocated;              ///< Indicate if the event is allocated or not
+  uint8_t        OSEventCount;                  ///< Semaphore Count - This value is increased with a post and decremented with a pend
+  uint8_t        OSEventWait;                   ///< Counter of waiting Tasks
 #if (BRTOS_BINARY_SEM_EN == 1)
-  INT8U		   Binary;						  ///< Defines if semaphore is binary or counting
+  uint8_t		   Binary;						  ///< Defines if semaphore is binary or counting
 #endif
   PriorityType OSEventWaitList;               ///< Task wait list for event to occur
 } BRTOS_Sem;
@@ -310,12 +310,12 @@ typedef struct {
 * Mutex Control Block Structure
 */
 typedef struct {
-  INT8U        OSEventAllocated;              ///< Indicate if the event is allocated or not
-  INT8U        OSEventState;                  ///< Mutex state - Defines if the resource is available or not
-  INT8U        OSEventOwner;                  ///< Defines mutex owner
-  INT8U        OSMaxPriority;                 ///< Defines max priority accessing resource
-  INT8U        OSOriginalPriority;            ///< Save original priority of Mutex owner task - used to the priority ceiling implementation
-  INT8U        OSEventWait;                   ///< Counter of waiting Tasks
+  uint8_t        OSEventAllocated;              ///< Indicate if the event is allocated or not
+  uint8_t        OSEventState;                  ///< Mutex state - Defines if the resource is available or not
+  uint8_t        OSEventOwner;                  ///< Defines mutex owner
+  uint8_t        OSMaxPriority;                 ///< Defines max priority accessing resource
+  uint8_t        OSOriginalPriority;            ///< Save original priority of Mutex owner task - used to the priority ceiling implementation
+  uint8_t        OSEventWait;                   ///< Counter of waiting Tasks
   PriorityType OSEventWaitList;               ///< Task wait list for event to occur
 } BRTOS_Mutex;
 
@@ -339,9 +339,9 @@ typedef struct {
 * MailBox Control Block Structure
 */
 typedef struct {
-  INT8U        OSEventAllocated;              ///< Indicate if the event is allocated or not
-  INT8U        OSEventWait;                   ///< Counter of waiting Tasks
-  INT8U        OSEventState;                  ///< Mailbox state - Defines if the message is available or not
+  uint8_t        OSEventAllocated;              ///< Indicate if the event is allocated or not
+  uint8_t        OSEventWait;                   ///< Counter of waiting Tasks
+  uint8_t        OSEventState;                  ///< Mailbox state - Defines if the message is available or not
   PriorityType OSEventWaitList;               ///< Task wait list for event to occur
   void         *OSEventPointer;               ///< Pointer to the message structure / type
 } BRTOS_Mbox;
@@ -366,9 +366,9 @@ typedef struct {
 * Queue Control Block Structure
 */
 typedef struct {
-  INT8U        OSEventAllocated;              ///< Indicate if the event is allocated or not
-  INT8U        OSEventCount;                  ///< Queue Event Count - This value is increased with a post and decremented with a pend
-  INT8U        OSEventWait;                   ///< Counter of waiting Tasks
+  uint8_t        OSEventAllocated;              ///< Indicate if the event is allocated or not
+  uint8_t        OSEventCount;                  ///< Queue Event Count - This value is increased with a post and decremented with a pend
+  uint8_t        OSEventWait;                   ///< Counter of waiting Tasks
   void         *OSEventPointer;               ///< Pointer to queue structure
   PriorityType OSEventWaitList;               ///< Task wait list for event to occur
 } BRTOS_Queue;
@@ -393,12 +393,12 @@ typedef struct {
 */
 typedef struct
 {
-  INT8U        *OSQStart;               ///< Pointer to the queue start
-  INT8U        *OSQEnd;                 ///< Pointer to the queue end
-  INT8U        *OSQIn;                  ///< Pointer to the next queue entry
-  INT8U        *OSQOut;                 ///< Pointer to the next data in the queue output
-  INT16U       OSQSize;                 ///< Size of the queue - Defined in the create queue function
-  INT16U       OSQEntries;              ///< Size of data inside the queue
+  uint8_t        *OSQStart;               ///< Pointer to the queue start
+  uint8_t        *OSQEnd;                 ///< Pointer to the queue end
+  uint8_t        *OSQIn;                  ///< Pointer to the next queue entry
+  uint8_t        *OSQOut;                 ///< Pointer to the next data in the queue output
+  uint16_t       OSQSize;                 ///< Size of the queue - Defined in the create queue function
+  uint16_t       OSQEntries;              ///< Size of data inside the queue
 } OS_QUEUE;
 
 ////////////////////////////////////////////////////////////
@@ -422,13 +422,13 @@ typedef struct
 */
 typedef struct
 {
-  INT8U        *OSQStart;               ///< Pointer to the queue start
-  INT8U        *OSQEnd;                 ///< Pointer to the queue end
-  INT8U        *OSQIn;                  ///< Pointer to the next queue entry
-  INT8U        *OSQOut;                 ///< Pointer to the next data in the queue output
-  INT16U       OSQTSize;                ///< Size of the queue type - Defined in the create queue function
-  INT16U       OSQLength;               ///< Length of the queue - Defined in the create queue function
-  INT16U       OSQEntries;              ///< Size of data inside the queue
+  uint8_t        *OSQStart;               ///< Pointer to the queue start
+  uint8_t        *OSQEnd;                 ///< Pointer to the queue end
+  uint8_t        *OSQIn;                  ///< Pointer to the next queue entry
+  uint8_t        *OSQOut;                 ///< Pointer to the next data in the queue output
+  uint16_t       OSQTSize;                ///< Size of the queue type - Defined in the create queue function
+  uint16_t       OSQLength;               ///< Length of the queue - Defined in the create queue function
+  uint16_t       OSQEntries;              ///< Size of data inside the queue
 } OS_DQUEUE;
 
 ////////////////////////////////////////////////////////////
@@ -452,12 +452,12 @@ typedef struct
 */
 typedef struct
 {
-  INT16U  *OSQStart;               ///< Pointer to the queue start
-  INT16U  *OSQEnd;                 ///< Pointer to the queue end
-  INT16U  *OSQIn;                  ///< Pointer to the next queue entry
-  INT16U  *OSQOut;                 ///< Pointer to the next data in the queue output
-  INT16U  OSQSize;                 ///< Size of the queue - Defined in the create queue function
-  INT16U  OSQEntries;              ///< Size of data inside the queue
+  uint16_t  *OSQStart;               ///< Pointer to the queue start
+  uint16_t  *OSQEnd;                 ///< Pointer to the queue end
+  uint16_t  *OSQIn;                  ///< Pointer to the next queue entry
+  uint16_t  *OSQOut;                 ///< Pointer to the next data in the queue output
+  uint16_t  OSQSize;                 ///< Size of the queue - Defined in the create queue function
+  uint16_t  OSQEntries;              ///< Size of data inside the queue
 } OS_QUEUE_16;
 
 ////////////////////////////////////////////////////////////
@@ -480,12 +480,12 @@ typedef struct
 */
 typedef struct
 {
-  INT32U  *OSQStart;               ///< Pointer to the queue start
-  INT32U  *OSQEnd;                 ///< Pointer to the queue end
-  INT32U  *OSQIn;                  ///< Pointer to the next queue entry
-  INT32U  *OSQOut;                 ///< Pointer to the next data in the queue output
-  INT16U  OSQSize;                 ///< Size of the queue - Defined in the create queue function
-  INT16U  OSQEntries;              ///< Size of data inside the queue
+  uint32_t  *OSQStart;               ///< Pointer to the queue start
+  uint32_t  *OSQEnd;                 ///< Pointer to the queue end
+  uint32_t  *OSQIn;                  ///< Pointer to the next queue entry
+  uint32_t  *OSQOut;                 ///< Pointer to the next data in the queue output
+  uint16_t  OSQSize;                 ///< Size of the queue - Defined in the create queue function
+  uint16_t  OSQEntries;              ///< Size of data inside the queue
 } OS_QUEUE_32;
 
 ////////////////////////////////////////////////////////////
@@ -504,7 +504,7 @@ typedef struct
 ////////////////////////////////////////////////////////////
 
 /*****************************************************************************************//**
-* \fn INT8U OSInstallTask(void(*FctPtr)(void),const char *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, void *parameters, OS_CPU_TYPE *TaskHandle)
+* \fn uint8_t OSInstallTask(void(*FctPtr)(void),const char *TaskName, uint16_t USER_STACKED_BYTES,uint8_t iPriority, void *parameters, OS_CPU_TYPE *TaskHandle)
 * \brief Install a task. Initial state = running.
 * \param *FctPtr Pointer to the task to be installed
 * \param *TaskName Task Name or task description
@@ -518,21 +518,21 @@ typedef struct
 * \return BUSY_PRIORITY Desired priority busy
 *********************************************************************************************/
 #if (TASK_WITH_PARAMETERS == 1)
-  INT8U OSInstallTask(void(*FctPtr)(void*),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, void *parameters, OS_CPU_TYPE *TaskHandle);
+  uint8_t OSInstallTask(void(*FctPtr)(void*),const CHAR8 *TaskName, uint16_t USER_STACKED_BYTES,uint8_t iPriority, void *parameters, OS_CPU_TYPE *TaskHandle);
   #define InstallTask OSInstallTask
 #else
-  INT8U OSInstallTask(void(*FctPtr)(void),const CHAR8 *TaskName, INT16U USER_STACKED_BYTES,INT8U iPriority, OS_CPU_TYPE *TaskHandle);
+  uint8_t OSInstallTask(void(*FctPtr)(void),const CHAR8 *TaskName, uint16_t USER_STACKED_BYTES,uint8_t iPriority, OS_CPU_TYPE *TaskHandle);
   #define InstallTask OSInstallTask
 #endif
 
 /*****************************************************************************************//**
-* \fn INT8U OSUninstallTask(BRTOS_TH TaskHandle)
+* \fn uint8_t OSUninstallTask(BRTOS_TH TaskHandle)
 * \brief Uninstall a task from the dynamic memory
 * \param TaskHandle The task handle id
 * \return OK Task successfully uninstalled
 * \return NOT_VALID_TASK Not valid task id or task is waiting for an event
 *********************************************************************************************/
-INT8U OSUninstallTask(BRTOS_TH TaskHandle);
+uint8_t OSUninstallTask(BRTOS_TH TaskHandle);
 #define UninstallTask OSUninstallTask
 
 /*****************************************************************************************//**
@@ -572,16 +572,16 @@ void IdleHook(void);
 void OS_TICK_HANDLER(void);
 
 /*****************************************************************************************//**
-* \fn INT8U BRTOSStart(void)
+* \fn uint8_t BRTOSStart(void)
 * \brief Start the Operating System Scheduler
 *  The user must call this function to start the tasks execution.
 * \return OK Success
 * \return NO_MEMORY There was not enough memory to start all tasks
 *********************************************************************************************/
-INT8U BRTOSStart(void);
+uint8_t BRTOSStart(void);
 
 /*****************************************************************************************//**
-* \fn INT8U OSDelayTask(ostick_t time_wait)
+* \fn uint8_t OSDelayTask(ostick_t time_wait)
 * \brief Wait for a specified period.
 *  A task that calling this function will be suspended for a certain time.
 *  When this time is reached the task back to ready state.
@@ -589,11 +589,11 @@ INT8U BRTOSStart(void);
 * \return OK Success
 * \return IRQ_PEND_ERR - Can not use block priority function from interrupt handler code
 *********************************************************************************************/
-INT8U OSDelayTask(ostick_t time_wait);
+uint8_t OSDelayTask(ostick_t time_wait);
 #define DelayTask OSDelayTask
 
 /*****************************************************************************************//**
-* \fn INT8U OSDelayTaskHMSM(INT8U hours, INT8U minutes, INT8U seconds, INT16U miliseconds)
+* \fn uint8_t OSDelayTaskHMSM(uint8_t hours, uint8_t minutes, uint8_t seconds, uint16_t miliseconds)
 * \brief Wait for a specified period (in hours, minutes, seconds and miliseconds).
 *  A task that calling this function will be suspended for a certain time.
 *  When this time is reached the task back to ready state.
@@ -604,7 +604,7 @@ INT8U OSDelayTask(ostick_t time_wait);
 * \return OK Success
 * \return INVALID_TIME The specified parameters are outside of the permitted range
 *********************************************************************************************/  
-INT8U OSDelayTaskHMSM(INT8U hours, INT8U minutes, INT8U seconds, INT16U miliseconds);
+uint8_t OSDelayTaskHMSM(uint8_t hours, uint8_t minutes, uint8_t seconds, uint16_t miliseconds);
 #define DelayTaskHMSM OSDelayTaskHMSM
 
 /*****************************************************************************************//**
@@ -639,7 +639,7 @@ void OSIncCounter(void);
 void PreInstallTasks(void);
 
 /*****************************************************************************************//**
-* \fn INT8U OSBlockPriority(INT8U iPriority)
+* \fn uint8_t OSBlockPriority(uint8_t iPriority)
 * \brief Blocks a specific priority
 *  Blocks the task that is associated with the specified priority.
 *  The user must be careful when using this function in together with mutexes.
@@ -648,11 +648,11 @@ void PreInstallTasks(void);
 * \return OK - Success
 * \return IRQ_PEND_ERR - Can not use block priority function from interrupt handler code
 *********************************************************************************************/  
-INT8U OSBlockPriority(INT8U iPriority);
+uint8_t OSBlockPriority(uint8_t iPriority);
 #define BlockPriority OSBlockPriority
 
 /*****************************************************************************************//**
-* \fn INT8U OSUnBlockPriority(INT8U iPriority)
+* \fn uint8_t OSUnBlockPriority(uint8_t iPriority)
 * \brief UnBlock a specific priority
 *  UnBlocks the task that is associated with the specified priority.
 *  The user must be careful when using this function in together with mutexes.
@@ -661,48 +661,48 @@ INT8U OSBlockPriority(INT8U iPriority);
 * \return OK - Success
 * \return IRQ_PEND_ERR - Can not use unblock priority function from interrupt handler code
 *********************************************************************************************/
-INT8U OSUnBlockPriority(INT8U iPriority);
+uint8_t OSUnBlockPriority(uint8_t iPriority);
 #define UnBlockPriority OSUnBlockPriority
 /*****************************************************************************************//**
-* \fn INT8U OSBlockTask(INT8U iTaskNumber)
+* \fn uint8_t OSBlockTask(uint8_t iTaskNumber)
 * \brief Blocks a specific task
 * \param iTaskNumber Task number to be blocked
 * \return OK - Success
 * \return IRQ_PEND_ERR - Can not use block task function from interrupt handler code
 *********************************************************************************************/
-INT8U OSBlockTask(BRTOS_TH iTaskNumber);
+uint8_t OSBlockTask(BRTOS_TH iTaskNumber);
 #define BlockTask OSBlockTask
 
 /*****************************************************************************************//**
-* \fn INT8U OSUnBlockTask(INT8U iTaskNumber)
+* \fn uint8_t OSUnBlockTask(uint8_t iTaskNumber)
 * \brief UnBlocks a specific task
 * \param iTaskNumber Task number to be unblocked
 * \return OK - Success
 * \return IRQ_PEND_ERR - Can not use unblock task function from interrupt handler code
 *********************************************************************************************/
-INT8U OSUnBlockTask(BRTOS_TH iTaskNumber);
+uint8_t OSUnBlockTask(BRTOS_TH iTaskNumber);
 #define UnBlockTask OSUnBlockTask
 
 /*****************************************************************************************//**
-* \fn INT8U OSBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
+* \fn uint8_t OSBlockMultipleTask(uint8_t TaskStart, uint8_t TaskNumber)
 * \brief Blocks a set of tasks
 * \param TaskStart Number of the first task to be blocked
 * \param TaskNumber Number of tasks to be blocked from the specified task start
 * \return OK - Success
 * \return IRQ_PEND_ERR - Can not use block multiple tasks function from interrupt handler code
 *********************************************************************************************/
-INT8U OSBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber);
+uint8_t OSBlockMultipleTask(uint8_t TaskStart, uint8_t TaskNumber);
 #define BlockMultipleTask OSBlockMultipleTask
 
 /*****************************************************************************************//**
-* \fn INT8U OSUnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber)
+* \fn uint8_t OSUnBlockMultipleTask(uint8_t TaskStart, uint8_t TaskNumber)
 * \brief UnBlocks a set of tasks
 * \param TaskStart Number of the first task to be unblocked
 * \param TaskNumber Number of tasks to be unblocked from the specified task start
 * \return OK - Success
 * \return IRQ_PEND_ERR - Can not use unblock multiple tasks function from interrupt handler code
 *********************************************************************************************/
-INT8U OSUnBlockMultipleTask(INT8U TaskStart, INT8U TaskNumber);
+uint8_t OSUnBlockMultipleTask(uint8_t TaskStart, uint8_t TaskNumber);
 #define UnBlockMultipleTask OSUnBlockMultipleTask
 
 /*********************************************************************************//**
@@ -713,18 +713,18 @@ void BRTOSInit(void);
 #define BRTOS_Init BRTOSInit
 
 /*****************************************************************//**
-* \fn INT8U OSSchedule(void)
+* \fn uint8_t OSSchedule(void)
 * \brief BRTOS Scheduler function (Internal kernel function).
 *********************************************************************/
-INT8U OSSchedule(void);
+uint8_t OSSchedule(void);
 
 /*****************************************************************//**
-* \fn INT8U SAScheduler(PriorityType ReadyList)
+* \fn uint8_t SAScheduler(PriorityType ReadyList)
 * \brief Sucessive Aproximation Scheduler (Internal kernel function).
 * \param ReadyList List of the tasks ready to run
 * \return The priority of the highest priority task ready to run
 *********************************************************************/
-INT8U SAScheduler(PriorityType ReadyList);
+uint8_t SAScheduler(PriorityType ReadyList);
 
 
 
@@ -767,7 +767,7 @@ void initEvents(void);
 #if (BRTOS_SEM_EN == 1)
 
   /*****************************************************************************************//**
-  * \fn INT8U OSSemCreate (INT8U cnt, BRTOS_Sem **event)
+  * \fn uint8_t OSSemCreate (uint8_t cnt, BRTOS_Sem **event)
   * \brief Allocates a semaphore control block
   * \param cnt Initial Semaphore counter - default = 0
   * \param **event Address of the semaphore control block pointer
@@ -775,11 +775,11 @@ void initEvents(void);
   * \return NO_AVAILABLE_EVENT No semaphore control blocks available
   * \return ALLOC_EVENT_OK Semaphore control block successfully allocated
   *********************************************************************************************/
-  INT8U OSSemCreate (INT8U cnt, BRTOS_Sem **event);
+  uint8_t OSSemCreate (uint8_t cnt, BRTOS_Sem **event);
 
 #if (BRTOS_BINARY_SEM_EN == 1)
   /*****************************************************************************************//**
-  * \fn INT8U OSSemBinaryCreate (INT8U cnt, BRTOS_Sem **event)
+  * \fn uint8_t OSSemBinaryCreate (uint8_t cnt, BRTOS_Sem **event)
   * \brief Allocates a semaphore control block
   * \param bit Initial Semaphore bit value - default = 0
   * \param **event Address of the semaphore control block pointer
@@ -787,20 +787,20 @@ void initEvents(void);
   * \return NO_AVAILABLE_EVENT No semaphore control blocks available
   * \return ALLOC_EVENT_OK Semaphore control block successfully allocated
   *********************************************************************************************/
-  INT8U OSSemBinaryCreate(INT8U bit, BRTOS_Sem **event);
+  uint8_t OSSemBinaryCreate(uint8_t bit, BRTOS_Sem **event);
 #endif
   
   /*****************************************************************************************//**
-  * \fn INT8U OSSemDelete (BRTOS_Sem **event)
+  * \fn uint8_t OSSemDelete (BRTOS_Sem **event)
   * \brief Releases a semaphore control block
   * \param **event Address of the semaphore control block pointer
   * \return IRQ_PEND_ERR Can not use semaphore delete function from interrupt handler code
   * \return DELETE_EVENT_OK Semaphore control block released with success
   *********************************************************************************************/
-  INT8U OSSemDelete (BRTOS_Sem **event);
+  uint8_t OSSemDelete (BRTOS_Sem **event);
 
   /*****************************************************************************************//**
-  * \fn INT8U OSSemPend (BRTOS_Sem *pont_event, ostick_t timeout)
+  * \fn uint8_t OSSemPend (BRTOS_Sem *pont_event, ostick_t timeout)
   * \brief Wait for a semaphore post
   *  Semaphore pend may be used to syncronize tasks or wait for an event occurs.
   *  A task exits a pending state with a semaphore post or by timeout.
@@ -811,22 +811,22 @@ void initEvents(void);
   * \return IRQ_PEND_ERR Can not use semaphore pend function from interrupt handler code
   * \return NO_EVENT_SLOT_AVAILABLE Full Event list
   *********************************************************************************************/
-  INT8U OSSemPend (BRTOS_Sem *pont_event, ostick_t timeout);
+  uint8_t OSSemPend (BRTOS_Sem *pont_event, ostick_t timeout);
   
   /*****************************************************************************************//**
-  * \fn INT8U OSSemPost(BRTOS_Sem *pont_event)
+  * \fn uint8_t OSSemPost(BRTOS_Sem *pont_event)
   * \brief Semaphore post
   *  Semaphore Post may be used to syncronize tasks or to inform that an event occurs.
   * \param *pont_event Semaphore pointer
   * \return OK Success
   * \return ERR_SEM_OVF Semaphore counter overflow
   *********************************************************************************************/  
-  INT8U OSSemPost(BRTOS_Sem *pont_event);
+  uint8_t OSSemPost(BRTOS_Sem *pont_event);
 #endif
 
 #if (BRTOS_MUTEX_EN == 1)
   /*****************************************************************************************//**
-  * \fn INT8U OSMutexCreate (BRTOS_Mutex **event, INT8U HigherPriority)
+  * \fn uint8_t OSMutexCreate (BRTOS_Mutex **event, uint8_t HigherPriority)
   * \brief Allocates a mutex control block
   * \param **event Address of the mutex control block pointer
   * \param HigherPriority Higher priority of the tasks that will share a resource
@@ -834,19 +834,19 @@ void initEvents(void);
   * \return NO_AVAILABLE_EVENT No mutex control blocks available
   * \return ALLOC_EVENT_OK Mutex control block successfully allocated
   *********************************************************************************************/
-  INT8U OSMutexCreate (BRTOS_Mutex **event, INT8U HigherPriority);
+  uint8_t OSMutexCreate (BRTOS_Mutex **event, uint8_t HigherPriority);
   
   /*****************************************************************************************//**
-  * \fn INT8U OSMutexDelete (BRTOS_Mutex **event)
+  * \fn uint8_t OSMutexDelete (BRTOS_Mutex **event)
   * \brief Releases a mutex control block
   * \param **event Address of the mutex control block pointer
   * \return IRQ_PEND_ERR Can not use mutex delete function from interrupt handler code
   * \return DELETE_EVENT_OK Mutex control block released with success
   *********************************************************************************************/  
-  INT8U OSMutexDelete (BRTOS_Mutex **event);
+  uint8_t OSMutexDelete (BRTOS_Mutex **event);
 
   /*****************************************************************************************//**
-  * \fn INT8U OSMutexAcquire(BRTOS_Mutex *pont_event, ostick_t time_wait)
+  * \fn uint8_t OSMutexAcquire(BRTOS_Mutex *pont_event, ostick_t time_wait)
   * \brief Wait for a mutex release
   *  Mutex release may be used to manage shared resources, for exemple, a LCD.
   *  A acquired state exits with a mutex owner release
@@ -856,10 +856,10 @@ void initEvents(void);
   * \return IRQ_PEND_ERR Can not use mutex pend function from interrupt handler code
   * \return NO_EVENT_SLOT_AVAILABLE Full Event list
   *********************************************************************************************/
-  INT8U OSMutexAcquire(BRTOS_Mutex *pont_event, ostick_t time_wait);
+  uint8_t OSMutexAcquire(BRTOS_Mutex *pont_event, ostick_t time_wait);
 
   /*****************************************************************************************//**
-  * \fn INT8U OSMutexRelease(BRTOS_Mutex *pont_event)
+  * \fn uint8_t OSMutexRelease(BRTOS_Mutex *pont_event)
   * \brief Release Mutex
   *  Mutex release must be used to release a shared resource.
   *  Only the mutex owner can executed the mutex post function with success.
@@ -868,13 +868,13 @@ void initEvents(void);
   * \return ERR_EVENT_OWNER The function caller is not the mutex owner
   * \return ERR_MUTEX_OVF Mutex counter overflow
   *********************************************************************************************/  
-  INT8U OSMutexRelease(BRTOS_Mutex *pont_event);
+  uint8_t OSMutexRelease(BRTOS_Mutex *pont_event);
 #endif
 
 #if (BRTOS_MBOX_EN == 1)
 
   /*****************************************************************************************//**
-  * \fn INT8U OSMboxCreate (BRTOS_Mbox **event, void *message)
+  * \fn uint8_t OSMboxCreate (BRTOS_Mbox **event, void *message)
   * \brief Allocates a mailbox control block
   * \param **event Address of the mailbox control block pointer
   * \param *message Specifies an initial message for the allocated mailbox control block
@@ -882,16 +882,16 @@ void initEvents(void);
   * \return NO_AVAILABLE_EVENT No mailbox control blocks available
   * \return ALLOC_EVENT_OK Mailbox control block successfully allocated
   *********************************************************************************************/
-  INT8U OSMboxCreate (BRTOS_Mbox **event, void *message);
+  uint8_t OSMboxCreate (BRTOS_Mbox **event, void *message);
   
   /*****************************************************************************************//**
-  * \fn INT8U OSMboxDelete (BRTOS_Mbox **event)
+  * \fn uint8_t OSMboxDelete (BRTOS_Mbox **event)
   * \brief Releases a mailbox control block
   * \param **event Address of the mailbox control block pointer
   * \return IRQ_PEND_ERR Can not use mailbox delete function from interrupt handler code
   * \return DELETE_EVENT_OK Mailbox control block released with success
   *********************************************************************************************/  
-  INT8U OSMboxDelete (BRTOS_Mbox **event);
+  uint8_t OSMboxDelete (BRTOS_Mbox **event);
   
   /*****************************************************************************************//**
   * \fn void *OSMboxPend (BRTOS_Mbox *pont_event, ostick_t timeout)
@@ -906,10 +906,10 @@ void initEvents(void);
   * \return TIMEOUT There was no post for this semaphore in the specified time
   * \return IRQ_PEND_ERR Can not use semaphore pend function from interrupt handler code
   *********************************************************************************************/  
-  INT8U OSMboxPend (BRTOS_Mbox *pont_event, void **Mail, ostick_t timeout);
+  uint8_t OSMboxPend (BRTOS_Mbox *pont_event, void **Mail, ostick_t timeout);
   
   /*****************************************************************************************//**
-  * \fn INT8U OSMboxPost(BRTOS_Mbox *pont_event, void *message)
+  * \fn uint8_t OSMboxPost(BRTOS_Mbox *pont_event, void *message)
   * \brief Mailbox post
   *  Mailbox post may be used to send messages to tasks.
   *  A message could be of any kind of data type.
@@ -918,7 +918,7 @@ void initEvents(void);
   * \return OK Success
   * \return ERR_EVENT_NO_CREATED No tasks waiting for the message
   *********************************************************************************************/  
-  INT8U OSMboxPost(BRTOS_Mbox *pont_event, void *message);
+  uint8_t OSMboxPost(BRTOS_Mbox *pont_event, void *message);
 #endif
 
 
@@ -939,7 +939,7 @@ void initEvents(void);
 #if (BRTOS_QUEUE_EN == 1)
 
   /*****************************************************************************************//**
-  * \fn INT8U OSQueueCreate(OS_QUEUE *cqueue, INT16U size, BRTOS_Queue **event)
+  * \fn uint8_t OSQueueCreate(OS_QUEUE *cqueue, uint16_t size, BRTOS_Queue **event)
   * \brief Allocates a queue control block  
   * \param size Queue size
   * \param **event Queue event pointer
@@ -947,38 +947,38 @@ void initEvents(void);
   * \return NO_AVAILABLE_EVENT No queue control blocks available
   * \return ALLOC_EVENT_OK Queue control block successfully allocated
   *********************************************************************************************/
-  INT8U OSQueueCreate(INT16U size, BRTOS_Queue **event);
+  uint8_t OSQueueCreate(uint16_t size, BRTOS_Queue **event);
  
   /*****************************************************************************************//**
-  * \fn OSWQueue(OS_QUEUE *cqueue,INT8U data)
+  * \fn OSWQueue(OS_QUEUE *cqueue,uint8_t data)
   * \brief Writes new data in the specified queue
   * \param *cqueue Pointer to a queue
   * \param data Data to be written in the queue
   * \return BUFFER_UNDERRUN Queue overflow - There is no more available for new data
   * \return READ_BUFFER_OK New data successfully written
   *********************************************************************************************/
-  INT8U OSWQueue(OS_QUEUE *cqueue,INT8U data);
+  uint8_t OSWQueue(OS_QUEUE *cqueue,uint8_t data);
 
   /*****************************************************************************************//**
-  * \fn INT8U OSRQueue(OS_QUEUE *cqueue, INT8U* pdata)
+  * \fn uint8_t OSRQueue(OS_QUEUE *cqueue, uint8_t* pdata)
   * \brief Reads new data from the specified queue
   * \param *cqueue Pointer to a queue
   * \param *pdata Pointer to data read - first data in the output buffer of the specified queue
   * \return READ_BUFFER_OK Data successfully read
   * \return NO_ENTRY_AVAILABLE There is no more available entry in queue
   *********************************************************************************************/
-  INT8U OSRQueue(OS_QUEUE *cqueue, INT8U* pdata);
+  uint8_t OSRQueue(OS_QUEUE *cqueue, uint8_t* pdata);
   
   /*****************************************************************************************//**
-  * \fn INT8U OSQueueClean(OS_QUEUE *cqueue)
+  * \fn uint8_t OSQueueClean(OS_QUEUE *cqueue)
   * \brief Clean data in the specified queue
   * \param *cqueue Pointer to a queue
   * \return CLEAN_BUFFER_OK Queue successfully cleaned
   *********************************************************************************************/  
-  INT8U OSQueueClean(BRTOS_Queue *pont_event);
+  uint8_t OSQueueClean(BRTOS_Queue *pont_event);
   
   /*****************************************************************************************//**
-  * \fn INT8U OSQueuePend (BRTOS_Queue *pont_event, OS_QUEUE *cqueue, ostick_t timeout)
+  * \fn uint8_t OSQueuePend (BRTOS_Queue *pont_event, OS_QUEUE *cqueue, ostick_t timeout)
   * \brief Wait for a queue post 
   *  A task exits a pending state with a queue post or by timeout.
   * \param *pont_event Queue event pointer
@@ -986,10 +986,10 @@ void initEvents(void);
   * \param timeout Timeout to the queue pend exits
   * \return First data in the output buffer of the specified queue
   *********************************************************************************************/
-  INT8U OSQueuePend (BRTOS_Queue *pont_event, INT8U* pdata, ostick_t timeout);
+  uint8_t OSQueuePend (BRTOS_Queue *pont_event, uint8_t* pdata, ostick_t timeout);
   
   /*****************************************************************************************//**
-  * \fn INT8U OSQueuePost(BRTOS_Queue *pont_event, OS_QUEUE *cqueue,INT8U data)
+  * \fn uint8_t OSQueuePost(BRTOS_Queue *pont_event, OS_QUEUE *cqueue,uint8_t data)
   * \brief Queue post
   *  A task exits a pending state with a queue post or by timeout.
   * \param *pont_event Queue event pointer
@@ -998,7 +998,7 @@ void initEvents(void);
   * \param timeout Timeout to the queue pend exits
   * \return First data in the output buffer of the specified queue
   *********************************************************************************************/
-  INT8U OSQueuePost(BRTOS_Queue *pont_event, INT8U data); 
+  uint8_t OSQueuePost(BRTOS_Queue *pont_event, uint8_t data); 
 #endif
 
 ////////////////////////////////////////////////////////////
@@ -1018,7 +1018,7 @@ void initEvents(void);
 #if (BRTOS_QUEUE_16_EN == 1)
 
   /*****************************************************************************************//**
-  * \fn INT8U OSQueueCreate(OS_QUEUE *cqueue, INT16U size, BRTOS_Queue **event)
+  * \fn uint8_t OSQueueCreate(OS_QUEUE *cqueue, uint16_t size, BRTOS_Queue **event)
   * \brief Allocates a queue control block  
   * \param *cqueue Queue pointer
   * \param size Queue size
@@ -1026,34 +1026,34 @@ void initEvents(void);
   * \return NO_AVAILABLE_EVENT No queue control blocks available
   * \return ALLOC_EVENT_OK Queue control block successfully allocated
   *********************************************************************************************/
-  INT8U OSQueue16Create(OS_QUEUE_16 *cqueue, INT16U size);
+  uint8_t OSQueue16Create(OS_QUEUE_16 *cqueue, uint16_t size);
   
   /*****************************************************************************************//**
-  * \fn OSWQueue(OS_QUEUE *cqueue,INT8U data)
+  * \fn OSWQueue(OS_QUEUE *cqueue,uint8_t data)
   * \brief Writes new data in the specified queue
   * \param *cqueue Pointer to a queue
   * \param data Data to be written in the queue
   * \return BUFFER_UNDERRUN Queue overflow - There is no more available for new data
   * \return READ_BUFFER_OK New data successfully written
   *********************************************************************************************/
-  INT8U OSWQueue16(OS_QUEUE_16 *cqueue,INT16U data);
+  uint8_t OSWQueue16(OS_QUEUE_16 *cqueue,uint16_t data);
 
   /*****************************************************************************************//**
-  * \fn INT8U OSRQueue(OS_QUEUE *cqueue)
+  * \fn uint8_t OSRQueue(OS_QUEUE *cqueue)
   * \brief Reads new data from the specified queue
   * \param *cqueue Pointer to a queue
   * \param *pdata Pointer to data read - first data in the output buffer of the specified queue  
   * \return First data in the output buffer of the specified queue
   *********************************************************************************************/
-  INT8U OSRQueue16(OS_QUEUE_16 *cqueue, INT16U *pdata);
+  uint8_t OSRQueue16(OS_QUEUE_16 *cqueue, uint16_t *pdata);
   
   /*****************************************************************************************//**
-  * \fn INT8U OSCleanQueue(OS_QUEUE *cqueue)
+  * \fn uint8_t OSCleanQueue(OS_QUEUE *cqueue)
   * \brief Clean data in the specified queue
   * \param *cqueue Pointer to a queue
   * \return CLEAN_BUFFER_OK Queue successfully cleaned
   *********************************************************************************************/  
-  INT8U OSCleanQueue16(OS_QUEUE_16 *cqueue);
+  uint8_t OSCleanQueue16(OS_QUEUE_16 *cqueue);
     
 #endif
 
@@ -1074,7 +1074,7 @@ void initEvents(void);
 #if (BRTOS_QUEUE_32_EN == 1)
 
   /*****************************************************************************************//**
-  * \fn INT8U OSQueueCreate(OS_QUEUE *cqueue, INT16U size, BRTOS_Queue **event)
+  * \fn uint8_t OSQueueCreate(OS_QUEUE *cqueue, uint16_t size, BRTOS_Queue **event)
   * \brief Allocates a queue control block  
   * \param *cqueue Queue pointer
   * \param size Queue size
@@ -1082,34 +1082,34 @@ void initEvents(void);
   * \return NO_AVAILABLE_EVENT No queue control blocks available
   * \return ALLOC_EVENT_OK Queue control block successfully allocated
   *********************************************************************************************/
-  INT8U OSQueue32Create(OS_QUEUE_32 *cqueue, INT16U size);
+  uint8_t OSQueue32Create(OS_QUEUE_32 *cqueue, uint16_t size);
   
   /*****************************************************************************************//**
-  * \fn OSWQueue(OS_QUEUE *cqueue,INT8U data)
+  * \fn OSWQueue(OS_QUEUE *cqueue,uint8_t data)
   * \brief Writes new data in the specified queue
   * \param *cqueue Pointer to a queue
   * \param data Data to be written in the queue
   * \return BUFFER_UNDERRUN Queue overflow - There is no more available for new data
   * \return READ_BUFFER_OK New data successfully written
   *********************************************************************************************/
-  INT8U OSWQueue32(OS_QUEUE_32 *cqueue,INT32U data);
+  uint8_t OSWQueue32(OS_QUEUE_32 *cqueue,uint32_t data);
 
   /*****************************************************************************************//**
-  * \fn INT8U OSRQueue(OS_QUEUE *cqueue)
+  * \fn uint8_t OSRQueue(OS_QUEUE *cqueue)
   * \brief Reads new data from the specified queue
   * \param *cqueue Pointer to a queue
   * \param *pdata Pointer to data read - first data in the output buffer of the specified queue  
   * \return First data in the output buffer of the specified queue
   *********************************************************************************************/
-  INT8U OSRQueue32(OS_QUEUE_32 *cqueue, INT32U *pdata);
+  uint8_t OSRQueue32(OS_QUEUE_32 *cqueue, uint32_t *pdata);
   
   /*****************************************************************************************//**
-  * \fn INT8U OSCleanQueue(OS_QUEUE *cqueue)
+  * \fn uint8_t OSCleanQueue(OS_QUEUE *cqueue)
   * \brief Clean data in the specified queue
   * \param *cqueue Pointer to a queue
   * \return CLEAN_BUFFER_OK Queue successfully cleaned
   *********************************************************************************************/  
-  INT8U OSCleanQueue32(OS_QUEUE_32 *cqueue);
+  uint8_t OSCleanQueue32(OS_QUEUE_32 *cqueue);
     
 #endif
 
@@ -1125,7 +1125,7 @@ void initEvents(void);
 #if (BRTOS_DYNAMIC_QUEUE_ENABLED == 1)
 
   /*****************************************************************************************//**
-  * \fn INT8U OSDQueueCreate(INT16U queue_lenght, OS_CPU_TYPE type_size, BRTOS_Queue **event)
+  * \fn uint8_t OSDQueueCreate(uint16_t queue_lenght, OS_CPU_TYPE type_size, BRTOS_Queue **event)
   * \brief Allocates a queue control block and queue data size
   * \param queue_lenght Queue lenght
   * \param type_size Queue type size
@@ -1136,27 +1136,27 @@ void initEvents(void);
   * \return NO_AVAILABLE_EVENT No queue control blocks available
   * \return ALLOC_EVENT_OK Queue control block successfully allocated
   *********************************************************************************************/
-  INT8U OSDQueueCreate(INT16U queue_lenght, OS_CPU_TYPE type_size, BRTOS_Queue **event);
+  uint8_t OSDQueueCreate(uint16_t queue_lenght, OS_CPU_TYPE type_size, BRTOS_Queue **event);
   
   /*****************************************************************************************//**
-  * \fn INT8U OSDQueueDelete (BRTOS_Queue **event)
+  * \fn uint8_t OSDQueueDelete (BRTOS_Queue **event)
   * \brief Releases a queue control block
   * \param **event Address of the queue control block pointer
   * \return IRQ_PEND_ERR Can not use queue delete function from interrupt handler code
   * \return DELETE_EVENT_OK Queue control block released with success
   *********************************************************************************************/  
-  INT8U OSDQueueDelete (BRTOS_Queue **event);
+  uint8_t OSDQueueDelete (BRTOS_Queue **event);
   
   /*****************************************************************************************//**
-  * \fn INT8U OSDQueueClean(BRTOS_Queue *pont_event)
+  * \fn uint8_t OSDQueueClean(BRTOS_Queue *pont_event)
   * \brief Clean data in the specified queue
   * \param **event Queue event pointer
   * \return CLEAN_BUFFER_OK Queue successfully cleaned
   *********************************************************************************************/  
-  INT8U OSDQueueClean(BRTOS_Queue *pont_event);
+  uint8_t OSDQueueClean(BRTOS_Queue *pont_event);
   
   /*****************************************************************************************//**
-  * \fn INT8U OSDQueuePend (BRTOS_Queue *pont_event, void *pdata, ostick_t time_wait)
+  * \fn uint8_t OSDQueuePend (BRTOS_Queue *pont_event, void *pdata, ostick_t time_wait)
   * \brief Wait for a queue post 
   *  A task exits a pending state with a queue post or by timeout.
   * \param *pont_event Queue event pointer
@@ -1166,10 +1166,10 @@ void initEvents(void);
   * \return TIMEOUT The queue pend exit by timeout
   * \return READ_BUFFER_OK The queue was successfully read
   *********************************************************************************************/
-  INT8U OSDQueuePend (BRTOS_Queue *pont_event, void *pdata, ostick_t time_wait);
+  uint8_t OSDQueuePend (BRTOS_Queue *pont_event, void *pdata, ostick_t time_wait);
   
   /*****************************************************************************************//**
-  * \fn INT8U OSDQueuePost(BRTOS_Queue *pont_event, void *pdata)
+  * \fn uint8_t OSDQueuePost(BRTOS_Queue *pont_event, void *pdata)
   * \brief Queue post
   *  A task exits a pending state with a queue post or by timeout.
   * \param *pont_event Queue event pointer
@@ -1177,7 +1177,7 @@ void initEvents(void);
   * \param timeout Timeout to the queue pend exits
   * \return
   *********************************************************************************************/
-  INT8U OSDQueuePost(BRTOS_Queue *pont_event, void *pdata);
+  uint8_t OSDQueuePost(BRTOS_Queue *pont_event, void *pdata);
 #endif
 
 ////////////////////////////////////////////////////////////
@@ -1202,20 +1202,20 @@ extern const PriorityType PriorityMask[configMAX_TASK_PRIORITY+1];
 extern ContextType *Tail;
 extern ContextType *Head;
 
-extern INT8U                iNesting;
-extern volatile INT8U       currentTask;
-extern volatile INT8U       SelectedTask;
+extern uint8_t                iNesting;
+extern volatile uint8_t       currentTask;
+extern volatile uint8_t       SelectedTask;
 extern ContextType          ContextTask[NUMBER_OF_TASKS + 1];
-extern INT16U               iStackAddress;
-extern INT8U                NumberOfInstalledTasks;
-extern volatile INT32U      OSDuty;
-extern INT8U                PriorityVector[configMAX_TASK_INSTALL];
-extern volatile INT32U      OSDutyTmp;
+extern uint16_t               iStackAddress;
+extern uint8_t                NumberOfInstalledTasks;
+extern volatile uint32_t      OSDuty;
+extern uint8_t                PriorityVector[configMAX_TASK_INSTALL];
+extern volatile uint32_t      OSDutyTmp;
 
 #ifdef TICK_TIMER_32BITS
-  extern volatile INT32U LastOSDuty;
+  extern volatile uint32_t LastOSDuty;
 #else
-  extern volatile INT16U LastOSDuty;
+  extern volatile uint16_t LastOSDuty;
 #endif
 
 #ifdef OS_CPU_TYPE
@@ -1227,8 +1227,8 @@ extern volatile INT32U      OSDutyTmp;
 	#error("You must define the OS_CPU_TYPE !!!")
 #endif
 
-extern INT32U TaskAlloc;
-extern INT16U iQueueAddress;
+extern uint32_t TaskAlloc;
+extern uint16_t iQueueAddress;
 
 #if (PROCESSOR == ATMEGA)
 #if (!defined __GNUC__)

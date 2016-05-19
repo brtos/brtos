@@ -52,8 +52,8 @@
   static volatile OS_RTC OSRtc;
   
   // Lookup table holding the length of each mont. The first element is a dummy.
-  static const INT8U MonthLength[13] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-  static INT8U LeapMonth;
+  static const uint8_t MonthLength[13] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+  static uint8_t LeapMonth;
 
 
 

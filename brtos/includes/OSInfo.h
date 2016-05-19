@@ -8,9 +8,9 @@
 #ifndef DEBUG_H_
 #define DEBUG_H_
 
-#define NO_ALIGN    (INT8U)0
-#define SPACE_ALIGN (INT8U)1
-#define ZEROS_ALIGN (INT8U)2
+#define NO_ALIGN    (uint8_t)0
+#define SPACE_ALIGN (uint8_t)1
+#define ZEROS_ALIGN (uint8_t)2
 
 void OSTaskList(char *string);
 void OSAvailableMemory(char *string);
