@@ -76,9 +76,9 @@ void OSTaskList(char *string)
     uint32_t *sp_address = 0;
     int z,count;
     
-    string += mem_cpy(string,"\n\r***************************************************\n\r");
-    string += mem_cpy(string,"ID   NAME            STATE   PRIORITY   STACK SIZE\n\r");
-    string += mem_cpy(string,"***************************************************\n\r");
+    string += mem_cpy(string,"\n\r***********************************************************\n\r");
+    string += mem_cpy(string,"ID   NAME                    STATE   PRIORITY   STACK SIZE\n\r");
+    string += mem_cpy(string,"***********************************************************\n\r");
 
 	#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
     for (j=1;j<=NumberOfInstalledTasks;j++)
@@ -102,7 +102,7 @@ void OSTaskList(char *string)
 			  string +=z;
 
 			  // Task name align
-			  for(count=0;count<(16-z);count++)
+			  for(count=0;count<(24-z);count++)
 			  {
 				  *string++ = ' ';
 			  }
