@@ -152,6 +152,18 @@ void OSTaskList(char *string)
 			  UserExitCritical();
 
 			  // Find for at least 16 available sp data into task stack
+			  #ifdef WATERMARK
+			  sp_address = sp_end;
+			  sp_address++;
+			  do
+			  {
+				  if (*sp_address != 0x24242424)
+				  {
+					  break;
+				  }
+				  sp_address++;
+			  }while((uint32_t)sp_address <= ContextTask[j].StackInit);			  
+			  #else
 			  i = 0;
 			  while(i<16)
 			  {
@@ -168,13 +180,21 @@ void OSTaskList(char *string)
 				}
 				sp_address--;
 			  }
-
+			  #endif
 
 			  UserEnterCritical();
 			  #if (!BRTOS_DYNAMIC_TASKS_ENABLED)
+			  #ifdef WATERMARK
+			  VirtualStack = ContextTask[j].StackInit - ((uint32_t)sp_address + 4);
+			  #else
 			  VirtualStack = ContextTask[j].StackInit - ((uint32_t)sp_address + (i*4));
+			  #endif
+			  #else
+			  #ifdef WATERMARK
+			  VirtualStack = (ContextTask[j].StackInit + (uint32_t)ContextTask[j].StackSize) - ((uint32_t)sp_address + 4);
 			  #else
 			  VirtualStack = (ContextTask[j].StackInit + (uint32_t)ContextTask[j].StackSize) - ((uint32_t)sp_address + (i*4));
+			  #endif
 			  #endif
 			  UserExitCritical();
 

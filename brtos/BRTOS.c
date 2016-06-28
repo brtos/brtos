@@ -105,9 +105,8 @@ uint16_t iStackAddress = 0;                       ///< Virtual stack counter - I
 uint16_t iQueueAddress = 0;                       ///< Queue heap control
 
 #if (!BRTOS_DYNAMIC_TASKS_ENABLED)
-stack_pointer_t StackAddress;           ///< Virtual stack pointer
+stack_pointer_t StackAddress = (stack_pointer_t) &STACK;           ///< Virtual stack pointer
 #endif
-
 
 
 // global variables
@@ -604,10 +603,7 @@ void PreInstallTasks(void)
   
   #if (OSRTCEN == 1)
     OSRTCSetup();
-  #endif
-
-  StackAddress = (stack_pointer_t) &STACK[0];
-  
+  #endif  
 }
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
