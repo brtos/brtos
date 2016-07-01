@@ -219,7 +219,7 @@ void OSTaskList(char *string)
 void OSRuntimeStats(char *string)
 {
     uint8_t  j = 0;
-    CHAR8  str[32];
+    CHAR8  str[16];
     int z,count;
     uint32_t runtime, total_time, percentage;
 
