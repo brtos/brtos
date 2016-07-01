@@ -246,6 +246,8 @@ void OSRuntimeStats(char *string)
 				  string += mem_cpy(string, (str+4));
 				  string += mem_cpy(string, "] ");
 			  }
+
+			  // Print task name
 			  z = mem_cpy(string,(char*)ContextTask[j].TaskName);
 			  string +=z;
 
@@ -254,28 +256,31 @@ void OSRuntimeStats(char *string)
 				  *string++ = ' ';
 			  }
 
-			  // Print the task priority
+			  // Get task runtime
 			  UserEnterCritical();
 			  runtime = ContextTask[j].Runtime;
 			  UserExitCritical();
 
+			  // Percentage calculation
 			  percentage = runtime / total_time;
 
 
+			  // Print task runtime
 			  sprintf( str, "%u", (unsigned int) runtime);
 			  z = mem_cpy(string,str);
 			  string +=z;
+
 			  // Align
 			  for(count=0;count<(12-z);count++){
 				  *string++ = ' ';
 			  }
 
 			  if( percentage > 0UL ){
+				  // Print percentage
 				  sprintf( str, "%u%%", (unsigned int)percentage);
 			  }
 			  else{
-					/* If the percentage is zero here then the task has
-					consumed less than 1% of the total run time. */
+				  // If percentace is zero, print <1%
 				  sprintf( str, "<1%%");
 			  }
 
