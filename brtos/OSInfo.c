@@ -223,9 +223,9 @@ void OSRuntimeStats(char *string)
     int z,count;
     uint32_t runtime, total_time, percentage;
 
-    string += mem_cpy(string,"\n\r*********************************************\n\r");
-    string += mem_cpy(string,"ID   NAME                  Abs Time    % Time \n\r");
-    string += mem_cpy(string,"*********************************************\n\r");
+    string += mem_cpy(string,"\n\r**********************************************\n\r");
+    string += mem_cpy(string,"ID   NAME                    Abs Time   % Time \n\r");
+    string += mem_cpy(string,"**********************************************\n\r");
 
     total_time = OSGetTimerForRuntimeStats();
     total_time /= 100UL;
