@@ -349,28 +349,12 @@ void OSRTCSetup(void);
 #define OS_ENABLE_NESTING()
 ////////////////////////////////////////////////////////////
 
-
-
-extern inline void CriticalDecNesting(void);
-
+#define CriticalDecNesting()
 
 #define BTOSStartFirstTask() __asm( /* Call SVC to start the first task. */		\
 									"cpsie i				\n"					\
 									"svc 0					\n"					\
 								  )
-
-
-#define OS_EXIT_INT()                                                   \
-    SelectedTask = OSSchedule();                                        \
-    if (currentTask != SelectedTask){                                   \
-        OS_SAVE_CONTEXT();                                              \
-        OS_SAVE_SP();                                                   \
-        ContextTask[currentTask].StackPoint = SPvalue;                  \
-	      currentTask = SelectedTask;                                   \
-        SPvalue = ContextTask[currentTask].StackPoint;                  \
-        OS_RESTORE_SP();                                                \
-        OS_RESTORE_CONTEXT();                                           \
-    }
 
 
 /// Save Context Define

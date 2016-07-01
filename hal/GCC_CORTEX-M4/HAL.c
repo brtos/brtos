@@ -86,7 +86,6 @@ void OSRTCSetup(void)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
-
 void TickTimer(void)
 {
   // ************************
@@ -158,7 +157,7 @@ __attribute__ ((naked)) void SwitchContext(void)
   // ************************
   // Interrupt Exit
   // ************************
-  OS_EXIT_INT();
+  OS_INT_EXIT();
   OS_RESTORE_ISR();
   // ************************
 }
@@ -286,11 +285,6 @@ void          OS_TaskReturn             (void);
 #endif
 
 
-inline void CriticalDecNesting(void)
-{
-	UserEnterCritical();
-	iNesting--;
-}
 
 
 

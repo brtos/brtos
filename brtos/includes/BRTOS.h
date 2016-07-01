@@ -248,6 +248,9 @@ struct Context
 #if (BRTOS_DYNAMIC_TASKS_ENABLED == 1)
  uint16_t StackSize;
 #endif
+#if (COMPUTES_TASK_LOAD == 1)
+   uint32_t Runtime;
+#endif
    ostick_t TimeToWait;     ///< Time to wait - could be used by delay or timeout
   #if (VERBOSE == 1)
    uint8_t  State;            ///< Task states
@@ -1284,8 +1287,29 @@ extern stack_pointer_t StackAddress;
 #else
 
 #define OS_INT_ENTER()  iNesting++;
+
       
-  
+#if (COMPUTES_TASK_LOAD == 1)
+extern void COMPUTE_TASK_LOAD(void);
+
+#define OS_INT_EXIT()                                                   					\
+	CriticalDecNesting();                                                 					\
+	if (!iNesting)                                                        					\
+	{                                                                     					\
+		SelectedTask = OSSchedule();                                        				\
+		if (currentTask != SelectedTask){                                   				\
+			COMPUTE_TASK_LOAD();															\
+			OS_SAVE_CONTEXT();                                              				\
+			OS_SAVE_SP();                                                   				\
+			ContextTask[currentTask].StackPoint = SPvalue;                  				\
+			currentTask = SelectedTask;                                   					\
+			SPvalue = ContextTask[currentTask].StackPoint;                  				\
+			OS_RESTORE_SP();                                                				\
+			OS_RESTORE_CONTEXT();                                           				\
+		}																					\
+    }																						\
+
+#else
 #define OS_INT_EXIT()                                                   \
   CriticalDecNesting();                                                 \
   if (!iNesting)                                                        \
@@ -1295,13 +1319,14 @@ extern stack_pointer_t StackAddress;
         OS_SAVE_CONTEXT();                                              \
         OS_SAVE_SP();                                                   \
         ContextTask[currentTask].StackPoint = SPvalue;                  \
-	      currentTask = SelectedTask;                                     \
+	    currentTask = SelectedTask;                                     \
         SPvalue = ContextTask[currentTask].StackPoint;                  \
         OS_RESTORE_SP();                                                \
         OS_RESTORE_CONTEXT();                                           \
     }                                                                   \
   }                                                                     \
   
+#endif
 #endif
 
 ////////////////////////////////////////////////////////////

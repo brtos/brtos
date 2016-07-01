@@ -61,7 +61,7 @@
 #define OPTIMIZED_SCHEDULER 1
 
 /// Define if InstallTask function will support parameters
-#define TASK_WITH_PARAMETERS 0
+#define TASK_WITH_PARAMETERS 1
 
 /// Define if 32 bits register for tick timer will be used
 #define TICK_TIMER_32BITS   1
@@ -320,8 +320,6 @@ extern __attribute__((naked)) void SwitchContextToFirstTask(void);
 
 
 
-extern inline void CriticalDecNesting(void);
-
 
 #define BTOSStartFirstTask() __asm( /* Call SVC to start the first task. */		\
 									"cpsie i				\n"					\
@@ -329,18 +327,7 @@ extern inline void CriticalDecNesting(void);
 								  )
 
 
-#define OS_EXIT_INT()                                                   \
-    SelectedTask = OSSchedule();                                        \
-    if (currentTask != SelectedTask){                                   \
-        OS_SAVE_CONTEXT();                                              \
-        OS_SAVE_SP();                                                   \
-        ContextTask[currentTask].StackPoint = SPvalue;                  \
-	      currentTask = SelectedTask;                                   \
-        SPvalue = ContextTask[currentTask].StackPoint;                  \
-        OS_RESTORE_SP();                                                \
-        OS_RESTORE_CONTEXT();                                           \
-    }
-
+#define CriticalDecNesting()
 
 /// Save Context Define
 #if (FPU_SUPPORT == 1)

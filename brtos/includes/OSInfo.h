@@ -13,6 +13,7 @@
 #define ZEROS_ALIGN (uint8_t)2
 
 void OSTaskList(char *string);
+void OSRuntimeStats(char *string);
 void OSAvailableMemory(char *string);
 void OSUptimeInfo(char *string);
 void OSCPULoad(char *string);

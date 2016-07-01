@@ -155,7 +155,7 @@ __attribute__ ((naked)) void SwitchContext(void)
   // ************************
   // Interrupt Exit
   // ************************
-  OS_EXIT_INT();
+  OS_INT_EXIT();
   OS_RESTORE_ISR();
   // ************************
 }
@@ -186,7 +186,6 @@ __attribute__ ((naked)) void SwitchContextToFirstTask(void)
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-void          OS_TaskReturn             (void);
 
 #if (!BRTOS_DYNAMIC_TASKS_ENABLED)
 #if (TASK_WITH_PARAMETERS == 1)
@@ -279,13 +278,6 @@ void          OS_TaskReturn             (void);
     return (unsigned int)stk_pt;    
 }
 #endif
-
-inline void CriticalDecNesting(void)
-{
-	UserEnterCritical();
-	iNesting--;
-}
-
 
 
 

@@ -233,6 +233,19 @@ ContextType ContextTask[NUMBER_OF_TASKS + 1];          ///< Task context info
                                                        ///< ContextTask[0] not used
                                                        ///< Last ContexTask is the Idle Task
 
+#if (COMPUTES_TASK_LOAD == 1)
+static volatile uint32_t OSTimeTaskSwitched = 0UL;				   	   ///< Value of a counter in the last time a task was switched.
+static volatile uint32_t OSTotalRuntime = 0UL;						   ///< Total amount of execution time
+
+void COMPUTE_TASK_LOAD(void){
+	OSTotalRuntime = OSGetTimerForRuntimeStats();
+	if( OSTotalRuntime > OSTimeTaskSwitched ){
+		ContextTask[currentTask].Runtime += (OSTotalRuntime - OSTimeTaskSwitched);
+	}
+	OSTimeTaskSwitched = OSTotalRuntime;
+}
+#endif
+
 
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
@@ -559,6 +572,10 @@ uint8_t BRTOSStart(void)
     return NO_MEMORY;
   };
 
+#if (COMPUTES_TASK_LOAD == 1)
+  OSConfigureTimerForRuntimeStats();
+#endif
+
   currentTask = OSSchedule();
   SPvalue = ContextTask[currentTask].StackPoint;
   BTOSStartFirstTask();
@@ -596,6 +613,9 @@ void PreInstallTasks(void)
   for(i=1;i<=NUMBER_OF_TASKS;i++)
   {
 	  ContextTask[i].Priority = EMPTY_PRIO;
+#if (COMPUTES_TASK_LOAD == 1)
+	  ContextTask[i].Runtime = 0;
+#endif
   }
     
   Tail = NULL;

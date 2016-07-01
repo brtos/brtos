@@ -69,7 +69,9 @@ void OSTaskList(char *string)
 {
     uint16_t VirtualStack = 0;
     uint8_t  j = 0;
+#ifndef WATERMARK
     uint8_t  i = 0;
+#endif
     uint8_t  prio = 0;
     CHAR8  str[9];
     uint32_t *sp_end = 0;
@@ -210,6 +212,85 @@ void OSTaskList(char *string)
     // End of string
     *string = '\0';
 }
+
+#if (COMPUTES_TASK_LOAD == 1)
+#include <string.h>
+#include <stdio.h>
+void OSRuntimeStats(char *string)
+{
+    uint8_t  j = 0;
+    CHAR8  str[32];
+    int z,count;
+    uint32_t runtime, total_time, percentage;
+
+    string += mem_cpy(string,"\n\r*********************************************\n\r");
+    string += mem_cpy(string,"ID   NAME                  Abs Time    % Time \n\r");
+    string += mem_cpy(string,"*********************************************\n\r");
+
+    total_time = OSGetTimerForRuntimeStats();
+    total_time /= 100UL;
+
+	#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
+    for (j=1;j<=NumberOfInstalledTasks;j++)
+	#else
+    for (j=1;j<=NUMBER_OF_TASKS;j++)
+	#endif
+    {
+		  if (ContextTask[j].Priority != EMPTY_PRIO){
+			  *string++ = '[';
+			  if (j<10){
+				  *string++ = j+'0';
+				  string += mem_cpy(string, "]  ");
+			  }else{
+				  (void)PrintDecimal(j, str);
+				  string += mem_cpy(string, (str+4));
+				  string += mem_cpy(string, "] ");
+			  }
+			  z = mem_cpy(string,(char*)ContextTask[j].TaskName);
+			  string +=z;
+
+			  // Task name align
+			  for(count=0;count<(24-z);count++){
+				  *string++ = ' ';
+			  }
+
+			  // Print the task priority
+			  UserEnterCritical();
+			  runtime = ContextTask[j].Runtime;
+			  UserExitCritical();
+
+			  percentage = runtime / total_time;
+
+
+			  sprintf( str, "%u", (unsigned int) runtime);
+			  z = mem_cpy(string,str);
+			  string +=z;
+			  // Align
+			  for(count=0;count<(12-z);count++){
+				  *string++ = ' ';
+			  }
+
+			  if( percentage > 0UL ){
+				  sprintf( str, "%u%%", (unsigned int)percentage);
+			  }
+			  else{
+					/* If the percentage is zero here then the task has
+					consumed less than 1% of the total run time. */
+				  sprintf( str, "<1%%");
+			  }
+
+			  string += mem_cpy(string,str);
+			  string += mem_cpy(string,"\n\r");
+		  }
+    }
+
+    string += mem_cpy(string, "\n\r");
+
+    // End of string
+    *string = '\0';
+}
+#endif
+
 
 
 // memoria total heap de tarefas
