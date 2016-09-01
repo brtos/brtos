@@ -105,7 +105,7 @@ uint16_t iStackAddress = 0;                       ///< Virtual stack counter - I
 uint16_t iQueueAddress = 0;                       ///< Queue heap control
 
 #if (!BRTOS_DYNAMIC_TASKS_ENABLED)
-stack_pointer_t StackAddress = (stack_pointer_t) &STACK;           ///< Virtual stack pointer
+stack_pointer_t StackAddress;          ///< Virtual stack pointer
 #endif
 
 
@@ -604,6 +604,7 @@ void PreInstallTasks(void)
   NumberOfInstalledTasks = 0;
   TaskAlloc = 0;
   iStackAddress = 0;
+  StackAddress = (stack_pointer_t) &STACK;
   
   for(i=0;i<configMAX_TASK_INSTALL;i++)
   {
