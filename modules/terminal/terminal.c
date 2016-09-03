@@ -1,15 +1,14 @@
 /*
  * terminal.c
  *
- *  Created on: 28/04/2016
- *      Author: Universidade Federal
  */
 
 #include "terminal.h"
 #include "stddef.h"
 #include "stdint.h"
+#include "string.h"
 
-#if 0
+#ifndef TERM_PRINT
 #define PRINTF_BUFSIZE 		64
 static int printf_idx = 0;
 static char printf_buf[PRINTF_BUFSIZE];
@@ -29,6 +28,10 @@ void term_putchar_install(char (*_putchar_func)(char))
 }
 #endif
 
+#define STRCMP(a,b)		strcmp(a,b)
+#define TERM_FLUSH(a)	memset(a,0x00, sizeof(a))
+
+
 static term_input input = NULL;
 
 void terminal_set_input (term_input _input)
@@ -36,7 +39,6 @@ void terminal_set_input (term_input _input)
 	input = _input;
 }
 
-#define TERM_INPUT_BUFSIZE 		32
 static int term_in_idx = 0;
 static char term_in[TERM_INPUT_BUFSIZE];
 
@@ -47,7 +49,7 @@ char terminal_input (char c)
 		input(c);
 	}
 
-	if (c=='\b' && term_in_idx > 0)
+	if ((c=='\b' || c==0x7F) && term_in_idx > 0)
 	{
 		term_in[term_in_idx--] = '\0';
 		return 0;
@@ -57,7 +59,7 @@ char terminal_input (char c)
 		term_in[term_in_idx++] = c;
 		if(c == '\n' || c == '\r' || (term_in_idx==(TERM_INPUT_BUFSIZE-1)))
 		{
-			term_in[term_in_idx]='\0';
+			term_in[term_in_idx-1]='\0';
 			return 1;
 		}else
 		{
@@ -76,15 +78,12 @@ const cmd_t cmds[NUMBER_OF_COMMANDS] =
     COMMAND_TABLE(EXPAND_AS_JUMPTABLE)
 };
 
-#include "string.h"
-#define STRCMP(a,b)	strcmp(a,b)
-
 static uint8_t search_cmd (char * c)
 {
 
-	uint8_t inf = 0;  // inferior limit
-	uint8_t sup = NUMBER_OF_COMMANDS-1; // superior limit
-	uint8_t meio;
+	int8_t inf = 0;  // inferior limit
+	int8_t sup = NUMBER_OF_COMMANDS-1; // superior limit
+	int8_t meio;
 
   while(inf <= sup){
 	meio = (uint8_t)((inf + sup) >> 1);
@@ -120,40 +119,52 @@ CMD_FUNC(help)
 #if (HELP_DESCRIPTION == 1)
 	TERM_PRINT("If you have not typed \"help\", the command you typed was not found!\r\n");
 	TERM_PRINT("Else, here is the list of supported commands: \r\n");
-	TERM_PRINT("----------------\n");
+	TERM_PRINT("----------------\n\r");
 	for (c = 0; c < NUMBER_OF_COMMANDS; c++)
 	{
 			TERM_PRINT("%s : ", cmds[c].cmd_name);
-			TERM_PRINT("%s\n", ListOfCmdDesc[c]);
+			TERM_PRINT("%s\n\r", ListOfCmdDesc[c]);
 	}
-	TERM_PRINT("----------------\n");
+	TERM_PRINT("----------------\n\r");
 #endif
+	return NULL;
 }
 
-void terminal_process(void)
+void *terminal_process(void)
 {
-	uint8_t idx_start, idx_end, c;
+	uint8_t idx_start = 0, c;
+	char *arg;
+	char *ret = NULL;
+	uint8_t argc = 0;
 
-	idx_start = 0;
+	#define TERM_ARGS_MAX_COUNT		6
+	char* 	argv[TERM_ARGS_MAX_COUNT];
+
+	memset(argv,0,sizeof(argv));
+
 	while(term_in[idx_start]== ' ' || term_in[idx_start]== '\t') idx_start++;
 
-	idx_end = idx_start;
-	while(term_in[idx_end] != ' ' && term_in[idx_end] != '\t' && term_in[idx_end] != '\0') idx_end++;
-	term_in[idx_end] = '\0';
+	arg = &term_in[idx_start];
+	arg = strtok(arg," \t\r\n");
 
-	c = search_cmd(&term_in[idx_start]);
-	cmds[c].cmd_func(&term_in[++idx_end]);
-}
-
-void terminal_test(void)
-{
-	char *cmd = "help\n";
-	while(*cmd)
+	while (arg != NULL)
 	{
-		if(terminal_input(*cmd++) == 1)
-		{
-			terminal_process();
-		}
+		//TERM_PRINT("%s\n",arg);
+		argv[argc++] = arg;
+		arg = strtok (NULL, " \t\r\n");
 	}
 
+	if(argv[0] != NULL)
+	{
+		c = search_cmd(argv[0]);
+
+		TERM_PRINT("\r\n");
+		ret = cmds[c].cmd_func(argc, argv);
+		TERM_PRINT("\r\n");
+	}
+
+	TERM_FLUSH(term_in);
+	term_in_idx = 0;
+	return (void *)ret;
 }
+

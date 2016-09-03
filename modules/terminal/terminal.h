@@ -1,14 +1,12 @@
 /*
  * terminal.h
  *
- *  Created on: 28/04/2016
- *      Author: Universidade Federal
  */
 
 #ifndef APP_TERMINAL_H_
 #define APP_TERMINAL_H_
 
-typedef void (*pf_cmd)(char*);
+typedef char *(*pf_cmd)(int, char**);
 
 typedef struct
 {
@@ -22,23 +20,27 @@ enum
 	CMD_UNKNOWN
 };
 
+#define STX  0x02
+#define ETX  0x03
+#define EOT  0x04
 void term_putchar_install(char (*_putchar_func)(char));
 
 typedef char (*term_input)(char);
 void terminal_set_input (term_input _input);
 char terminal_input (char);
 
-void terminal_process(void);
+void *terminal_process(void);
+void terminal_test(void);
 
-#define CMD_FUNC(x)              void cmd_##x(char * arg)
-#define CMD_UNUSED_ARG()         (void)arg;
+#define CMD_FUNC(x)              char *cmd_##x(int argc, char ** argv)
+#define CMD_UNUSED_ARG()        (void)argc;(void)argv;
 
 #include "terminal_cfg.h"
 
 #define EXPAND_AS_COMMAND_CODE_ENUM(a,c)    enum_##a,
 #define EXPAND_AS_STRUCT(a,b)               char a;
 #define EXPAND_AS_JUMPTABLE(a,b)            {&cmd_##a,""#a""},
-#define EXPAND_AS_PROTOTYPES(a,b)           void cmd_##a(char*);
+#define EXPAND_AS_PROTOTYPES(a,b)           CMD_FUNC(a);
 #define EXPAND_AS_DESCRIPTIONS(a,b)         b,
 
 enum {
@@ -52,5 +54,6 @@ typedef  struct{
 #define NUMBER_OF_COMMANDS sizeof(size_struct_t)
 
 COMMAND_TABLE(EXPAND_AS_PROTOTYPES)
+
 
 #endif /* APP_TERMINAL_H_ */
