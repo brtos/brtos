@@ -12,11 +12,12 @@ typedef uint16_t tick_t;
 
 #if (PROCESSOR == X86)
 #include <stdio.h>
-#include <assert.h>
 #include <string.h>
 #include <stdlib.h>
 
 #define PRINTF(...) printf(__VA_ARGS__);
+#if 0
+#include <assert.h>
 void __cdecl _assert(const char *_Message, const char *_File, unsigned _Line)
 {
  	PRINTF("Test failed at line %d\r\n", _Line);
@@ -25,8 +26,8 @@ void __cdecl _assert(const char *_Message, const char *_File, unsigned _Line)
 
  	exit(0);
 }
-
-#define TEST_ASSERT(x)  //assert(x);
+#define TEST_ASSERT(x)   assert(x);
+#endif
 #endif
 
 /* config TEST_ASSERT( macro */
