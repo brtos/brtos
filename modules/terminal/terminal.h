@@ -24,6 +24,7 @@ enum
 #define ETX  0x03
 #define EOT  0x04
 void term_putchar_install(char (*_putchar_func)(char));
+void terminal_init(char (*_putchar_func)(char));
 
 typedef char (*term_input)(char);
 void terminal_set_input (term_input _input);

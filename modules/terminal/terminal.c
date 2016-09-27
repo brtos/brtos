@@ -18,15 +18,15 @@ static char __putchar_buf(char c)
 	printf_buf[printf_idx++%PRINTF_BUFSIZE] = c;
 	return c;
 }
-
-static char (*putchar_func)(char) = __putchar_buf;
+#endif
+static char (*putchar_func)(char);
 
 void term_putchar_install(char (*_putchar_func)(char))
 {
 	if(_putchar_func == NULL) return;
 	putchar_func = _putchar_func;
 }
-#endif
+
 
 #define STRCMP(a,b)		strcmp(a,b)
 #define TERM_FLUSH(a)	memset(a,0x00, sizeof(a))
@@ -39,7 +39,20 @@ void terminal_set_input (term_input _input)
 	input = _input;
 }
 
+void terminal_init(char (*_putchar_func)(char))
+{
+	#ifdef TERM_PRINT
+	printf_install_putchar(_putchar_func);
+	#endif
+	term_putchar_install(_putchar_func);
+	putchar_func('\n');
+	putchar_func('\r');
+	putchar_func('>');
+	putchar_func('>');
+}
+
 static int term_in_idx = 0;
+static int term_tmp_idx = 0;
 static char term_in[TERM_INPUT_BUFSIZE];
 
 char terminal_input (char c)
@@ -49,22 +62,45 @@ char terminal_input (char c)
 		input(c);
 	}
 
-	if ((c=='\b' || c==0x7F) && term_in_idx > 0)
-	{
-		term_in[term_in_idx--] = '\0';
-		return 0;
+	if (c != 0x7F){
+		putchar_func(c);
+		if (c != 13){
+			if (term_tmp_idx >= 0){
+				term_tmp_idx++;
+			}else{
+				term_tmp_idx = 1;
+			}
+		}else{
+			term_tmp_idx = 0;
+		}
+	}else{
+		term_tmp_idx--;
+		if (term_tmp_idx >= 0){
+			putchar_func(c);
+		}
 	}
-	else
-	{
-		term_in[term_in_idx++] = c;
-		if(c == '\n' || c == '\r' || (term_in_idx==(TERM_INPUT_BUFSIZE-1)))
+
+
+	if (term_tmp_idx >= 0){
+		if ((c=='\b' || c==0x7F) && term_in_idx > 0)
 		{
-			term_in[term_in_idx-1]='\0';
-			return 1;
-		}else
-		{
+			term_in[term_in_idx--] = '\0';
 			return 0;
 		}
+		else
+		{
+			term_in[term_in_idx++] = c;
+			if(c == '\n' || c == '\r' || (term_in_idx==(TERM_INPUT_BUFSIZE-1)))
+			{
+				term_in[term_in_idx-1]='\0';
+				return 1;
+			}else
+			{
+				return 0;
+			}
+		}
+	}else{
+		return 0;
 	}
 }
 
@@ -160,7 +196,7 @@ void *terminal_process(void)
 
 		TERM_PRINT("\r\n");
 		ret = cmds[c].cmd_func(argc, argv);
-		TERM_PRINT("\r\n");
+		TERM_PRINT("\r\n>>");
 	}
 
 	TERM_FLUSH(term_in);
