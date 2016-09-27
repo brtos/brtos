@@ -307,9 +307,9 @@ void OSAvailableMemory(char *string)
 
     string += mem_cpy(string, "\n\r***** BRTOS Memory Info *****\n\r");
 #if (!BRTOS_DYNAMIC_TASKS_ENABLED)
-    string += mem_cpy(string, "STATIC TASK MEMORY HEAP:  ");
+    string += mem_cpy(string, "STATIC TASK MEMORY HEAP:   ");
 #else
-    string += mem_cpy(string, "DYNAMIC MEMORY HEAP:      ");
+    string += mem_cpy(string, "DYNAMIC MEMORY HEAP:       ");
 #endif
 
     UserEnterCritical();
@@ -330,11 +330,8 @@ void OSAvailableMemory(char *string)
     string += mem_cpy(string, PrintDecimal(DYNAMIC_HEAP_SIZE, str));
 	#endif
 
-#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
-    string += mem_cpy(string, "\n\rQUEUE MEMORY HEAP: ");
-#else
-    string += mem_cpy(string, "\n\rSTATIC QUEUE MEMORY HEAP: ");
-#endif
+#if (QUEUE_HEAP_SIZE > 0)
+    string += mem_cpy(string, "\n\rSTATIC QUEUE MEMORY HEAP:  ");
 
     UserEnterCritical();
     address = iQueueAddress * sizeof(OS_CPU_TYPE);
@@ -346,7 +343,17 @@ void OSAvailableMemory(char *string)
     string += mem_cpy(string, " of ");
 
     string += mem_cpy(string, PrintDecimal(QUEUE_HEAP_SIZE, str));
+#endif
     string += mem_cpy(string, "\n\r");
+
+	#if ((BRTOS_DYNAMIC_QUEUE_ENABLED == 1) && (!BRTOS_DYNAMIC_TASKS_ENABLED))
+    	string += mem_cpy(string, "DYNAMIC QUEUE MEMORY HEAP: ");
+    	(void)PrintDecimal((int16_t)OSGetUsedHeapSize(), str);
+    	string += mem_cpy(string, &str[2]);
+    	string += mem_cpy(string, " of ");
+    	string += mem_cpy(string, PrintDecimal(DYNAMIC_HEAP_SIZE, str));
+    	string += mem_cpy(string, "\n\r");
+	#endif
 
     // End of string
     *string = '\0';
