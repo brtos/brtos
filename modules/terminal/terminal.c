@@ -53,7 +53,9 @@ void terminal_init(char (*_putchar_func)(char))
 
 static int term_in_idx = 0;
 static int term_tmp_idx = 0;
+static char discard_char = 0;
 static char term_in[TERM_INPUT_BUFSIZE];
+static char last_term_in[TERM_INPUT_BUFSIZE];
 
 char terminal_input (char c)
 {
@@ -63,7 +65,21 @@ char terminal_input (char c)
 	}
 
 	if (c != 0x7F){
-		putchar_func(c);
+		if (c != '\033'){
+			if (!discard_char){
+				putchar_func(c);
+			}else{
+				discard_char--;
+				if (!discard_char){
+					c = '\033';
+				}else{
+					return 0;
+				}
+			}
+		}else{
+			discard_char = 2;
+			return 0;
+		}
 		if (c != 13){
 			if (term_tmp_idx >= 0){
 				term_tmp_idx++;
@@ -89,14 +105,40 @@ char terminal_input (char c)
 		}
 		else
 		{
-			term_in[term_in_idx++] = c;
-			if(c == '\n' || c == '\r' || (term_in_idx==(TERM_INPUT_BUFSIZE-1)))
-			{
-				term_in[term_in_idx-1]='\0';
-				return 1;
-			}else
-			{
-				return 0;
+			// if up key pressed
+			if (c == '\033'){
+  			  // erase last chars in case of up key pressed
+  			  while(term_in_idx)
+  			  {
+  				  putchar_func(0x7F);
+  				  term_in_idx--;
+  			  }
+  			  char *cp = last_term_in;
+  			  if (*cp){
+				  while(*cp){
+					  putchar_func(*cp++);
+				  }
+				  cp = last_term_in;
+				  term_in_idx = 0;
+				  while(*cp)
+				  {
+					  term_in[term_in_idx] = last_term_in[term_in_idx];
+					  term_in_idx++;
+					  cp++;
+				  }
+				  term_in[term_in_idx] = '\0';
+  			  }
+			  return 0;
+			}else{
+				term_in[term_in_idx++] = c;
+				if(c == '\n' || c == '\r' || (term_in_idx==(TERM_INPUT_BUFSIZE-1)))
+				{
+					term_in[term_in_idx-1]='\0';
+					return 1;
+				}else
+				{
+					return 0;
+				}
 			}
 		}
 	}else{
@@ -196,6 +238,14 @@ void *terminal_process(void)
 
 		TERM_PRINT("\r\n");
 		ret = cmds[c].cmd_func(argc, argv);
+	    // copy last command
+	    int cpi=0;
+	    while(term_in[cpi])
+	    {
+	      last_term_in[cpi] = term_in[cpi];
+		  cpi++;
+	    }
+	    last_term_in[cpi] = '\0';
 		TERM_PRINT("\r\n>>");
 	}
 
