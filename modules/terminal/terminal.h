@@ -14,6 +14,14 @@ typedef struct
    const char* cmd_name;
 }cmd_t;
 
+typedef struct _dcmd_t
+{
+	pf_cmd cmd_func;
+	char* cmd_name;
+	char* cmd_description;
+	struct _dcmd_t *next;
+}dcmd_t;
+
 enum
 {
 	CMD_OK,
@@ -25,6 +33,7 @@ enum
 #define EOT  0x04
 void term_putchar_install(char (*_putchar_func)(char));
 void terminal_init(char (*_putchar_func)(char));
+void terminal_add_cmd(dcmd_t *handler, pf_cmd cmd, char *name, char *description);
 
 typedef char (*term_input)(char);
 void terminal_set_input (term_input _input);

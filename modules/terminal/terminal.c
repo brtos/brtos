@@ -33,6 +33,7 @@ void term_putchar_install(char (*_putchar_func)(char))
 
 
 static term_input input = NULL;
+dcmd_t *cmd_head = NULL;
 
 void terminal_set_input (term_input _input)
 {
@@ -54,6 +55,7 @@ void terminal_init(char (*_putchar_func)(char))
 static int term_in_idx = 0;
 static int term_tmp_idx = 0;
 static char discard_char = 0;
+static volatile int cpi=0;
 static char term_in[TERM_INPUT_BUFSIZE];
 static char last_term_in[TERM_INPUT_BUFSIZE];
 
@@ -113,18 +115,17 @@ char terminal_input (char c)
   				  putchar_func(0x7F);
   				  term_in_idx--;
   			  }
-  			  char *cp = last_term_in;
-  			  if (*cp){
-				  while(*cp){
-					  putchar_func(*cp++);
+  			  term_in_idx = 0;
+  			  if (last_term_in[0]){
+				  while(term_in_idx <= cpi){
+					  putchar_func(last_term_in[term_in_idx++]);
 				  }
-				  cp = last_term_in;
+
 				  term_in_idx = 0;
-				  while(*cp)
+				  while(term_in_idx <= cpi)
 				  {
 					  term_in[term_in_idx] = last_term_in[term_in_idx];
 					  term_in_idx++;
-					  cp++;
 				  }
 				  term_in[term_in_idx] = '\0';
   			  }
@@ -180,6 +181,19 @@ static uint8_t search_cmd (char * c)
 	  }
 	}
   }
+  // Teste dos comandos dinâmicos
+  if (cmd_head != NULL){
+	dcmd_t *cmd_p = cmd_head;
+	uint8_t idx = NUMBER_OF_COMMANDS;
+	while(cmd_p != NULL){
+		if (STRCMP(cmd_p->cmd_name,c) == 0){
+			return idx;
+		}
+		cmd_p = cmd_p->next;
+		idx++;
+	}
+  }
+
   return 0; // command index not found, return default index 0
 }
 
@@ -202,6 +216,15 @@ CMD_FUNC(help)
 	{
 			TERM_PRINT("%s : ", cmds[c].cmd_name);
 			TERM_PRINT("%s\n\r", ListOfCmdDesc[c]);
+	}
+	// Teste dos comandos dinâmicos
+	if (cmd_head != NULL){
+		dcmd_t *cmd_p = cmd_head;
+		while(cmd_p != NULL){
+			TERM_PRINT("%s : ", cmd_p->cmd_name);
+			TERM_PRINT("%s\n\r", cmd_p->cmd_description);
+			cmd_p = cmd_p->next;
+		}
 	}
 	TERM_PRINT("----------------\n\r");
 #endif
@@ -237,12 +260,26 @@ void *terminal_process(void)
 		c = search_cmd(argv[0]);
 
 		TERM_PRINT("\r\n");
-		ret = cmds[c].cmd_func(argc, argv);
+		if (c < NUMBER_OF_COMMANDS){
+			ret = cmds[c].cmd_func(argc, argv);
+		}else{
+			int idx = c - NUMBER_OF_COMMANDS;
+			dcmd_t *cmd_p = cmd_head;
+			while(idx){
+				cmd_p = cmd_p->next;
+				idx--;
+			}
+			ret = cmd_p->cmd_func(argc, argv);
+		}
 	    // copy last command
-	    int cpi=0;
-	    while(term_in[cpi])
+	    cpi=0;
+	    while((term_in[cpi] != 0) || (term_in[cpi+1] != 0))
 	    {
-	      last_term_in[cpi] = term_in[cpi];
+	      if (!term_in[cpi]){
+	    	  last_term_in[cpi] = 0x20;
+	      }else{
+	    	  last_term_in[cpi] = term_in[cpi];
+	      }
 		  cpi++;
 	    }
 	    last_term_in[cpi] = '\0';
@@ -254,3 +291,18 @@ void *terminal_process(void)
 	return (void *)ret;
 }
 
+void terminal_add_cmd(dcmd_t *handler, pf_cmd cmd, char *name, char *description){
+	dcmd_t *cmd_p = cmd_head;
+	if (cmd_head == NULL){
+		cmd_head = handler;
+	}else{
+		while(cmd_p->next != NULL){
+			cmd_p = cmd_p->next;
+		}
+		cmd_p->next = handler;
+	}
+	handler->cmd_func = cmd;
+	handler->cmd_name = name;
+	handler->cmd_description = description;
+	handler->next = NULL;
+}
