@@ -42,7 +42,7 @@ void terminal_set_input (term_input _input)
 
 void terminal_init(char (*_putchar_func)(char))
 {
-	#ifdef TERM_PRINT
+	#if defined(TERM_PRINT) && defined(CUSTOM_PRINTF)
 	printf_install_putchar(_putchar_func);
 	#endif
 	term_putchar_install(_putchar_func);
@@ -67,19 +67,19 @@ char terminal_input (char c)
 	}
 
 	if (c != 0x7F){
-		if (c != UP_KEY_CHAR){
+		if (c != '\033'){
 			if (!discard_char){
 				putchar_func(c);
 			}else{
 				discard_char--;
 				if (!discard_char){
-					c = UP_KEY_CHAR;
+					c = '\033';
 				}else{
 					return 0;
 				}
 			}
 		}else{
-			discard_char = CHARS_TO_DISCARD;
+			discard_char = 2;
 			return 0;
 		}
 		if (c != 13){
@@ -108,7 +108,7 @@ char terminal_input (char c)
 		else
 		{
 			// if up key pressed
-			if (c == UP_KEY_CHAR){
+			if (c == '\033'){
   			  // erase last chars in case of up key pressed
   			  while(term_in_idx)
   			  {
