@@ -67,19 +67,19 @@ char terminal_input (char c)
 	}
 
 	if (c != 0x7F){
-		if (c != '\033'){
+		if (c != UP_KEY_CHAR){
 			if (!discard_char){
 				putchar_func(c);
 			}else{
 				discard_char--;
 				if (!discard_char){
-					c = '\033';
+					c = UP_KEY_CHAR;
 				}else{
 					return 0;
 				}
 			}
 		}else{
-			discard_char = 2;
+			discard_char = CHARS_TO_DISCARD;
 			return 0;
 		}
 		if (c != 13){
@@ -108,7 +108,7 @@ char terminal_input (char c)
 		else
 		{
 			// if up key pressed
-			if (c == '\033'){
+			if (c == UP_KEY_CHAR){
   			  // erase last chars in case of up key pressed
   			  while(term_in_idx)
   			  {
