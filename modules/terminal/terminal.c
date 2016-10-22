@@ -281,6 +281,7 @@ void *terminal_process(void)
 	    	  last_term_in[cpi] = term_in[cpi];
 	      }
 		  cpi++;
+		  term_tmp_idx++;
 	    }
 	    last_term_in[cpi] = '\0';
 		TERM_PRINT("\r\n>>");
