@@ -122,12 +122,16 @@ char terminal_input (char c)
 				  }
 
 				  term_in_idx = 0;
+				  term_tmp_idx = 0;
 				  while(term_in_idx <= cpi)
 				  {
 					  term_in[term_in_idx] = last_term_in[term_in_idx];
 					  term_in_idx++;
+					  term_tmp_idx++;
 				  }
+				  term_tmp_idx--;
 				  term_in[term_in_idx] = '\0';
+				  term_in_idx--;
   			  }
 			  return 0;
 			}else{
@@ -281,7 +285,6 @@ void *terminal_process(void)
 	    	  last_term_in[cpi] = term_in[cpi];
 	      }
 		  cpi++;
-		  term_tmp_idx++;
 	    }
 	    last_term_in[cpi] = '\0';
 		TERM_PRINT("\r\n>>");
