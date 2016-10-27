@@ -604,7 +604,9 @@ void PreInstallTasks(void)
   NumberOfInstalledTasks = 0;
   TaskAlloc = 0;
   iStackAddress = 0;
+#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
   StackAddress = (stack_pointer_t) &STACK;
+#endif
   
   for(i=0;i<configMAX_TASK_INSTALL;i++)
   {
