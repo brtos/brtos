@@ -1290,9 +1290,9 @@ uint8_t OSUnBlockMultipleTask(uint8_t TaskStart, uint8_t TaskNumber)
 
    // Fill the virtual task stack
    #if (TASK_WITH_PARAMETERS == 1)
-   Task->StackPoint = CreateDVirtualStack(FctPtr, (OS_CPU_TYPE)Stack + USER_STACKED_BYTES, parameters);
+   Task->StackPoint = CreateDVirtualStack(FctPtr, (OS_CPU_TYPE)Stack, USER_STACKED_BYTES, parameters);
    #else
-   Task->StackPoint = CreateDVirtualStack(FctPtr, (OS_CPU_TYPE)Stack + USER_STACKED_BYTES);
+   Task->StackPoint = CreateDVirtualStack(FctPtr, (OS_CPU_TYPE)Stack, USER_STACKED_BYTES);
    #endif
 
    Task->StackSize = USER_STACKED_BYTES;

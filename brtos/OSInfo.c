@@ -164,7 +164,11 @@ void OSTaskList(char *string)
 					  break;
 				  }
 				  sp_address++;
-			  }while((uint32_t)sp_address <= ContextTask[j].StackInit);			  
+			  #if (WATERMARK == 1) && (BRTOS_DYNAMIC_TASKS_ENABLED == 1)
+			  }while((uint32_t)sp_address <= ContextTask[j].StackPoint);
+              #else
+			  }while((uint32_t)sp_address <= ContextTask[j].StackInit);
+			  #endif
 			  #else
 			  i = 0;
 			  while(i<16)
