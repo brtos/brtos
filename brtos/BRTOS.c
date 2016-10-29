@@ -105,7 +105,7 @@ uint16_t iStackAddress = 0;                       ///< Virtual stack counter - I
 uint16_t iQueueAddress = 0;                       ///< Queue heap control
 
 #if (!BRTOS_DYNAMIC_TASKS_ENABLED)
-stack_pointer_t StackAddress = (stack_pointer_t) &STACK;           ///< Virtual stack pointer
+stack_pointer_t StackAddress;          ///< Virtual stack pointer
 #endif
 
 
@@ -604,6 +604,9 @@ void PreInstallTasks(void)
   NumberOfInstalledTasks = 0;
   TaskAlloc = 0;
   iStackAddress = 0;
+#if (!BRTOS_DYNAMIC_TASKS_ENABLED)
+  StackAddress = (stack_pointer_t) &STACK;
+#endif
   
   for(i=0;i<configMAX_TASK_INSTALL;i++)
   {
@@ -1287,9 +1290,9 @@ uint8_t OSUnBlockMultipleTask(uint8_t TaskStart, uint8_t TaskNumber)
 
    // Fill the virtual task stack
    #if (TASK_WITH_PARAMETERS == 1)
-   Task->StackPoint = CreateDVirtualStack(FctPtr, (OS_CPU_TYPE)Stack + USER_STACKED_BYTES, parameters);
+   Task->StackPoint = CreateDVirtualStack(FctPtr, (OS_CPU_TYPE)Stack, USER_STACKED_BYTES, parameters);
    #else
-   Task->StackPoint = CreateDVirtualStack(FctPtr, (OS_CPU_TYPE)Stack + USER_STACKED_BYTES);
+   Task->StackPoint = CreateDVirtualStack(FctPtr, (OS_CPU_TYPE)Stack, USER_STACKED_BYTES);
    #endif
 
    Task->StackSize = USER_STACKED_BYTES;

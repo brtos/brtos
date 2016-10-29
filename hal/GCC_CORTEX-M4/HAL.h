@@ -182,9 +182,9 @@ void OS_CPU_SR_Restore(INT32U);
 #endif
 
 #if (TASK_WITH_PARAMETERS == 1)
-  unsigned int CreateDVirtualStack(void(*FctPtr)(void*), unsigned int stk, void *parameters);
+  unsigned int CreateDVirtualStack(void(*FctPtr)(void*), unsigned int stk, unsigned int stk_size, void *parameters);
 #else
-  unsigned int CreateDVirtualStack(void(*FctPtr)(void), unsigned int stk);
+  unsigned int CreateDVirtualStack(void(*FctPtr)(void), unsigned int stk, unsigned int stk_size);
 #endif
 
 /*****************************************************************************************//**
@@ -317,7 +317,6 @@ extern __attribute__((naked)) void SwitchContextToFirstTask(void);
 /// Restore Status Register Define
 #define OS_ENABLE_NESTING()
 ////////////////////////////////////////////////////////////
-
 
 
 
