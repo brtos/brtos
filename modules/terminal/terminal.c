@@ -44,6 +44,8 @@ void terminal_init(char (*_putchar_func)(char))
 {
 	#if defined(TERM_PRINT) && defined(CUSTOM_PRINTF)
 	printf_install_putchar(_putchar_func);
+	#else
+	term_putchar_install(_putchar_func);
 	#endif
 	putchar_func('\n');
 	putchar_func('\r');
