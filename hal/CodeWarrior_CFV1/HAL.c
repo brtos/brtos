@@ -296,12 +296,17 @@ interrupt void SwitchContext(void)
 
 #if (BRTOS_DYNAMIC_TASKS_ENABLED == 1)
 #if (TASK_WITH_PARAMETERS == 1)
-  unsigned int CreateDVirtualStack(void(*FctPtr)(void*), unsigned int stk, void *parameters)
+  unsigned int CreateDVirtualStack(void(*FctPtr)(void*), unsigned int stk, unsigned int stk_size, void *parameters)
 #else
-  unsigned int CreateDVirtualStack(void(*FctPtr)(void), unsigned int stk)
+  unsigned int CreateDVirtualStack(void(*FctPtr)(void), unsigned int stk, unsigned int stk_size)
 #endif
 {
-	OS_CPU_TYPE *stk_pt = (OS_CPU_TYPE *)stk;
+#ifdef WATERMARK
+	unsigned int ret_stk;
+	OS_CPU_TYPE *temp_stk_pt = (OS_CPU_TYPE *)stk;
+	*temp_stk_pt++ = (INT32U)(((NumberOfInstalledTasks + '0') << 24) + 'T' + ('S' << 8) + ('K' << 16));
+#endif
+	OS_CPU_TYPE *stk_pt = (OS_CPU_TYPE *)(stk + stk_size);
 
    // Pointer to Task Entry
    *--stk_pt = (INT32U)FctPtr;
@@ -378,7 +383,16 @@ interrupt void SwitchContext(void)
    
    #endif
    
-   return (unsigned int)stk_pt;
+   
+	#ifdef WATERMARK
+    ret_stk = (unsigned int)stk_pt;
+    do{
+    	*--stk_pt = 0x24242424;
+    }while (stk_pt > temp_stk_pt);
+    return ret_stk;
+	#else
+    return (unsigned int)stk_pt;
+	#endif
 }
 #endif
 

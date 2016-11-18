@@ -35,7 +35,6 @@
 
 #include "OS_types.h"
 #include "hardware.h"
-#include "BRTOSConfig.h"
 
 
 /// Supported processors
@@ -58,7 +57,7 @@
 /// Define if nesting interrupt is active
 #define NESTING_INT 1
 
-//#define TASK_WITH_PARAMETERS 1  // configured in BRTOSConfig.h
+#define TASK_WITH_PARAMETERS 1
 
 /// Define if its necessary to save status register / interrupt info
 #if NESTING_INT == 1
@@ -113,7 +112,7 @@ extern INT32U SPvalue;
 #endif
 
 /// Defines the low power command of the choosen microcontroller
-#define OS_Wait asm(STOP #0x2000);
+#define OS_Wait //asm(STOP #0x2000);
 /// Defines the tick timer interrupt handler code (clear flag) of the choosen microcontroller
 #define TICKTIMER_INT_HANDLER TPM1SC_TOF = 0
 #define TIMER_MODULE  TPM1MOD
@@ -151,6 +150,12 @@ extern INT32U SPvalue;
   void CreateVirtualStack(void(*FctPtr)(void*), INT16U NUMBER_OF_STACKED_BYTES, void *parameters);
 #else
   void CreateVirtualStack(void(*FctPtr)(void), INT16U NUMBER_OF_STACKED_BYTES);
+#endif
+
+#if (TASK_WITH_PARAMETERS == 1)
+  unsigned int CreateDVirtualStack(void(*FctPtr)(void*), unsigned int stk, unsigned int stk_size, void *parameters);
+#else
+  unsigned int CreateDVirtualStack(void(*FctPtr)(void), unsigned int stk, unsigned int stk_size);
 #endif
 
 /*****************************************************************************************//**
