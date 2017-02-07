@@ -37,7 +37,12 @@
   INT16U SPvalue;                             ///< Used to save and restore a task stack pointer
 #endif
 
-
+#if (TICKLESS == 1)
+#define MAX_TICKS	(INT32U)(0x00FFFFFF / ((configCPU_CLOCK_HZ / (INT32U)configTICK_RATE_HZ) - 1))
+  volatile ostick_t time_next_task=0;
+  volatile char normal_run = 1;
+  void OSIncTickLess(void);
+#endif
 
 
 ////////////////////////////////////////////////////////////
@@ -95,7 +100,11 @@ void TickTimer(void)
   // Interrupt handling
   TICKTIMER_INT_HANDLER;
 
+#if (TICKLESS == 1)
+  OSIncTickLess();
+#else
   OSIncCounter();
+#endif
   
   // BRTOS TRACE SUPPORT
   #if (OSTRACE == 1) 
@@ -143,6 +152,53 @@ void TickTimer(void)
 * \brief Software interrupt handler routine (Internal kernel function).
 *  Used to switch the tasks context.
 ****************************************************************/
+#if (TICKLESS == 1)
+void BRTOS_WakeUP(void){
+	  OS_SR_SAVE_VAR
+	  OSEnterCritical();
+
+		if (!normal_run)
+		{
+			// Calcula o tempo de correção
+			INT32U 		module  = (configCPU_CLOCK_HZ / (INT32U)configTICK_RATE_HZ) - 1;
+			volatile ostick_t time = time_next_task-((*(NVIC_SYSTICK_CNT))/module);
+
+			// Corrige o tempo
+			if (time > 0){
+				OSIncCounter(time);
+    			// ************************
+				// Handler code for the tick
+				// ************************
+				OS_TICK_HANDLER();
+			}
+
+			// Configura o timer para o modo normal, um incremento por tick
+			normal_run=1;
+			TickTimerSetup();
+		}
+
+		OSExitCritical();
+}
+
+void OSIncTickLess(void)
+{
+    OS_SR_SAVE_VAR
+
+	OSEnterCritical();
+	if(!normal_run)
+	{
+		normal_run=1;
+
+		OSIncCounter(time_next_task);
+		TickTimerSetup();
+	} else
+	{
+		OSIncCounter(1);
+	}
+	OSExitCritical();
+
+}
+#endif
 
 __attribute__ ((naked)) void SwitchContext(void)
 {
@@ -150,6 +206,10 @@ __attribute__ ((naked)) void SwitchContext(void)
   // Entrada de interrupção
   // ************************
   OS_SAVE_ISR();
+
+#if (TICKLESS == 1)
+  BRTOS_WakeUP();
+#endif
 
   // Interrupt Handling
   Clear_PendSV();
@@ -322,6 +382,68 @@ void OS_CPU_SR_Restore(INT32U SR)
 {
 	__asm volatile ("MSR PRIMASK, %0\n\t" : : "r" (SR) );
 }
+
+#if (TICKLESS == 1)
+void WaitTickless(void){
+	ostick_t  lowWait = MAX_TIMER;
+    ContextType *Task = Head;
+    volatile ostick_t time_tmp = 0;
+
+    UserEnterCritical();
+
+    //Get current tick count
+    volatile ostick_t OS_tick_counter=OSGetTickCount();
+
+    // Disable systick
+    *(NVIC_SYSTICK_CTRL) = 0;
+
+    while(Task != NULL)
+    {
+        if (Task->TimeToWait >= OS_tick_counter)
+        {
+			time_tmp = Task->TimeToWait - OS_tick_counter;
+			if (time_tmp < lowWait)
+			{
+					lowWait = time_tmp;
+			}
+        }
+		#if  (ostick_t != uint64_t)
+        else
+        {
+			time_tmp = Task->TimeToWait + (TICK_COUNT_OVERFLOW - OS_tick_counter);
+			if (time_tmp < lowWait)
+				{
+					lowWait = time_tmp;
+				}
+        }
+		#endif
+        Task = Task->Next;
+    }
+
+    // Reconfigura o timer para acordar somente quanto a tarefa
+   	// mais próxima estiver pronta
+    time_next_task = lowWait;
+	INT32U 		module  = configCPU_CLOCK_HZ / (INT32U)configTICK_RATE_HZ;
+
+	*(NVIC_SYSTICK_CTRL) = 0;			// Disable Sys Tick Timer
+	if (time_next_task > MAX_TICKS) time_next_task = MAX_TICKS;
+	if (time_next_task > 0){
+    *(NVIC_SYSTICK_LOAD) = (module - 1u) * time_next_task;	// Set tick timer module
+	}else{
+	    *(NVIC_SYSTICK_LOAD) = (module - 1u);	// Set tick timer module
+	}
+    *(NVIC_SYSTICK_CTRL) = NVIC_SYSTICK_CLK | NVIC_SYSTICK_INT | NVIC_SYSTICK_ENABLE;
+
+   	// Entra em modo de economia de energia
+	normal_run = 0;
+
+    __asm("DSB");
+    __asm("WFI");
+    __asm("ISB");
+
+    UserExitCritical();
+}
+#endif
 
 
 

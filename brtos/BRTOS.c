@@ -324,11 +324,39 @@ ostick_t OSGetCount(void)
 /////      Update the tick count                       /////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
+#if (TICKLESS == 1)
+void OSIncCounter(ostick_t inc)
+{
+	if(inc !=1)
+	{
+		osdtick_t timeout = (osdtick_t)((osdtick_t)OSTickCounter + (osdtick_t)inc);
+
+        if (sizeof_ostick_t < 8){
+        	if (timeout >= TICK_COUNT_OVERFLOW)
+        	{
+        		OSTickCounter = (ostick_t)(timeout - TICK_COUNT_OVERFLOW);
+        	}
+        	else
+        	{
+        		OSTickCounter = (ostick_t)timeout;
+        	}
+        }else{
+        	OSTickCounter = (ostick_t)timeout;
+        }
+	} else
+	{
+		  OSTickCounter++;
+		  if (OSTickCounter == TICK_COUNT_OVERFLOW) OSTickCounter = 0;
+	}
+}
+#else
+
 void OSIncCounter(void)
 {
 	  OSTickCounter++;
 	  if (OSTickCounter == TICK_COUNT_OVERFLOW) OSTickCounter = 0;
 }
+#endif
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////

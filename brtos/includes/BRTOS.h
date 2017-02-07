@@ -109,7 +109,7 @@
 
 /// Timer defines
 #if  (ostick_t == uint64_t)
-#define MAX_TIMER					0xffffffffffffffff
+#define MAX_TIMER					0xffffffffffffffffULL
 #elif (ostick_t == uint32_t)
 #define MAX_TIMER					0xffffffff
 #else
@@ -631,7 +631,11 @@ ostick_t OSGetCount(void);
 * \brief Update the tick counter.
 * \return NONE
 *********************************************************************************************/
+#if (TICKLESS == 1)
+void OSIncCounter(ostick_t inc);
+#else
 void OSIncCounter(void);
+#endif
 
 /*****************************************************************************************//**
 * \fn void PreInstallTasks(void)

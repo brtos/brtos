@@ -66,6 +66,8 @@
 /// Define if 32 bits register for tick timer will be used
 #define TICK_TIMER_32BITS   1
 
+#define TICKLESS 0
+
 /// Define if nesting interrupt is active
 #define NESTING_INT 1
 
@@ -108,6 +110,7 @@ extern INT32U SPvalue;
 // ARM Cortex-Mx registers
 #define NVIC_SYSTICK_CTRL       		( ( volatile unsigned long *) 0xe000e010 )
 #define NVIC_SYSTICK_LOAD       		( ( volatile unsigned long *) 0xe000e014 )
+#define NVIC_SYSTICK_CNT        		( ( volatile unsigned long *) 0xe000e018 )
 #define NVIC_INT_CTRL           		( ( volatile unsigned long *) 0xe000ed04 )
 #define FPU_FPCCR						( ( volatile unsigned long *) 0xE000EF34 )
 #define NVIC_SYSPRI3					( ( volatile unsigned long *) 0xe000ed20 )
@@ -143,7 +146,12 @@ void OS_CPU_SR_Restore(INT32U);
 #define UserExitCritical()  __asm(" CPSIE I")
 
 /// Defines the low power command of the choosen microcontroller
+#if (TICKLESS == 1)
+void WaitTickless(void);
+#define OS_Wait WaitTickless()
+#else
 #define OS_Wait __asm(" WFI ");
+#endif
 /// Defines the tick timer interrupt handler code (clear flag) of the choosen microcontroller
 #define TICKTIMER_INT_HANDLER
 #define TIMER_MODULE  SYST_RVR
