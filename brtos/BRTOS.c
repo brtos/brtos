@@ -303,16 +303,16 @@ BRTOS_TH OSGetCurrentTaskHandle(void)
 
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
-/////      Get the current task priority               /////
+/////      Get task priority               			   /////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
-OS_CPU_TYPE OSGetCurrentTaskPriority(void)
+OS_CPU_TYPE OSGetTaskPriority(BRTOS_TH task_handle)
 {
 	OS_SR_SAVE_VAR
 	OS_CPU_TYPE task_prio;
 
   	OSEnterCritical();
-	task_prio = (OS_CPU_TYPE)ContextTask[currentTask].Priority;
+	task_prio = (OS_CPU_TYPE)ContextTask[task_handle].Priority;
   	OSExitCritical();
 	return task_prio;
 }
