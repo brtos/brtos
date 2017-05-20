@@ -592,6 +592,14 @@ uint8_t BRTOSStart(void);
 BRTOS_TH OSGetCurrentTaskHandle(void);
 
 /*****************************************************************************************//**
+* \fn BRTOS_TH OSGetCurrentTaskPriority(void)
+* \brief Return the priority of the current task.
+*  The user must call this function in order to receive the current task priority.
+* \return current task priority
+*********************************************************************************************/
+BRTOS_TH OSGetCurrentTaskPriority(void);
+
+/*****************************************************************************************//**
 * \fn uint8_t OSDelayTask(ostick_t time_wait)
 * \brief Wait for a specified period.
 *  A task that calling this function will be suspended for a certain time.
