@@ -584,6 +584,14 @@ void OS_TICK_HANDLER(void);
 uint8_t BRTOSStart(void);
 
 /*****************************************************************************************//**
+* \fn BRTOS_TH OSGetCurrentTaskHandle(void)
+* \brief Return the handle of the current task.
+*  The user must call this function in order to receive the current task handle.
+* \return current task handle
+*********************************************************************************************/
+BRTOS_TH OSGetCurrentTaskHandle(void);
+
+/*****************************************************************************************//**
 * \fn uint8_t OSDelayTask(ostick_t time_wait)
 * \brief Wait for a specified period.
 *  A task that calling this function will be suspended for a certain time.
