@@ -532,10 +532,11 @@ typedef struct
 * \fn uint8_t OSUninstallTask(BRTOS_TH TaskHandle)
 * \brief Uninstall a task from the dynamic memory
 * \param TaskHandle The task handle id
+* \param safety_off TRUE ensures that all system objects used by the task were deleted
 * \return OK Task successfully uninstalled
 * \return NOT_VALID_TASK Not valid task id or task is waiting for an event
 *********************************************************************************************/
-uint8_t OSUninstallTask(BRTOS_TH TaskHandle);
+uint8_t OSUninstallTask(BRTOS_TH TaskHandle, OS_CPU_TYPE safety_off);
 #define UninstallTask OSUninstallTask
 
 /*****************************************************************************************//**
