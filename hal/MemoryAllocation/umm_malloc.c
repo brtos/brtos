@@ -926,5 +926,16 @@ void *umm_malloc( size_t size ) {
 }
 
 
+void *umm_calloc( size_t num, size_t item_size ) {
+  void *ret;
+
+  ret = umm_malloc((size_t)(item_size * num));
+  if (ret){
+      memset(ret, 0x00, (size_t)(item_size * num));
+  }
+
+  return ret;
+}
+
 
 #endif

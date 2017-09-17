@@ -32,6 +32,7 @@ extern size_t __umm_heap_size;
 void *umm_info( void *ptr, int force );
 
 void *umm_malloc( size_t size );
+void *umm_calloc( size_t num, size_t item_size );
 void *umm_realloc( void *ptr, size_t size );
 void umm_free( void *ptr );
 
