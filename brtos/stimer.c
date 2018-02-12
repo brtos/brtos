@@ -75,7 +75,8 @@ static void Descer (BRTOS_TIMER* timers,uint8_t i, uint8_t n)
 {
   uint8_t son;
   do{    
-    if (RIGHT(i) <= n && timers[RIGHT(i)]->timeout < timers[LEFT(i)]->timeout)
+    if ((RIGHT(i) <= n && timers[RIGHT(i)] != NULL && timers[LEFT(i)] != NULL) &&
+    		timers[RIGHT(i)]->timeout < timers[LEFT(i)]->timeout)
     {
        son = RIGHT(i);
     }
@@ -83,12 +84,13 @@ static void Descer (BRTOS_TIMER* timers,uint8_t i, uint8_t n)
 	{
 		son = LEFT(i);
 	}
-    if (son <= n  && timers[son]->timeout < timers[i]->timeout)
+    if ((son <= n && timers[son] != NULL && timers[i] != NULL) &&
+    		(timers[son]->timeout < timers[i]->timeout))
     {
        void* tmp = timers[son];
        timers[son] = timers[i];
        timers[i] = tmp;
-       i=son;     
+       i=son;
     }else break;
   }while(1);
 }
@@ -154,7 +156,7 @@ void BRTOSTimerTask(void *param)
 void BRTOSTimerTask(void)
 #endif
 {
-     
+
      OS_SR_SAVE_VAR
      BRTOS_TIMER p;
      TIMER_CNT   repeat;
@@ -194,38 +196,45 @@ void BRTOSTimerTask(void)
 		if(p!= NULL && p->timeout > OSGetTickCount()){
             while(p!= NULL)
             {
+            	p->state = TIMER_STOPPED;
+
                 // some timer has expired
                 if((p)->func_cb != NULL)
                 {
-                  repeat = (TIMER_CNT)((p)->func_cb()); /* callback */
+                	repeat = (TIMER_CNT)((p)->func_cb()); /* callback */
+                }
+				else
+				{
+					repeat = 0;
+				}
+                OSEnterCritical();
 
-                  OSEnterCritical();
+				if (repeat > 0)
+				{ /* needs to repeat after "repeat" time ? */
+					p->state = TIMER_RUNNING;
+					timeout = (osdtick_t)((osdtick_t)OSGetTickCount() + (osdtick_t)repeat);
+					p->timeout = (TIMER_CNT)timeout;
+					list_tmp = BRTOS_TIMER_VECTOR.future; // add into future list
+					if(list_tmp->count < (BRTOS_MAX_TIMER-1)) list_tmp->count++;
+					list_tmp->timers[list_tmp->count] = p; // insert in the end
+					Subir(list_tmp->timers,list_tmp->count);
+					list->timers[1]=list->timers[list->count]; // remove from current list
+					list->timers[list->count] = NULL;
+					if(list->count > 0) list->count--;
+				}
+				else
+				{
+					p->timeout = 0;
+					p->state = TIMER_NOT_USED; // was _NOT_ALLOCATED
+					p->func_cb = NULL;
+					list->timers[1]=list->timers[list->count]; // remove from current list
+					list->timers[list->count] = NULL;
+					if(list->count > 0) list->count--;
+				}
 
-                  if (repeat > 0)
-                  { /* needs to repeat after "repeat" time ? */
-                	  timeout = (osdtick_t)((osdtick_t)OSGetTickCount() + (osdtick_t)repeat);
-                	  p->timeout = (TIMER_CNT)timeout;
-					  list_tmp = BRTOS_TIMER_VECTOR.future; // add into future list
-					  list_tmp->timers[++list_tmp->count] = p; // insert in the end
-					  Subir(list_tmp->timers,list_tmp->count);
-					  list->timers[1]=list->timers[list->count]; // remove from current list
-					  list->timers[list->count] = NULL;
-					  list->count--;
-                   }
-                   else
-                   {
-                      p->timeout = 0;
-                      p->state = TIMER_NOT_ALLOCATED;
-                      p->func_cb = NULL;
-                      list->timers[1]=list->timers[list->count]; // remove from current list
-                      list->timers[list->count] = NULL;
-                      list->count--;
-                   }
-                 }
-
-                 Descer (list->timers, 1, list->count); // order it
-                 p=list->timers[1];
-                 OSExitCritical();
+                Descer (list->timers, 1, list->count); // order it
+                p=list->timers[1];
+                OSExitCritical();
             }
             if(p==NULL)
             {
@@ -240,51 +249,58 @@ void BRTOSTimerTask(void)
 
         while(p!= NULL && p->timeout <= OSGetTickCount())
         {  
+        	p->state = TIMER_STOPPED;
+
             // some timer has expired
             if((p)->func_cb != NULL) 
-            {                            
-              repeat = (TIMER_CNT)((p)->func_cb()); /* callback */
-              
-              OSEnterCritical(); 
+            {
+            	repeat = (TIMER_CNT)((p)->func_cb()); /* callback */
+            }
+			else
+			{
+				repeat = 0;
+			}
+            OSEnterCritical();
                            
-              if (repeat > 0)
-              { /* needs to repeat after "repeat" time ? */
-            	  timeout = (osdtick_t)((osdtick_t)OSGetTickCount() + (osdtick_t)repeat);
-                  if (timeout >= TICK_COUNT_OVERFLOW)
-                  {
+            if (repeat > 0)
+            { /* needs to repeat after "repeat" time ? */
+            	p->state = TIMER_RUNNING;
+            	timeout = (osdtick_t)((osdtick_t)OSGetTickCount() + (osdtick_t)repeat);
+                if (timeout >= TICK_COUNT_OVERFLOW)
+                {
                     p->timeout = (TIMER_CNT)(timeout - TICK_COUNT_OVERFLOW);                                 
                     list_tmp = BRTOS_TIMER_VECTOR.future; // add into future list
-                    list_tmp->timers[++list_tmp->count] = p; // insert in the end
+					if(list_tmp->count < (BRTOS_MAX_TIMER-1)) list_tmp->count++;
+                    list_tmp->timers[list_tmp->count] = p; // insert in the end
                     Subir(list_tmp->timers,list_tmp->count);                                      
                     list->timers[1]=list->timers[list->count]; // remove from current list
                     list->timers[list->count] = NULL;
-                    list->count--;                    
-                  }
-                  else
-                  {
+					if(list->count > 0) list->count--;
+                }
+                else
+                {
                     p->timeout = (TIMER_CNT)timeout;                  
-                  }                  
-               } 
-               else
-               {
-                  p->timeout = 0;  
-                  p->state = TIMER_NOT_ALLOCATED; 
-                  p->func_cb = NULL;                                  
-                  list->timers[1]=list->timers[list->count]; // remove from current list
-                  list->timers[list->count] = NULL;
-                  list->count--;                
-               }             
-             }
+                }
+            }
+            else
+            {
+                p->timeout = 0;
+                p->state = TIMER_NOT_USED; // was _NOT_ALLOCATED
+                p->func_cb = NULL;
+                list->timers[1]=list->timers[list->count]; // remove from current list
+                list->timers[list->count] = NULL;
+				if(list->count > 0) list->count--;
+            }
              
-             Descer (list->timers, 1, list->count); // order it                         
-             p=list->timers[1];                           
-             OSExitCritical();                           
+            Descer (list->timers, 1, list->count); // order it
+            p=list->timers[1];
+            OSExitCritical();
         }
                 
         if(timeout > TIMER_MAX_COUNTER)
         {
           if(p==NULL)
-          {            
+          {
             /* time to switch lists */
             void* tmp = BRTOS_TIMER_VECTOR.current;                               
             BRTOS_TIMER_VECTOR.current = BRTOS_TIMER_VECTOR.future;
@@ -351,7 +367,7 @@ uint8_t OSTimerSet (BRTOS_TIMER *cbp, FCN_CALLBACK cb, TIMER_CNT time_wait)
     
     OS_SR_SAVE_VAR
     
-    uint8_t i;     
+    uint8_t i;
     BRTOS_TIMER p;
     osdtick_t timeout;
     BRTOS_TMR_T* list;
@@ -375,7 +391,6 @@ uint8_t OSTimerSet (BRTOS_TIMER *cbp, FCN_CALLBACK cb, TIMER_CNT time_wait)
         return(NO_AVAILABLE_EVENT);
       }
       if(BRTOS_TIMER_VECTOR.mem[i].state == TIMER_NOT_ALLOCATED){
-        
         // Exit critical Section
         if (currentTask)
            OSExitCritical();
@@ -396,7 +411,7 @@ uint8_t OSTimerSet (BRTOS_TIMER *cbp, FCN_CALLBACK cb, TIMER_CNT time_wait)
     
        
     if(time_wait > 0)
-    {      
+    {
     
       timeout = (osdtick_t)((osdtick_t)OSGetCount() + (osdtick_t)time_wait);
       
@@ -404,14 +419,16 @@ uint8_t OSTimerSet (BRTOS_TIMER *cbp, FCN_CALLBACK cb, TIMER_CNT time_wait)
       {
         p->timeout = (TIMER_CNT)(timeout - TICK_COUNT_OVERFLOW);
         list = BRTOS_TIMER_VECTOR.future;   // add into future list
-        list->timers[++list->count] = p; // insert in the end                            
+        if(list->count < (BRTOS_MAX_TIMER-1)) list->count++;
+        list->timers[list->count] = p; // insert in the end
         Subir (list->timers, list->count); // order it 
       }
       else
       {
         p->timeout = (TIMER_CNT)timeout;
         list = BRTOS_TIMER_VECTOR.current;  // add into current list
-        list->timers[++list->count] = p; // insert in the end                            
+        if(list->count < (BRTOS_MAX_TIMER-1)) list->count++;
+        list->timers[list->count] = p; // insert in the end
         Subir (list->timers, list->count); // order it 
         
         // may need to change wake time of timer task
@@ -508,14 +525,16 @@ uint8_t OSTimerStart (BRTOS_TIMER p, TIMER_CNT time_wait){
         {
           p->timeout = (TIMER_CNT)(timeout - TICK_COUNT_OVERFLOW);
           list = BRTOS_TIMER_VECTOR.future;   // add into future list
-          list->timers[++list->count] = p; // insert in the end                            
+          if(list->count < (BRTOS_MAX_TIMER-1)) list->count++;
+          list->timers[list->count] = p; // insert in the end
           Subir (list->timers, list->count); // order it 
         }
         else
         {
           p->timeout = (TIMER_CNT)timeout;
           list = BRTOS_TIMER_VECTOR.current;  // add into current list
-          list->timers[++list->count] = p; // insert in the end                            
+          if(list->count < (BRTOS_MAX_TIMER-1)) list->count++;
+          list->timers[list->count] = p; // insert in the end
           Subir (list->timers, list->count); // order it 
           
           // may need to change wake time of timer task
@@ -550,29 +569,28 @@ uint8_t OSTimerStart (BRTOS_TIMER p, TIMER_CNT time_wait){
   \return OK success
   \return NULL_EVENT_POINTER error code
 */
-
 uint8_t OSTimerStop (BRTOS_TIMER p, uint8_t del){
   
   OS_SR_SAVE_VAR
   BRTOS_TMR_T* list;
   uint8_t pos_timer = 0;
-  
+
   if(p != NULL)
   {
   
       if (currentTask)
           OSEnterCritical();
-     
-        
+
         if(p->timeout >= OSGetCount())
-        {                
+        {
            list = BRTOS_TIMER_VECTOR.current;  // remove from current list   
         }
         else
         {
            list = BRTOS_TIMER_VECTOR.future;   // remove from future list
         }  
-        
+
+
         /* search timer index */
         p->state = TIMER_SEARCH;
         for(pos_timer = 1; pos_timer <= list->count; pos_timer++)
@@ -586,20 +604,20 @@ uint8_t OSTimerStop (BRTOS_TIMER p, uint8_t del){
         p->timeout = 0;
         Subir (list->timers, pos_timer); // order it 
         list->timers[1]=list->timers[list->count]; // remove from current list
-        list->timers[list->count] = NULL;
-        list->count--; 
+        list->timers[list->count] = NULL; //// <---- rest problem here!
+        if(list->count > 0)list->count--;
         Descer (list->timers, 1, list->count); // order it
-        
+
         if(del > 0)
-        {                     
-          p->state = TIMER_NOT_ALLOCATED; 
+        {
+          p->state = TIMER_NOT_USED; // was TIMER_NOT_ALLOCATED
           p->func_cb = NULL; 
         }
         else
         {
           p->state = TIMER_STOPPED; 
         }
-         
+
       if (currentTask)               
           OSExitCritical();
       
