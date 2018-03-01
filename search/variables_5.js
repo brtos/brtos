@@ -1,0 +1,20 @@
+var searchData=
+[
+  ['osduty',['OSDuty',['../a00012.html#a6e768acc9af450bd7540c376b04faf97',1,'OSDuty():&#160;BRTOS.c'],['../a00014.html#a6e768acc9af450bd7540c376b04faf97',1,'OSDuty():&#160;BRTOS.c']]],
+  ['osdutytmp',['OSDutyTmp',['../a00012.html#a3b88729a2bfc2e49c96487e07d862b3c',1,'OSDutyTmp():&#160;BRTOS.c'],['../a00014.html#a3b88729a2bfc2e49c96487e07d862b3c',1,'OSDutyTmp():&#160;BRTOS.c']]],
+  ['oseventallocated',['OSEventAllocated',['../a00006.html#a547a484ee9abc2deb15e50594311901e',1,'BRTOS_Sem::OSEventAllocated()'],['../a00004.html#a547a484ee9abc2deb15e50594311901e',1,'BRTOS_Mutex::OSEventAllocated()'],['../a00003.html#a547a484ee9abc2deb15e50594311901e',1,'BRTOS_Mbox::OSEventAllocated()'],['../a00005.html#a547a484ee9abc2deb15e50594311901e',1,'BRTOS_Queue::OSEventAllocated()']]],
+  ['oseventcount',['OSEventCount',['../a00006.html#a7e91feec558959664c59266cca9fe48a',1,'BRTOS_Sem::OSEventCount()'],['../a00005.html#a7e91feec558959664c59266cca9fe48a',1,'BRTOS_Queue::OSEventCount()']]],
+  ['oseventowner',['OSEventOwner',['../a00004.html#aeb92380cae8b5852c791fa2807d8fc48',1,'BRTOS_Mutex']]],
+  ['oseventpointer',['OSEventPointer',['../a00003.html#a71426ab78a30fd363c38a07f4c575080',1,'BRTOS_Mbox::OSEventPointer()'],['../a00005.html#a71426ab78a30fd363c38a07f4c575080',1,'BRTOS_Queue::OSEventPointer()']]],
+  ['oseventstate',['OSEventState',['../a00004.html#acfedac2d5fac347f3371a133b7246a14',1,'BRTOS_Mutex::OSEventState()'],['../a00003.html#acfedac2d5fac347f3371a133b7246a14',1,'BRTOS_Mbox::OSEventState()']]],
+  ['oseventwait',['OSEventWait',['../a00006.html#a842919bfc9c3646e833e28c1f656d1ab',1,'BRTOS_Sem::OSEventWait()'],['../a00004.html#a842919bfc9c3646e833e28c1f656d1ab',1,'BRTOS_Mutex::OSEventWait()'],['../a00003.html#a842919bfc9c3646e833e28c1f656d1ab',1,'BRTOS_Mbox::OSEventWait()'],['../a00005.html#a842919bfc9c3646e833e28c1f656d1ab',1,'BRTOS_Queue::OSEventWait()']]],
+  ['oseventwaitlist',['OSEventWaitList',['../a00006.html#af0058c2a470a61ef2db20ada9dc19535',1,'BRTOS_Sem::OSEventWaitList()'],['../a00004.html#af0058c2a470a61ef2db20ada9dc19535',1,'BRTOS_Mutex::OSEventWaitList()'],['../a00003.html#af0058c2a470a61ef2db20ada9dc19535',1,'BRTOS_Mbox::OSEventWaitList()'],['../a00005.html#af0058c2a470a61ef2db20ada9dc19535',1,'BRTOS_Queue::OSEventWaitList()']]],
+  ['osmaxpriority',['OSMaxPriority',['../a00004.html#a231e080bf363d6b0beec1c6250e6e645',1,'BRTOS_Mutex']]],
+  ['osoriginalpriority',['OSOriginalPriority',['../a00004.html#a3de2cec618a7372a73a24dd8fb397b76',1,'BRTOS_Mutex']]],
+  ['osqend',['OSQEnd',['../a00008.html#adccd1178bb85ef54f12dd5b6da2eeab4',1,'OS_QUEUE']]],
+  ['osqentries',['OSQEntries',['../a00008.html#a1b383c53f46cc41d6fbf626f2b90d645',1,'OS_QUEUE']]],
+  ['osqin',['OSQIn',['../a00008.html#aca0db9c519b6ba866a4aa712467e4f82',1,'OS_QUEUE']]],
+  ['osqout',['OSQOut',['../a00008.html#a9db5efa094efed17689859146cf85979',1,'OS_QUEUE']]],
+  ['osqsize',['OSQSize',['../a00008.html#a91439b7301893e5c458d37eb8cdb1ba5',1,'OS_QUEUE']]],
+  ['osqstart',['OSQStart',['../a00008.html#af8d535ad18df73453515c43c0cfe55c8',1,'OS_QUEUE']]]
+];
